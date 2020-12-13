@@ -98,8 +98,6 @@ export const UserProvider = (props) => {
 
     return (
         <>
-            <div>Loading: {session.loading}</div>
-            <div>UID: {session.user?.uid}</div>
             <UserContext.Provider value={session} >
                 {!session.loading && props.children}
             </UserContext.Provider>
