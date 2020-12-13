@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { Link, Grid, IconButton, Icon, TextField, Button, FormControl, makeStyles } from '@material-ui/core'
+import React, { useState, useEffect } from 'react'
+import { Grid, IconButton, Icon, TextField, Button, makeStyles } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete';
 import { getDocument, updateDocument, addCollection, deleteCollection } from '../firebase/storage'
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -46,7 +46,7 @@ function DocumentView({ path, onPathChange, editing }) {
             setDoc(null)
             return null
         }
-    }, [dbKey, editing])
+    }, [dbKey, editing, documentId])
 
 
     const handleClick = (subCollectionName) => {
@@ -109,7 +109,7 @@ function EditAttributes( { doc, dbKey } ) {
                 append({name: attribute, value: doc.thing[attribute]})
             })
           }
-      }, [doc, dbKey])
+      }, [doc, dbKey, append, remove])
        
 
     const onSave = (data) => {
@@ -184,7 +184,6 @@ function EditAttributes( { doc, dbKey } ) {
 
 function EditDocChildren( { doc, dbKey }) {
 
-    const classes = useStyles();
     const { register, handleSubmit, reset, errors} = useForm()
     
 
@@ -224,11 +223,11 @@ function EditDocChildren( { doc, dbKey }) {
             <TextField name='newCollection' label="New collection" inputRef={register({
                 validate: value => {
                         console.log('validate ', value, doc.meta.children )
-                        if(value == 'meta') {
+                        if(value === 'meta') {
                             return false
                         }
                         if(doc?.meta?.children) {
-                            return !doc?.meta?.children.some( child => value == child ) || 'Child name must be uniqe'
+                            return !doc?.meta?.children.some( child => value === child ) || 'Child name must be uniqe'
                         }
                         return true
                     }

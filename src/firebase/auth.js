@@ -15,3 +15,9 @@ export const signin = async ({ email, password}) => {
     const resp = await firebase.auth().signInWithEmailAndPassword(email, password)
     return resp.user
 }
+
+export const signInWithCustomToken = async (token) => {
+    const resp = await firebase.auth().signInWithCustomToken(token)
+
+    return resp
+}

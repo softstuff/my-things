@@ -8,8 +8,8 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
-    "eslint-plugin-react-hooks": "^4.2.0",
     "firebase": "^8.1.1",
+    "query-string": "^6.13.7",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-hook-form": "^6.12.1",
@@ -25,7 +25,6 @@
     "deploy:firestore": "firebase deploy --only firestore:rules",
     "deploy:hosting": "firebase deploy --only hosting",
     "deploy": "firebase deploy"
-    
   },
   "eslintConfig": {
     "extends": [

@@ -1,9 +1,14 @@
 const functions = require('firebase-functions');
+const connectApp = require('./connect-app')
+const express = require("express");
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+
+const app = express()
+  .use('/api', express.static('public'))
+  .post('/api/hooks/jira/installed', connectApp.handleInstall)
+  ///.post('/api/hooks/jira/uninstalled', handleAuth, handleUninstall)
+
+  .get('/api/auth/jira/login', connectApp.handleTokenExchange) 
+
+exports.api = functions
+    .https.onRequest(app)

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { firestore } from '../firebase/config'
-import { Paper, Grid, makeStyles, Breadcrumbs, Link, FormControlLabel, Switch } from '@material-ui/core'
+import { Paper, Grid, makeStyles, FormControlLabel, Switch } from '@material-ui/core'
 import DocumentView from '../components/DocumentView';
 import ThingsBreadcrumbs from '../components/ThingsBreadcrumbs';
 
@@ -88,8 +88,8 @@ function CollectionList({ path, onPathChange }) {
         const colRef = firestore.collection(dbKey)
         const unsubscribe = colRef.onSnapshot((snapshot) => {
 
-            const metaData = snapshot.docs.find( doc => doc.id == 'meta')
-            const data = snapshot.docs.filter(doc => doc.id != 'meta').map((doc) => {
+            const metaData = snapshot.docs.find( doc => doc.id === 'meta')
+            const data = snapshot.docs.filter(doc => doc.id !== 'meta').map((doc) => {
                 return doc.id
             })
             setCollection({ 
@@ -114,7 +114,7 @@ function CollectionList({ path, onPathChange }) {
                 <h2>{collectionPath[collectionPath.length -1]} ({collection.keys.length})</h2>
                 <ol>
                     {collection.keys
-                        .filter(name => name != 'meta')
+                        .filter(name => name !== 'meta')
                         .map((key, index) => 
                             <CollectionItem key={index} name={key} onClick={() => handleClick(key)} />)}
                 </ol>

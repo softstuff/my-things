@@ -68,3 +68,22 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `yarn build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+#Atlassian
+
+https://developer.atlassian.com/cloud/jira/platform/about-the-connect-javascript-api/
+
+https://bitbucket.org/atlassian/atlassian-connect-express/src/master/
+
+https://googleapis.dev/nodejs/firestore/latest/Firestore.html
+
+http://expressjs.com/en/api.html
+
+## Setup service account
+First run the firebase init functionn to create the service account
+Enable IAM API
+In IAM admin > service account menu select {project}@appspot.gserviceaccount.com
+Permissions > Grant access
+New member > {project}@appspot.gserviceaccount.com
+Add another role > Service Accounts > Service Account Token Creator

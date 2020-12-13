@@ -12,25 +12,28 @@ import Signin from "./pages/Signin"
 import Profile from "./pages/Profile";
 import Editor from "./pages/Editor";
 import Header from "./Header"
+import Jira from "./pages/Jira";
 
 function App() {
   return (
-    <UserProvider>
-      <BrowserRouter>
+    
+    <BrowserRouter>
+      <UserProvider>
         <Container maxWidth="lg">
           <Header></Header>
           <Switch>
             <ProfileRedirect exact path="/signup" component={Signup} />
             <ProfileRedirect exact path="/signin" component={Signin} />
             <Route exact path="/editor" component={Editor} />
+            <Route path="/jira" component={Jira} />
             <Route path="/profile" component={Profile} />
             <Route path="/">
               <Redirect to="/signin" />
             </Route>
           </Switch>
         </Container>
-      </BrowserRouter>
-    </UserProvider>
+      </UserProvider>
+    </BrowserRouter>
   );
 }
 
