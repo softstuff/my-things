@@ -23,13 +23,17 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-function Header() {
-    const { user } = useSession()    
+function Header(props) {
+    const { user, jira } = useSession()    
     const classes = useStyles();
     
+    if (jira) {
+        console.log('Hide Header menu on Jira setup')
+        return null
+    }
     return (
         <div className={classes.root}>
-            <AppBar position="static">
+            <AppBar position="static" className={props.appBar}>
                 <Toolbar>
                     <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
                         <MenuIcon />

@@ -29,11 +29,12 @@ function DocumentView({ path, onPathChange, editing }) {
     const dbKey = path.join('/')
 
     useEffect(() => {
+        console.log(`Changed dbKey: ${dbKey}, editing: ${editing}, documentId: ${documentId}`)
         if (!!documentId) {
             
             const onLoaded = (data) => {
                 console.log(`Document ${dbKey} is loaded`, data)
-                setDoc(data)
+                setDoc(()=> data)
             }
             const onError = (error) => {
                 console.log(`Failed to load document ${dbKey}`, error)
@@ -46,7 +47,8 @@ function DocumentView({ path, onPathChange, editing }) {
             setDoc(null)
             return null
         }
-    }, [dbKey, editing, documentId])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dbKey])
 
 
     const handleClick = (subCollectionName) => {
@@ -109,7 +111,8 @@ function EditAttributes( { doc, dbKey } ) {
                 append({name: attribute, value: doc.thing[attribute]})
             })
           }
-      }, [doc, dbKey, append, remove])
+          // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [doc, dbKey])
        
 
     const onSave = (data) => {

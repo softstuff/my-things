@@ -31,7 +31,7 @@ export const UserProvider = (props) => {
                 console.log('fetch clames')
                 const tokenResult = await user.getIdTokenResult(true)
 
-                setSession(session => ({
+                const newSession = {
                     ...session,
                     user: {
                         displayName: user.displayName,
@@ -47,14 +47,18 @@ export const UserProvider = (props) => {
                     },
                     signInProvider: tokenResult.signInProvider,
                     authTime: tokenResult.authTime,
-                    jira: {
+                    loading: false
+                }
+                if(query.xdm_e){
+                    newSession.jira = {
                         lic: query.lic,
                         channel: query.xdm_c,
                         domain: query.xdm_e
-                    },
-                    loading: false
-                }))
-                console.log('done login', session)
+                    }
+                }
+
+                setSession(session => newSession)
+                console.log('done login', newSession)
 
             } else {
 
