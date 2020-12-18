@@ -24,7 +24,10 @@
     "eject": "react-scripts eject",
     "deploy:firestore": "firebase deploy --only firestore:rules",
     "deploy:hosting": "firebase deploy --only hosting",
-    "deploy": "firebase deploy"
+    "deploy": "firebase deploy",
+    "emulator": "firebase emulators:start --import emulator-snapshot --export-on-exit emulator-snapshot",
+    "emulator:debgger": "firebase emulators:start --import emulator-snapshot --export-on-exit emulator-snapshot --inspect-functions 9229",
+    "emulator:fresh": "firebase emulators:start --export-on-exit emulator-snapshot"
   },
   "eslintConfig": {
     "extends": [

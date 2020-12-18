@@ -3,6 +3,7 @@ import firebase from 'firebase/app'
 import queryString from 'query-string'
 import { useLocation } from 'react-router-dom'
 import { signInWithCustomToken } from './auth'
+import { EmojiObjects } from '@material-ui/icons'
 
 export const UserContext = React.createContext()
 
@@ -19,7 +20,7 @@ export const UserProvider = (props) => {
 
         const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
 
-            setSession(session => ({ ...session, loading: true }))
+            // setSession(session => ({ ...session, loading: true }))
 
             const query = queryString.parse(location.search)
         
@@ -28,8 +29,8 @@ export const UserProvider = (props) => {
 
             if (user) {
 
-                console.log('fetch clames')
                 const tokenResult = await user.getIdTokenResult(true)
+                console.log('fetched clames', tokenResult, tokenResult.claims)
 
                 const newSession = {
                     ...session,
@@ -41,14 +42,15 @@ export const UserProvider = (props) => {
                         providerId: user.providerId,
                         uid: user.uid
                     },
-                    claims: {
-                        tenantId: tokenResult.claims.tenantId,
-                        accountId: tokenResult.claims.accountId
-                    },
                     signInProvider: tokenResult.signInProvider,
                     authTime: tokenResult.authTime,
+                    claims: {},
                     loading: false
                 }
+                Object.keys(tokenResult.claims).filter( claim => claim.startsWith('x_mt_')).forEach(key => {
+                    newSession.claims[key] = tokenResult.claims[key]
+                    console.log(`Adding app claims ${key} = ${tokenResult.claims[key]}`)
+                });
                 if(query.xdm_e){
                     newSession.jira = {
                         lic: query.lic,
@@ -62,10 +64,13 @@ export const UserProvider = (props) => {
 
             } else {
 
+                //TODO use AP.context.getToken() instead to get away with not validation the QSH claims
                 if (query.jwt) {
                     try {
-                        console.log('Found a Jira JWT exchanging tokens')
-                        const res = await fetch(`/api/auth/jira/login?jwt=${query?.jwt}`)
+                        debugger
+                        const freshToken = await window.AP.context.getToken()
+                        console.log('Found a Jira JWT exchanging tokens, freshToken', freshToken)
+                        const res = await fetch(`/api/auth/jira/login?jwt=${freshToken}`)
                         const body = await res.json()
                         console.log('Token exchange, got result', body)
                         const customToken = body.customToken
