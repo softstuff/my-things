@@ -1,27 +1,45 @@
 const jwtParser = require('atlassian-jwt')
-
+//const firebase = require("firebase/app");
+//import "firebase/functions";
+const functions = require('firebase-functions');
 // The Firebase Admin SDK to access Cloud Firestore.
 const admin = require('firebase-admin');
-admin.initializeApp();
+const jiraApi = require('./jira-api')
+
+admin.initializeApp({ projectId: "my-things-60357" });
 
 const firestore = admin.firestore()
-
-const functions = require('firebase-functions');
+const auth = admin.auth()
 const logger = functions.logger
+
 const { Addon, AuthError } = require('atlassian-connect-auth')
 const { validateToken, extractToken, validateQsh } = require('atlassian-connect-auth/lib/util')
 
-
 const addon = new Addon({
-    baseUrl: 'https://my-things-60357.web.app',
+    baseUrl: process.env.NGROK_URL || functions.config().jira.app.baseurl,
     product: 'jira',
 })
+
+
+
 
 const handleInstall = async (req, res) => {
 
     try {
         
-        logger.debug(`handleInstall body:`, req.body)
+        logger.debug(`handleInstall req.path: ${req.path}, req.originalUrl: ${req.originalUrl}, body:`, req.body)
+        if(process.env.NGROK_URL) {
+            logger.debug(`Fix ngrok url rewrite, use req.path: ${req.path} instead of req.originalUrl: ${req.originalUrl}` )
+            req.originalUrl = req.path
+            // req.originalUrl = `https://c221e70fb59a.eu.ngrok.io`
+        }
+        const expectedHash = jwtParser.createQueryStringHash(
+            req.originalUrl ? jwtParser.fromExpressRequest(req) : req,
+            false,
+            addon.baseUrl
+          )
+          logger.debug('Hash', expectedHash)
+
         const accountRef = firestore.doc(`meta/${req.body.clientKey}`)
         await addon.install(req, {
 
@@ -100,9 +118,9 @@ const handleAuth = async (req, res, next) => {
         }
     }
 }
-
 const handleTokenExchange = async (req, res) => {
-    logger.debug('handleTokenExchange got jiraJwt: ', req.query.jwt)
+    console.log('Doing token exhange')
+    logger.info('handleTokenExchange got jiraJwt: ', req.query.jwt)
     try {
         
         const jiraToken = extractToken(req)
@@ -117,19 +135,24 @@ const handleTokenExchange = async (req, res) => {
         } else {
             new Error('No account was found for ', clientKey)
         }
-        const secret = accountSnap.data().account.sharedSecret
-        const payload = validateToken(jiraToken, secret)
+        const account = accountSnap.data().account
+        const payload = validateToken(jiraToken, account.sharedSecret)
         //validateQsh(req, payload, addon.baseUrl)
 
         logger.debug('JWT is valid!')
-        //TODO request user groups
+        const groups = await jiraApi.getUserPermissionGroupes(accountId, account.baseUrl, functions.config().jira.app.key, account.sharedSecret)
+        logger.debug('Got groups ', groups)
         const auth = admin.auth()
-        const additionalClaims = {
-            tenantId: clientKey,
-            accountId: accountId
+        var additionalClaims = {
+            x_mt_tenant_id: clientKey,
+            x_mt_account_id: accountId,
         };
+        groups.forEach(group => {
+            additionalClaims[`x_mt_groop-${group}`]="true"
+        });
+        logger.debug('Create a custom token with claims:', additionalClaims)
         const customToken = await auth.createCustomToken(accountId, additionalClaims)
-        logger.debug('created a custom token with claims', additionalClaims, customToken)
+        logger.debug('Created a custom token with claims:', customToken)
         return res.json({ 
             customToken: customToken,
         })
@@ -145,7 +168,50 @@ const handleTokenExchange = async (req, res) => {
     
 }
 
+const handleDescriptor = async (req, res) => {
+
+    const descriptor = {
+        key: functions.config().jira.app.key,
+        name: functions.config().jira.app.name,
+        baseUrl: addon.baseUrl,
+        vendor: {
+            name: functions.config().jira.app.vendor.name,
+            url: functions.config().jira.app.vendor.url
+        },
+        links: {
+            config: ''
+        },
+        authentication: {
+            type: 'jwt'
+        },
+        scopes: [
+            'read'
+        ],
+        enableLicensing: false,
+        lifecycle: {
+            installed: '/api/hooks/jira/installed'
+        },
+        modules: {
+            generalPages: [
+                {
+                    key: 'editor',
+                    name: {
+                        value: functions.config().jira.app.page.title.general
+                    },
+                    url: '/editor',
+                    conditions: [{
+                        condition: 'user_is_logged_in'
+                    }]
+                }
+            ]
+        }
+    }
+
+    res.json(descriptor)
+}
+
 module.exports = {
+    handleDescriptor,
     handleInstall,
-    handleTokenExchange
+    handleTokenExchange,
 } 
