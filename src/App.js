@@ -5,7 +5,6 @@ import './firebase/config'
 import "firebase/auth"
 import 'firebase/firestore'
 import { UserProvider } from './firebase/UserProvider'
-import ProfileRedirect from "./router/ProfileRedirect";
 import Header from "./Header"
 import Signup from "./pages/Signup"
 import Signin from "./pages/Signin"
@@ -15,6 +14,9 @@ import Jira from "./pages/Jira";
 import SiteMenu from "./components/SideMenu";
 import { makeStyles, CssBaseline } from "@material-ui/core";
 import Main from "./components/Main";
+import Workspaces from "./pages/Workspaces";
+import { WorkspaceProvider } from "./components/WorkspaceProvider";
+import { SnackbarProvider } from "notistack";
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -47,25 +49,34 @@ function App() {
   return (
 
     <BrowserRouter>
-      <UserProvider>
-        <Header appBar={classes.appBar}></Header>
-        <div className={classes.root}>
-          <CssBaseline />
-          <SiteMenu drawer={classes.drawer} drawerPaper={classes.drawerPaper} toolbar={classes.toolbar}></SiteMenu>
-          <Main content={classes.content}>
-            <Switch>
-              <ProfileRedirect exact path="/signup" component={Signup} />
-              <ProfileRedirect exact path="/signin" component={Signin} />
-              <Route exact path="/editor" component={Editor} />
-              <Route path="/jira" component={Jira} />
-              <Route path="/profile" component={Profile} />
-              <Route path="/">
-                <Redirect to="/signin" />
-              </Route>
-            </Switch>
-          </Main>
-        </div>
-      </UserProvider>
+      <SnackbarProvider maxSnack={5} anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+          }}>
+        <UserProvider>
+          <WorkspaceProvider>
+            <Header appBar={classes.appBar}></Header>
+            <div className={classes.root}>
+              <CssBaseline />
+              <SiteMenu drawer={classes.drawer} drawerPaper={classes.drawerPaper} toolbar={classes.toolbar}></SiteMenu>
+              <Main content={classes.content}>
+                <Switch>
+                  <Route exact path="/signup" component={Signup} />
+                  <Route exact path="/signin" component={Signin} />
+                  <Route exact path="/editor" component={Editor} />
+                  <Route path="/jira" component={Jira} />
+                  <Route exact path="/profile" component={Profile} />
+                  <Route path="/workspaces" component={Workspaces} />
+
+                  <Route path="/">
+                    <Redirect to="/signin" />
+                  </Route>
+                </Switch>
+              </Main>
+            </div>
+          </WorkspaceProvider>
+        </UserProvider>
+      </SnackbarProvider>
     </BrowserRouter>
   );
 }

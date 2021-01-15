@@ -1,19 +1,30 @@
 import React from 'react'
 import {useSession} from '../firebase/UserProvider'
+import { auth } from '../firebase/config'
 
 const Profile = () => {
-    const { user } = useSession()
+    const { claims } = useSession()
 
-    if(!user) {
+    if(!claims) {
         return null
     }
 
     return (
-        <div>
-            <p>Name: {user.displayName}</p>
-            <p>Email: {user.email}</p>
-            <p>ID: {user.uid}</p>
-        </div>
+        <>
+            
+            <div>
+                <p>Name: {auth.currentUser.displayName}</p>
+                <p>Email: {auth.currentUser.email}</p>
+                <p>ID: {auth.currentUser.uid}</p>
+            </div>
+            <hr/>
+            <div>
+            { Object.keys(claims.myThings).map(key =>
+                <p key={key}>{key}: {claims.myThings[key]}</p>
+            )}
+            </div>
+            <hr/>
+        </>
     )
 }
 

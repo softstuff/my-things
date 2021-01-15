@@ -8,7 +8,9 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
-    "firebase": "^8.1.1",
+    "firebase": "^8.2.2",
+    "flow-bin": "^0.141.0",
+    "notistack": "^1.0.3",
     "query-string": "^6.13.7",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
@@ -18,10 +20,11 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "BROWSER=none react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "flow": "flow",
     "deploy:firestore": "firebase deploy --only firestore:rules",
     "deploy:hosting": "firebase deploy --only hosting",
     "deploy": "firebase deploy",
@@ -46,5 +49,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "react-test-renderer": "^17.0.1"
   }
 }

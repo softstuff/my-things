@@ -1,22 +1,11 @@
 const jwtParser = require('atlassian-jwt')
-//const firebase = require("firebase/app");
-//import "firebase/functions";
-const functions = require('firebase-functions');
-// The Firebase Admin SDK to access Cloud Firestore.
-const admin = require('firebase-admin');
+const fs = require('../firebase-service')
 const jiraApi = require('./jira-api')
+const atlassianConn = require('atlassian-connect-auth')
+const { firestore } = require('../firebase-service')
 
-admin.initializeApp({ projectId: "my-things-60357" });
-
-const firestore = admin.firestore()
-const auth = admin.auth()
-const logger = functions.logger
-
-const { Addon, AuthError } = require('atlassian-connect-auth')
-const { validateToken, extractToken, validateQsh } = require('atlassian-connect-auth/lib/util')
-
-const addon = new Addon({
-    baseUrl: process.env.NGROK_URL || functions.config().jira.app.baseurl,
+const addon = new atlassianConn.Addon({
+    baseUrl: process.env.NGROK_URL || fs.functions.config().jira.app.baseurl,
     product: 'jira',
 })
 
@@ -26,26 +15,25 @@ const addon = new Addon({
 const handleInstall = async (req, res) => {
 
     try {
-        
+
         logger.debug(`handleInstall req.path: ${req.path}, req.originalUrl: ${req.originalUrl}, body:`, req.body)
-        if(process.env.NGROK_URL) {
-            logger.debug(`Fix ngrok url rewrite, use req.path: ${req.path} instead of req.originalUrl: ${req.originalUrl}` )
+        if (process.env.NGROK_URL) {
+            logger.debug(`Fix ngrok url rewrite, use req.path: ${req.path} instead of req.originalUrl: ${req.originalUrl}`)
             req.originalUrl = req.path
-            // req.originalUrl = `https://c221e70fb59a.eu.ngrok.io`
         }
         const expectedHash = jwtParser.createQueryStringHash(
             req.originalUrl ? jwtParser.fromExpressRequest(req) : req,
             false,
             addon.baseUrl
-          )
-          logger.debug('Hash', expectedHash)
+        )
+        logger.debug('Hash', expectedHash)
 
-        const accountRef = firestore.doc(`meta/${req.body.clientKey}`)
+        const accountRef = fs.firestore.doc(`jira/${req.body.clientKey}`)
         await addon.install(req, {
 
             loadCredentials: async clientKey => {
                 const snapshot = await accountRef.get()
-                if(snapshot.exists) {
+                if (snapshot.exists) {
                     const { account } = snapshot.data()
                     logger.debug(`Loading account ${clientKey}: `, account)
                     return account
@@ -59,34 +47,44 @@ const handleInstall = async (req, res) => {
                     logger.log(`Save new account: `, { clientKey, newCredentials, storedCredentials })
                 }
 
-                if(accountRef.exists) {
+                if (accountRef.exists) {
                     await accountRef.update({ account: newCredentials })
                     auditLogger('Install - Updated tenant account', 201, null, req, clientKey)
                 } else {
-                    await accountRef.set({ account: newCredentials })
+                    const tenantId = await firestore.collection('tenants').add({
+                        meta: {
+                            jira: true,
+                            clientKey: clientKey
+                        }
+                    })
+                    await accountRef.set({ 
+                        account: newCredentials,
+                        tenantId,
+                        clientKey
+                     })
                     auditLogger('Install - Installed a new tenant', 201, null, req, clientKey)
                 }
                 return 'Wii'
             }
         })
 
-        
+
         return res.sendStatus(201)
     } catch (error) {
         if (error instanceof AuthError) {
             logger.warn('AuthError:', error)
-            auditLogger('Install - Failed unauthorized', 401, error, req , req.body.clientKey)
+            auditLogger('Install - Failed unauthorized', 401, error, req, req.body.clientKey)
             return res.sendStatus(401)
         } else {
             logger.error('Unknown error:', error)
-            auditLogger('Install - Failed unknown error', 500, error, req , req.body.clientKey)
+            auditLogger('Install - Failed unknown error', 500, error, req, req.body.clientKey)
             return res.sendStatus(500)
         }
     }
 }
 
-const auditLogger = async ( message, statusCode, error, req, clientKey) => {
-    const auditRef = firestore.collection(`meta/${clientKey}/audit`)
+const auditLogger = async (message, statusCode, error, req, clientKey) => {
+    const auditRef = fs.firestore.collection(`meta/${clientKey}/audit`)
     const timestamp = new Date()
     const log = await auditRef.doc(`${timestamp.getTime()}`).set({
         message,
@@ -122,42 +120,48 @@ const handleTokenExchange = async (req, res) => {
     console.log('Doing token exhange')
     logger.info('handleTokenExchange got jiraJwt: ', req.query.jwt)
     try {
-        
+
         const jiraToken = extractToken(req)
-        const jwt = jwtParser.decode(jiraToken, '', true) 
+        const jwt = jwtParser.decode(jiraToken, '', true)
         logger.debug('parsed token to ', jwt)
         const clientKey = jwt.iss
         const accountId = jwt.sub
 
-        const accountSnap = await firestore.doc(`meta/${clientKey}`).get()
-        if(accountSnap.exists) {
+        const accountSnap = await fs.firestore.doc(`jira/${clientKey}`).get()
+        if (accountSnap.exists) {
             logger.debug('Found users account')
         } else {
             new Error('No account was found for ', clientKey)
         }
         const account = accountSnap.data().account
         const payload = validateToken(jiraToken, account.sharedSecret)
-        //validateQsh(req, payload, addon.baseUrl)
 
         logger.debug('JWT is valid!')
-        const groups = await jiraApi.getUserPermissionGroupes(accountId, account.baseUrl, functions.config().jira.app.key, account.sharedSecret)
+        const groups = await getUserPermissionGroupes(accountId, account.baseUrl, functions.config().jira.app.key, account.sharedSecret)
         logger.debug('Got groups ', groups)
-        const auth = admin.auth()
+
         var additionalClaims = {
-            x_mt_tenant_id: clientKey,
-            x_mt_account_id: accountId,
+            myThings: {
+                tenantId: account.tenantId,
+            },
+            jira: {
+                client_key: account.clientKey,
+                base_url: account.baseUrl,
+                account_id: accountId,
+                group: {}
+            }
         };
         groups.forEach(group => {
-            additionalClaims[`x_mt_groop-${group}`]="true"
+            additionalClaims.jira.group[group] = true
         });
         logger.debug('Create a custom token with claims:', additionalClaims)
-        const customToken = await auth.createCustomToken(accountId, additionalClaims)
+        const customToken = await fs.auth.createCustomToken(accountId, additionalClaims)
         logger.debug('Created a custom token with claims:', customToken)
-        return res.json({ 
+        return res.json({
             customToken: customToken,
         })
-    } catch(error){
-        if (error instanceof AuthError) {
+    } catch (error) {
+        if (error instanceof atlassianConn.AuthError) {
             logger.warn(error)
             return res.sendStatus(401)
         } else {
@@ -165,7 +169,7 @@ const handleTokenExchange = async (req, res) => {
             return res.sendStatus(500)
         }
     }
-    
+
 }
 
 const handleDescriptor = async (req, res) => {
@@ -196,7 +200,7 @@ const handleDescriptor = async (req, res) => {
                 {
                     key: 'editor',
                     name: {
-                        value: functions.config().jira.app.page.title.general
+                        value: fs.functions.config().jira.app.page.title.general
                     },
                     url: '/editor',
                     conditions: [{
