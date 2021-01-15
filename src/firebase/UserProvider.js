@@ -1,15 +1,33 @@
 import React, { useEffect, useState, useContext } from 'react'
-import firebase from 'firebase/app'
+import { auth } from './config'
 import queryString from 'query-string'
 import { useLocation } from 'react-router-dom'
 import { signInWithCustomToken } from './auth'
+import NewTenant from '../pages/NewTenant'
+import Signin from '../pages/Signin'
+import { CircularProgress } from '@material-ui/core'
 
 export const UserContext = React.createContext()
 
 export const UserProvider = (props) => {
-    const [session, setSession] = useState({})
     const location = useLocation()
+    const [loading, setLoading] = useState(true)
+    const [claims, setClaims] = useState()
+    const [jira, setJira] = useState()
 
+
+    const loadClames = async (forceRefresh) => {
+
+        if (auth.currentUser){
+            const tokenResult = await auth.currentUser.getIdTokenResult(forceRefresh)
+            console.log('fetched clames', tokenResult.claims)
+            setClaims(tokenResult.claims)
+
+        } else {
+            setClaims(null)
+        }
+        return claims
+    }
 
 
 
@@ -17,56 +35,31 @@ export const UserProvider = (props) => {
 
         console.log('subscribe onAuthStateChanged, JWT', location)
 
-        const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
-
-            // setSession(session => ({ ...session, loading: true }))
+        const unsubscribe = auth.onAuthStateChanged(async (user) => {
 
             const query = queryString.parse(location.search)
         
-
-            console.log('onAuthStateChanged triggered')
-
             if (user) {
+                console.log('onAuthStateChanged triggered with user')
+                await loadClames(true)
 
-                const tokenResult = await user.getIdTokenResult(true)
-                console.log('fetched clames', tokenResult, tokenResult.claims)
-
-                const newSession = {
-                    ...session,
-                    user: {
-                        displayName: user.displayName,
-                        email: user.email,
-                        phoneNumber: user.phoneNumber,
-                        photoURL: user.photoURL,
-                        providerId: user.providerId,
-                        uid: user.uid
-                    },
-                    signInProvider: tokenResult.signInProvider,
-                    authTime: tokenResult.authTime,
-                    claims: {},
-                    loading: false
-                }
-                Object.keys(tokenResult.claims).filter( claim => claim.startsWith('x_mt_')).forEach(key => {
-                    newSession.claims[key] = tokenResult.claims[key]
-                    console.log(`Adding app claims ${key} = ${tokenResult.claims[key]}`)
-                });
                 if(query.xdm_e){
-                    newSession.jira = {
+                    setJira({
                         lic: query.lic,
                         channel: query.xdm_c,
                         domain: query.xdm_e
-                    }
+                    })
                 }
 
-                setSession(session => newSession)
-                console.log('done login', newSession)
+                console.log('done login')
+                setLoading(false)
+                
 
             } else {
-
-                //TODO use AP.context.getToken() instead to get away with not validation the QSH claims
+                console.log('onAuthStateChanged triggered with no user')
+                // Jira entry from IFrame
                 if (query.jwt) {
                     try {
-                        debugger
                         const freshToken = await window.AP.context.getToken()
                         console.log('Found a Jira JWT exchanging tokens, freshToken', freshToken)
                         const res = await fetch(`/api/auth/jira/login?jwt=${freshToken}`)
@@ -78,24 +71,14 @@ export const UserProvider = (props) => {
                         const result = await signInWithCustomToken(customToken)
                         console.log('loginWithToken', result)
 
-                        setSession(session => ({
-                            ...session,
-                            loading: false,
-                            extra: {
-                                isNewUser: result.additionalUserInfo.isNewUser,
-                                profile: result.additionalUserInfo.profile,
-                                providerId: result.additionalUserInfo.proficerId,
-                                username: result.additionalUserInfo.username
-                            }
-                        }))
-                        console.log('Logged in to firebase', session)
                     } catch (error) {
                         console.log('Failed to exchange tokens', error)
-                        setSession({})
+                        setClaims(null)
                     }
                 } else {
                     console.log('Not logged in and no Jira jwt was found, running standalone')
-                    setSession({})
+                    setClaims(null)
+                    setLoading(false)
                 }
             }
         })
@@ -106,8 +89,21 @@ export const UserProvider = (props) => {
 
     return (
         <>
-            <UserContext.Provider value={session} >
-                {!session.loading && props.children}
+            <UserContext.Provider value={{claims, jira, loadClames}} >
+                { (()=>{
+                    if(loading){
+                        return (<CircularProgress />)
+                    } else if(!claims?.user_id) {
+                        if (location.pathname === '/signin' || location.pathname === '/signup' ) {
+                            return (props.children)
+                        }
+                        return (<Signin/>)
+                    } else if(!claims?.myThings?.tenantId) {
+                        return (<NewTenant/>)
+                    } else {
+                        return (props.children)
+                    }
+                })()}
             </UserContext.Provider>
         </>
     )

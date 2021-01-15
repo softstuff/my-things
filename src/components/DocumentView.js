@@ -1,255 +1,259 @@
 import React, { useState, useEffect } from 'react'
-import { Grid, IconButton, Icon, TextField, Button, makeStyles } from '@material-ui/core'
+import { Grid, IconButton, Icon, TextField, Button, AppBar, Tabs, Tab, Box, useTheme } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete';
-import { getDocument, updateDocument, addCollection, deleteCollection } from '../firebase/storage'
-import { useForm, useFieldArray } from 'react-hook-form';
+import { getDocument, deleteCollection, updateThing, addSubCollection } from '../firebase/storage'
+import { useForm} from 'react-hook-form';
+import { useSession } from '../firebase/UserProvider';
+import { useWorkspace } from './WorkspaceProvider';
+import AttributesManualEditor from './document/AttributesManuelEditor';
+import { useSnackbar } from 'notistack';
 
 
-const useStyles = makeStyles((theme) => ({
-    editRow: {
-        width: '80%',
-        height: '4rem'
-    },
-    editField: {
-        width: '90%'
-    },
-    newAttribName: {
-        width: '45%'
-    },
-    newAttribValue: {
-        width: '45%'
-    }
-}));
-
-
-function DocumentView({ path, onPathChange, editing }) {
-
-    const [ doc, setDoc ] = useState({})
-    const documentId = toDocumentId(path)
-    const dbKey = path.join('/')
+function DocumentView({ create, collectionPath, documentId, onSubCollectionClick, editing, onDocumentIdChange }) {
+    const { enqueueSnackbar } = useSnackbar();
+    const [document, setDocument] = useState()
+    const { claims } = useSession()
+    const { workspace } = useWorkspace()
+    // const documentId = toDocumentId(path)
+    const dbKey = ''
+    const tenantId = claims.myThings.tenantId
+    const wid = workspace.id
 
     useEffect(() => {
-        console.log(`Changed dbKey: ${dbKey}, editing: ${editing}, documentId: ${documentId}`)
-        if (!!documentId) {
-            
-            const onLoaded = (data) => {
-                console.log(`Document ${dbKey} is loaded`, data)
-                setDoc(()=> data)
-            }
-            const onError = (error) => {
-                console.log(`Failed to load document ${dbKey}`, error)
-                setDoc(null)
-            }
-            const unsubscribe = getDocument(dbKey, onLoaded, onError)
 
-            return () => unsubscribe()
-        } else {
-            setDoc(null)
+        if (create) {
+            setDocument({
+                meta: {
+                    children: []
+                },
+                thing: []
+            })
             return null
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dbKey])
+        else if (collectionPath && documentId) {
+            console.log('Loading document ', collectionPath, documentId)
+            const unsubscribe = getDocument(tenantId, wid, collectionPath, documentId,
+                (data) => {
+                    if (data) {
+                        console.log("Loaded document", collectionPath, documentId, data)
+                        setDocument(data)
+                    } else {
+                        setDocument()
+                    }
+                }, (error) => {
+                    console.log(`Failed to load document:`, collectionPath, documentId, error)
+                }
+            )
+            return unsubscribe
+        }
+
+
+    }, [tenantId, wid, collectionPath, documentId, create])
 
 
     const handleClick = (subCollectionName) => {
-        const newPath = path.concat(subCollectionName)
-        console.log('newPath', newPath, subCollectionName)
-        onPathChange(newPath)
+        const newPath = `${collectionPath}/${documentId}/${subCollectionName}`
+        console.log('selected a subcollection, opening ', newPath)
+        onSubCollectionClick(subCollectionName)
     }
+
+    const onSaveThing = async (thing) => {
+        try {
+            let docId = documentId
+            if(thing.id){
+                docId = thing.id
+                delete thing.id
+            }
+            console.log('onSaveThing', thing, collectionPath, docId)
+            await updateThing(tenantId, wid, collectionPath, docId, thing)
+            onDocumentIdChange(docId)
+            enqueueSnackbar(`${docId} was saved`, { variant: 'success' })
+        } catch (error) {
+            console.log("onSave, error", error)
+            enqueueSnackbar(`Failed to save`, { variant: 'error' })
+        }
+    }
+
+    const handleAddChild = name => {
+        try {
+            console.log("handleAddChild", name)
+            addSubCollection(tenantId, wid, collectionPath, documentId, name)
+        } catch (error) {
+            console.log("handleAddChild, error", error, name)
+            enqueueSnackbar(`Failed to add collection`, { variant: 'error' })
+        }
+    }
+
+    const handleRemoveChild = name => {
+        try {
+            console.log("handleRemoveChild, name:", name)
+            const path = `${collectionPath}/${documentId}/${name}`
+            deleteCollection(tenantId, wid, path)
+
+        } catch (error) {
+            console.log("handleRemoveChild, error", error, name)
+            enqueueSnackbar(`Failed to remove collection`, { variant: 'error' })
+        }
+    }
+
     return (
 
         <>
-            { !documentId ? (
-                <p>No document selected</p>
-            ) : (
-                <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                        Document
-                        <h2>{documentId}</h2>
-                    </Grid>
-
-                    { editing ? (
-                        <Grid item xs={10}>
-                            <h2>Attributes</h2>
-                            <EditAttributes doc={doc} dbKey={dbKey}></EditAttributes>
-                            <h2>Collections</h2>
-                            <EditDocChildren doc={doc} dbKey={dbKey}></EditDocChildren>
-                        </Grid>
-                    ) : (
-                        <Grid item xs={10}>
-                            <h2>Attributes</h2>
-                            {doc?.thing && Reflect.ownKeys(doc.thing)
-                                .filter((key) => key !== 'metaInfo')
-                                .map((attib) => <div key={attib}>{attib} = {doc.thing[attib]}</div>)}
-                            
-                            <h2>Collections</h2>
-                            {doc?.meta?.children && doc.meta.children.map((name) => 
-                                <div><Button key={name} onClick={() => handleClick(name)}>{name}</Button></div>)}
-                        </Grid>
-                        )}
+            <Grid container spacing={3}>
+                <Grid item xs={12}>
+                    <h2>
+                        {create && ('Create a Thing')}
+                        {!create && (documentId)}
+                    </h2>
                 </Grid>
-            )}
+
+                {editing ? (
+                    <Grid item xs={10}>
+                        
+                        <EditAttributes create={create} doc={document} onSaveThing={onSaveThing} dbKey={dbKey}></EditAttributes>
+                        <h2>Collections</h2>
+                        <EditDocChildren doc={document} onAddChild={handleAddChild} onRemoveChild={handleRemoveChild} />
+                    </Grid>
+                ) : (
+                        <Grid item xs={10}>
+                            <h2>Attributes</h2>
+                            {document?.thing && Object.keys(document.thing)
+                                .filter((key) => key !== 'metaInfo')
+                                .map((attib) => <div key={attib}>{attib} = {document.thing[attib]}</div>)}
+
+                            <h2>Collections</h2>
+                            {document?.meta?.children.map((collectionId) =>
+                                <div key={collectionId} ><Button onClick={() => handleClick(collectionId)}>{collectionId}</Button></div>)}
+                        </Grid>
+                    )}
+                <Grid item xs={10}>
+                    JSON:
+                    <pre>{JSON.stringify(document, null, 2)}</pre>
+                </Grid>
+            </Grid>
         </>
     )
 
 }
 
-function EditAttributes( { doc, dbKey } ) {
-    const classes = useStyles();
-    const { register, handleSubmit, control} = useForm()
-    const { register: registerAddAttribute, handleSubmit: handleSubmitAddAttribute, reset: resetAddAttribute, errors} = useForm()
-    const { fields, append, remove } = useFieldArray({
-        control,
-        name: "thing", 
-      });
-   
+function EditAttributes({ create, doc, onSaveThing }) {
+    const theme = useTheme();
+    const [value, setValue] = React.useState(0);
 
-      useEffect(() => {
-          remove()
-          if (doc) {
-            Reflect.ownKeys(doc?.thing).forEach(attribute => {
-                append({name: attribute, value: doc.thing[attribute]})
-            })
-          }
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [doc, dbKey])
-       
-
-    const onSave = (data) => {
-        try {
-            const toSave = {...doc, thing: data }
-            console.log("onSave", toSave)
-            const onSuccess = () => {
-                console.log(`Document ${dbKey} was saved`, toSave)
-            }
-            const onFailed = (error) => {
-                console.log(`Failed to save document ${dbKey}`, toSave, error)
-            }
-            updateDocument(dbKey, toSave, onSuccess, onFailed)
-            
-        } catch(error) {
-            console.log("onSave, error", error)
-        }
-    }
-    
-
-
-    const onAddNewAttribute = (data) => {
-        console.log(`Add attribute ${data.name}: ${data.value}`)
-        append({name: data.name, value: data.value})
-        resetAddAttribute()
-    }
+    const handleChange = (_, newValue) => {
+        setValue(newValue);
+    };
 
     return (
         <>
-            <form >
-            {fields.map((item, index) => (
-                <div className={classes.editRow} key={item.id}>
-                    <TextField className={classes.editField} 
-                    required
-                    name={item.name}
-                    label={item.name}
-                    inputRef={register()}
-                    defaultValue={item.value}/>
-                    <IconButton aria-label="delete" onClick={()=>remove(index)}>
-                        <DeleteIcon />
-                    </IconButton>
-                </div>
-            ))}
+            <AppBar position="static" color="default">
+                <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    indicatorColor="primary"
+                    textColor="primary"
+                    variant="fullWidth"
+                    aria-label="full width tabs example"
+                >
+                    <Tab label="Manuell" {...a11yProps(0)} />
+                    <Tab label="By schema" {...a11yProps(1)} />
+                    <Tab label="Raw" {...a11yProps(2)} />
+                </Tabs>
+            </AppBar>
 
-            </form>
-        
-        <form onSubmit={handleSubmitAddAttribute(onAddNewAttribute)}>
-            <div className={classes.editRow}>
-                <TextField className={classes.newAttribName} placeholder='Name' name='name' inputRef={registerAddAttribute({
-                    required: 'Attribute name is required',
-                    validate: value => {
-                        console.log('validate ', value, doc.thing[value] )
-                        return !doc.thing[value] || 'Attribute name must be uniqe'
-                    }
-                })}
-                helperText={errors.name?.message}
-                error={ errors.name ? true : false }
-                />
-                <TextField className={classes.newAttribValue} placeholder='Value' name='value' inputRef={registerAddAttribute}/>
-                <IconButton aria-label="add" type='submit'>
-                    <Icon>add_circle</Icon>
-                </IconButton>
-            </div>
-        </form>
+            <TabPanel value={value} index={0} dir={theme.direction}>
+                <AttributesManualEditor doc={doc} onSaveThing={onSaveThing} create={create} />
+            </TabPanel>
+            <TabPanel value={value} index={1} dir={theme.direction}>
+                TODO edit by schema
+            </TabPanel>
+            <TabPanel value={value} index={2} dir={theme.direction}>
+                TODO edit by Json
+         </TabPanel>
 
-    <Button variant="contained" color="primary" type='button' onClick={handleSubmit(onSave)}>
-    Save
-    </Button>
-</>
+        </>
     )
 }
 
-function EditDocChildren( { doc, dbKey }) {
+function TabPanel(props) {
+    const { children, value, index, ...other } = props;
 
-    const { register, handleSubmit, reset, errors} = useForm()
-    
+    return (
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`full-width-tabpanel-${index}`}
+            aria-labelledby={`full-width-tab-${index}`}
+            {...other}
+        >
+            {value === index && (
+                <Box p={3}>
+                    {children}
+                </Box>
+            )}
+        </div>
+    );
+}
+
+function a11yProps(index) {
+    return {
+        id: `full-width-tab-${index}`,
+        'aria-controls': `full-width-tabpanel-${index}`,
+    };
+}
+
+function EditDocChildren({ doc, onAddChild, onRemoveChild }) {
+
+    const { register, handleSubmit, reset, errors } = useForm()
+
 
     const onAddCollection = (data) => {
-        try {
-            console.log("onAddCollection", data.newCollection)
-            addCollection(dbKey, data.newCollection)
-            console.log('reset newCollection')
-            reset({ newCollection: '' })
-            
-        } catch(error) {
-            console.log("onAddCollection, error", error, data.newCollection)
-        }
+        console.log('onAddCollection ', data.newCollection)
+        onAddChild((data.newCollection))
+        reset({ newCollection: '' })
     }
-    
+
     const onDelete = (name) => {
-        try {
-            console.log("onDelete, name:", name)
-            deleteCollection(dbKey, name)
-            
-        } catch(error) {
-            console.log("onDelete, error", error, name)
-        }
+        onRemoveChild(name)
     }
 
     return (
-        <form> 
-            {doc?.meta?.children && doc.meta.children.map((name, index) => 
+        <form>
+            {doc?.meta?.children && doc.meta.children.map((name, index) =>
                 <div key={index}>
-                {name} 
-                <IconButton aria-label="delete" onClick={() => onDelete(name)}>
-                    <DeleteIcon />
-                </IconButton>
-            </div>
+                    {name}
+                    <IconButton aria-label="delete" onClick={() => onDelete(name)}>
+                        <DeleteIcon />
+                    </IconButton>
+                </div>
             )}
-            
+
             <TextField name='newCollection' label="New collection" inputRef={register({
                 validate: value => {
-                        console.log('validate ', value, doc.meta.children )
-                        if(value === 'meta') {
-                            return false
-                        }
-                        if(doc?.meta?.children) {
-                            return !doc?.meta?.children.some( child => value === child ) || 'Child name must be uniqe'
-                        }
-                        return true
+                    if (value === 'meta') {
+                        return false
                     }
-                })}
+                    if (doc?.meta?.children) {
+                        return !doc?.meta?.children.some(child => value === child) || 'Child name must be uniqe'
+                    }
+                    return true
+                }
+            })}
                 helperText={errors.name?.message}
-                error={ errors.name ? true : false }/>
+                error={errors.name ? true : false} />
             <IconButton aria-label="add" onClick={handleSubmit(onAddCollection)}>
                 <Icon>add_circle</Icon>
             </IconButton>
         </form>
     )
 }
-function toDocumentId(path) {
-    if (path.length % 2 === 0) {
-        return path.slice(path.length - 1)
-    } else {
-        return null
-    }
-}
+// function toDocumentId(path) {
+//     if (path.length % 2 === 0) {
+//         return path.slice(path.length - 1)
+//     } else {
+//         return null
+//     }
+// }
 
 export default DocumentView
 

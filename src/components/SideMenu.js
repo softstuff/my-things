@@ -1,13 +1,15 @@
 import React from 'react'
-import { Drawer, Divider, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core'
+import { Drawer, Divider, List, ListItem, ListItemIcon, ListItemText, ListSubheader } from '@material-ui/core'
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import InfoIcon from '@material-ui/icons/Info';
+import InputIcon from '@material-ui/icons/Input';
 import ExtensionIcon from '@material-ui/icons/Extension';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
+import { useWorkspace } from './WorkspaceProvider';
 
 const SiteMenu = (props) => {
-
+  const { workspace } = useWorkspace()
   const history = useHistory()
 
   const openUserProfile = () => {
@@ -29,9 +31,21 @@ const SiteMenu = (props) => {
       }}
       anchor="left"
     >
-      
+
       <Divider />
       <List>
+        <ListItem button component={Link} to={`/workspaces`} >
+          <ListItemIcon>
+            <InputIcon />
+          </ListItemIcon>
+          <ListItemText primary='Workspaces' />
+        </ListItem>
+      </List>
+      <Divider />
+      { workspace && (<List>
+        <ListSubheader>
+          {`Workspace: ${workspace.id}`}
+        </ListSubheader>
 
         <ListItem button onClick={openEditor}>
           <ListItemIcon>
@@ -45,9 +59,9 @@ const SiteMenu = (props) => {
           </ListItemIcon>
           <ListItemText primary='Assets' />
         </ListItem>
-      </List>
+      </List>)}
+      <Divider />
       <List>
-
         <ListItem button onClick={openUserProfile}>
           <ListItemIcon>
             <AccountCircle />

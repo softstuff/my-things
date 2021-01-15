@@ -3,12 +3,12 @@ import { Route, Redirect } from 'react-router-dom'
 import { useSession } from '../firebase/UserProvider'
 
 const ProfileRedirect = ({component: Component, ...rest}) => {
-    const { user } = useSession()
+    const { claims } = useSession()
 
     return <Route 
         {...rest} 
         render={(props) =>
-            !user ? (
+            !claims?.user_id ? (
                 <Component {...props}/>
              ): ( 
                 <Redirect 

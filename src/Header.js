@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 function Header(props) {
-    const { user, jira } = useSession()    
+    const { claims, jira } = useSession()    
     const classes = useStyles();
     
     if (jira) {
@@ -40,7 +40,7 @@ function Header(props) {
                     </IconButton>
                     
 
-                    {!!user ? (
+                    {!!claims ? (
                         <LoggedInUsersMenu />
                     ) : (
                         <NotLoggedInUsersMenu />    
@@ -57,7 +57,7 @@ function NotLoggedInUsersMenu() {
 
 function LoggedInUsersMenu() {
 
-    const { user } = useSession() 
+    const { claims } = useSession() 
     const history = useHistory()
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = useState(null);
@@ -102,7 +102,7 @@ function LoggedInUsersMenu() {
                 color="inherit"
             >
                 <AccountCircle />
-                {user.displayName}
+                {claims.displayName}
             </IconButton>
             <Menu
                 id="user-menu"
