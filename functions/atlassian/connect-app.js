@@ -1,11 +1,11 @@
 const jwtParser = require('atlassian-jwt')
-const fs = require('../firebase-service')
 const jiraApi = require('./jira-api')
 const atlassianConn = require('atlassian-connect-auth')
-const { firestore } = require('../firebase-service')
+const atlConUtil = require('atlassian-connect-auth/lib/util')
+const { firestore, functions, auth, logger } = require('../firebase-service')
 
 const addon = new atlassianConn.Addon({
-    baseUrl: process.env.NGROK_URL || fs.functions.config().jira.app.baseurl,
+    baseUrl: process.env.NGROK_URL || functions.config().jira.app.baseurl,
     product: 'jira',
 })
 
@@ -28,7 +28,7 @@ const handleInstall = async (req, res) => {
         )
         logger.debug('Hash', expectedHash)
 
-        const accountRef = fs.firestore.doc(`jira/${req.body.clientKey}`)
+        const accountRef = firestore.doc(`jira/${req.body.clientKey}`)
         await addon.install(req, {
 
             loadCredentials: async clientKey => {
@@ -51,7 +51,7 @@ const handleInstall = async (req, res) => {
                     await accountRef.update({ account: newCredentials })
                     auditLogger('Install - Updated tenant account', 201, null, req, clientKey)
                 } else {
-                    const tenantId = await firestore.collection('tenants').add({
+                    const tenantRef = await firestore.collection('tenants').add({
                         meta: {
                             jira: true,
                             clientKey: clientKey
@@ -59,7 +59,7 @@ const handleInstall = async (req, res) => {
                     })
                     await accountRef.set({ 
                         account: newCredentials,
-                        tenantId,
+                        tenantId: tenantRef.id,
                         clientKey
                      })
                     auditLogger('Install - Installed a new tenant', 201, null, req, clientKey)
@@ -84,7 +84,7 @@ const handleInstall = async (req, res) => {
 }
 
 const auditLogger = async (message, statusCode, error, req, clientKey) => {
-    const auditRef = fs.firestore.collection(`meta/${clientKey}/audit`)
+    const auditRef = firestore.collection(`meta/${clientKey}/audit`)
     const timestamp = new Date()
     const log = await auditRef.doc(`${timestamp.getTime()}`).set({
         message,
@@ -121,42 +121,43 @@ const handleTokenExchange = async (req, res) => {
     logger.info('handleTokenExchange got jiraJwt: ', req.query.jwt)
     try {
 
-        const jiraToken = extractToken(req)
+        const jiraToken = atlConUtil.extractToken(req)
         const jwt = jwtParser.decode(jiraToken, '', true)
-        logger.debug('parsed token to ', jwt)
         const clientKey = jwt.iss
         const accountId = jwt.sub
 
-        const accountSnap = await fs.firestore.doc(`jira/${clientKey}`).get()
-        if (accountSnap.exists) {
-            logger.debug('Found users account')
-        } else {
-            new Error('No account was found for ', clientKey)
+        const accountSnap = await firestore.doc(`jira/${clientKey}`).get()
+        if (!accountSnap.exists) {
+            res.statusMessage= "wiii"
+            res.status(404)
+            res.send(`No account was found for clientKey: ${clientKey}, reinstall the app!`)
+            
+            return
         }
-        const account = accountSnap.data().account
-        const payload = validateToken(jiraToken, account.sharedSecret)
+
+        const jira = accountSnap.data()
+        const account = jira.account
+        atlConUtil.validateToken(jiraToken, account.sharedSecret)
 
         logger.debug('JWT is valid!')
-        const groups = await getUserPermissionGroupes(accountId, account.baseUrl, functions.config().jira.app.key, account.sharedSecret)
+        const groups = await jiraApi.getUserPermissionGroupes(accountId, account.baseUrl, functions.config().jira.app.key, account.sharedSecret)
         logger.debug('Got groups ', groups)
+
 
         var additionalClaims = {
             myThings: {
-                tenantId: account.tenantId,
+                tenantId: jira.tenantId,
+                admin: isAdmin(groups)
             },
             jira: {
                 client_key: account.clientKey,
                 base_url: account.baseUrl,
                 account_id: accountId,
-                group: {}
             }
         };
-        groups.forEach(group => {
-            additionalClaims.jira.group[group] = true
-        });
+
         logger.debug('Create a custom token with claims:', additionalClaims)
-        const customToken = await fs.auth.createCustomToken(accountId, additionalClaims)
-        logger.debug('Created a custom token with claims:', customToken)
+        const customToken = await auth.createCustomToken(accountId, additionalClaims)
         return res.json({
             customToken: customToken,
         })
@@ -170,6 +171,11 @@ const handleTokenExchange = async (req, res) => {
         }
     }
 
+}
+
+const isAdmin = (groups) => {
+    const jiraAdminGroups = ['administrators','jira-administrators','jira-servicemanagement-users','site-admins']
+    return groups && groups.some(group => jiraAdminGroups.includes(group))
 }
 
 const handleDescriptor = async (req, res) => {
@@ -200,7 +206,7 @@ const handleDescriptor = async (req, res) => {
                 {
                     key: 'editor',
                     name: {
-                        value: fs.functions.config().jira.app.page.title.general
+                        value: functions.config().jira.app.page.title.general
                     },
                     url: '/editor',
                     conditions: [{

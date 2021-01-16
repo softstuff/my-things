@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { auth } from './config'
 import queryString from 'query-string'
-import { useLocation } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { signInWithCustomToken } from './auth'
 import NewTenant from '../pages/NewTenant'
 import Signin from '../pages/Signin'
@@ -11,6 +11,7 @@ export const UserContext = React.createContext()
 
 export const UserProvider = (props) => {
     const location = useLocation()
+    const history = useHistory()
     const [loading, setLoading] = useState(true)
     const [claims, setClaims] = useState()
     const [jira, setJira] = useState()
@@ -63,6 +64,13 @@ export const UserProvider = (props) => {
                         const freshToken = await window.AP.context.getToken()
                         console.log('Found a Jira JWT exchanging tokens, freshToken', freshToken)
                         const res = await fetch(`/api/auth/jira/login?jwt=${freshToken}`)
+                        if (!res.ok){
+                            const error = await res.text()
+                            console.log('Response', res.ok, res.status, res.statusText, error)
+                            history.push('/error', { message: error })
+                            return
+                        }
+                        console.log('Response', res.ok, res.status, res.statusText)
                         const body = await res.json()
                         console.log('Token exchange, got result', body)
                         const customToken = body.customToken
@@ -74,6 +82,8 @@ export const UserProvider = (props) => {
                     } catch (error) {
                         console.log('Failed to exchange tokens', error)
                         setClaims(null)
+                        history.push('/error', { message: error })
+                        return
                     }
                 } else {
                     console.log('Not logged in and no Jira jwt was found, running standalone')

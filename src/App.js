@@ -17,6 +17,8 @@ import Main from "./components/Main";
 import Workspaces from "./pages/Workspaces";
 import { WorkspaceProvider } from "./components/WorkspaceProvider";
 import { SnackbarProvider } from "notistack";
+import NotFoundPage from "./pages/NotFoundPage";
+import Error from "./pages/Error";
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -49,33 +51,42 @@ function App() {
   return (
 
     <BrowserRouter>
+
       <SnackbarProvider maxSnack={5} anchorOrigin={{
               vertical: 'top',
               horizontal: 'right',
           }}>
-        <UserProvider>
-          <WorkspaceProvider>
-            <Header appBar={classes.appBar}></Header>
-            <div className={classes.root}>
-              <CssBaseline />
-              <SiteMenu drawer={classes.drawer} drawerPaper={classes.drawerPaper} toolbar={classes.toolbar}></SiteMenu>
-              <Main content={classes.content}>
-                <Switch>
-                  <Route exact path="/signup" component={Signup} />
-                  <Route exact path="/signin" component={Signin} />
-                  <Route exact path="/editor" component={Editor} />
-                  <Route path="/jira" component={Jira} />
-                  <Route exact path="/profile" component={Profile} />
-                  <Route path="/workspaces" component={Workspaces} />
 
-                  <Route path="/">
-                    <Redirect to="/signin" />
-                  </Route>
-                </Switch>
-              </Main>
-            </div>
-          </WorkspaceProvider>
-        </UserProvider>
+        <Switch>
+          <Route path="/signup" component={Signup} />
+          <Route path="/signin" component={Signin} />
+          <Route path="/error" component={Error} />
+          <Route path="/404" component={NotFoundPage} />
+          <Route>
+            <UserProvider>
+              <WorkspaceProvider>
+                <Header appBar={classes.appBar}></Header>
+                <div className={classes.root}>
+                  <CssBaseline />
+                  <SiteMenu drawer={classes.drawer} drawerPaper={classes.drawerPaper} toolbar={classes.toolbar}></SiteMenu>
+                  <Main content={classes.content}>
+                    <Switch>
+                      <Route exact path="/editor" component={Editor} />
+                      <Route path="/jira" component={Jira} />
+                      <Route exact path="/profile" component={Profile} />
+                      <Route path="/workspaces" component={Workspaces} />
+
+                      <Route path="/">
+                        <Redirect to="/signin" />
+                      </Route>
+                      <Route path="*" component={NotFoundPage} />
+                    </Switch>
+                  </Main>
+                </div>
+              </WorkspaceProvider>
+            </UserProvider>
+          </Route>
+        </Switch>
       </SnackbarProvider>
     </BrowserRouter>
   );

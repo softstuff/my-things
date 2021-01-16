@@ -20,6 +20,7 @@ export const firestore = firebase.firestore()
 console.log(firebase.app().options)
 
 if (enabledEmulator()) {
+    console.log("USING EMULATOR SETTINGS")
     auth.useEmulator('http://localhost:9099/');
     firestore.useEmulator('localhost', 8080);
     //firebase.hosting().useEmulator('localhost' , 5000);
