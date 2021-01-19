@@ -19,7 +19,7 @@ const Profile = () => {
             </div>
             <hr/>
             <div>
-            { Object.keys(claims.myThings).map(key =>
+            { Object.getOwnPropertyNames(claims.myThings).map(key =>
                 <p key={key}>{key}: {claims.myThings[key]}</p>
             )}
             </div>

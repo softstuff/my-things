@@ -36,7 +36,7 @@ const AttributesManualEditor = ({create, doc, onSaveThing}) => {
     useEffect(() => {
         remove()
         console.log('AttributesManualEditor - Init ', doc)
-        doc?.thing && Object.keys(doc.thing).forEach(attribute => {
+        doc?.thing && Object.getOwnPropertyNames(doc.thing).forEach(attribute => {
             append({name: attribute, value: doc.thing[attribute]})
         })
         

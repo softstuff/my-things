@@ -54,7 +54,7 @@ function Jira() {
             <p>Jira query parameters</p>
             { query ? (
                 <ul>
-                    {Object.keys(query).map( (key, index) => 
+                    {Object.getOwnPropertyNames(query).map( (key, index) => 
                         <li key={index}>{key} = {query[key]}</li>
                     )}
                 </ul>

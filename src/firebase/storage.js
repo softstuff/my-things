@@ -76,6 +76,7 @@ export const addNewCollection = async (tenantId, wid, collectionId) => {
     console.log('Added new collection', collectionId )
 }
 
+
 export const deleteCollection = async (tenantId, wid, path) => {
     console.log('Delete collection', path)
     const ws = getWorkspacePath(tenantId, wid)
@@ -156,13 +157,24 @@ export const getLevelInfo = (tenantId, wid, levelPath, onLoad, onError) => {
     )
 }
 
-export const updateCollectionMetadata = async (tenantId, wid, collection, displayName) => {
+export const getSchema = async (tenantId, wid, collectionPath, onLoaded, onError) => {
 
-    const path = getDocPath(tenantId, wid, collection)
-    console.log('getCollectionMetadata',path, displayName)
-    const doc = firestore.doc(path)
-    console.log('firestore.doc(path)',doc.id)
-   
+    const path = getDocPath(tenantId, wid, collectionPath, metaDocumentName)
+    console.log('getSchema',path)
+    return firestore.doc(path).onSnapshot(
+        snap => {
+            onLoaded(snap.data().schema)
+        }, error => {
+            onError(error)
+        }
+    )
+}
+
+export const saveSchema = (tenantId, wid, collectionPath, schema) => {
+
+    const path = getDocPath(tenantId, wid, collectionPath, metaDocumentName)
+    console.log('saveSchema',path, schema)
+    return firestore.doc(path).update( {schema})
 }
 
 export const listDocuments = async (tenantId, wid, collectionPath, onLoaded, onError) => {

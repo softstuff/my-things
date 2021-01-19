@@ -7,9 +7,11 @@
     "@material-ui/icons": "^4.11.2",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
+    "@testing-library/react-hooks": "^5.0.0",
     "@testing-library/user-event": "^12.1.10",
     "firebase": "^8.2.2",
     "flow-bin": "^0.141.0",
+    "joi": "^17.3.0",
     "notistack": "^1.0.3",
     "query-string": "^6.13.7",
     "react": "^17.0.1",
@@ -51,6 +53,7 @@
     ]
   },
   "devDependencies": {
+    "@hookform/devtools": "^2.2.1",
     "react-test-renderer": "^17.0.1"
   }
 }

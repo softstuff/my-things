@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { addNewCollection, deleteCollection, getLevelInfo, listDocuments } from '../firebase/storage'
+import { addNewCollection, deleteCollection, getLevelInfo } from '../firebase/storage'
 import { Paper, Grid, makeStyles, FormControlLabel, Switch, Box } from '@material-ui/core'
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
@@ -7,10 +7,10 @@ import ThingsBreadcrumbs from '../components/ThingsBreadcrumbs';
 
 import { useSession } from '../firebase/UserProvider';
 import { useWorkspace } from '../components/WorkspaceProvider';
-import DocumentList from '../components/DocumentList';
 import CollectionList from '../components/CollectiontList';
 import DocumentView from '../components/DocumentView';
 import { useSnackbar } from 'notistack';
+import CollectionView from '../components/CollectionView';
 
 
 
@@ -59,7 +59,6 @@ function Editor() {
     const { workspace } = useWorkspace()
     const [ levelPath, setLevelPath] = useState('/')
     const [ collectionList, setCollectionList] = useState([])
-    const [ documentList, setDocumentList] = useState()
     const [ collectionId, setCollectionId] = useState()
     const [ documentId, setDocumentId] = useState()
     const [createDocument, setCreateDocument] = useState(false)
@@ -83,22 +82,7 @@ function Editor() {
     }, [tenantId, wid, levelPath])
 
 
-    useEffect(() => {
-        console.log(' document list load for collectionId:', levelPath, collectionId)
-
-        const unsubscribe = listDocuments(tenantId, wid, `${levelPath}${collectionId}`,
-            (documentIds) => {
-                console.log("Loaded list documents", documentIds)
-                setDocumentList(documentIds)
-            }, (error) => {
-                console.log(`Failed to load documents for `, collectionId, error)
-                enqueueSnackbar(`Failed to documents for ${collectionId}`, { variant: 'error' })
-            }
-        )
-        return unsubscribe
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tenantId, wid, levelPath, collectionId])
+    
 
 
     // const onMetaSave =  (meta) => {
@@ -215,7 +199,8 @@ function Editor() {
                         </Grid>
                     </Paper>
                 </Grid>
-                <Grid item xs={3}>
+                
+                <Grid item sm={6} md={3} lg={2}>
                     <Box className={classes.main}>
                         <Paper className={`${classes.paper} ${classes.collection}`}>
 
@@ -231,36 +216,46 @@ function Editor() {
                             </>)}
                     </Box>
                 </Grid>
-                <Grid item xs={3}>
-                    <Box className={classes.main}>
-                        <Paper className={`${classes.paper} ${classes.collection}`}>
-                            {documentList &&
-                                <DocumentList selected={documentId} documentList={documentList} onDocumentSelect={onDocumentSelect} />}
+                {!documentId && !collectionId && 
+                    <p>Welcome add or select your collection</p>
+                }
+                {!documentId && collectionId && 
+                    <CollectionView 
+                        tenantId={tenantId}
+                        wid={wid}
+                        levelPath={levelPath} 
+                        collectionId={collectionId} 
+                        documentId={documentId} 
+                        editing={editing}
+                        onDocumentSelect={onDocumentSelect} /> }
+                {documentId && <>
+                    
+                    <Grid item sm={6} md={9} lg={10}>
+                        <Box className={classes.main}>
+                            <Paper className={`${classes.paper} ${classes.thing}`}>
 
-                        </Paper>
-                    </Box>
-                </Grid>
-                <Grid item xs={6}>
-                    <Box className={classes.main}>
-                        <Paper className={`${classes.paper} ${classes.thing}`}>
+                                {(documentId || createDocument) && (
+                                    <>
+                                        
+                                        <DocumentView
+                                            create={createDocument}
+                                            collectionPath={`${levelPath ? levelPath : '/'}${collectionId}`}
+                                            collectionId={collectionId}
+                                            documentId={documentId}
+                                            editing={editing}
+                                            onDocumentIdChange={onDocumentSelect}
+                                            onSubCollectionClick={handleSubCollectionTransition} />
+                                    </>)}
 
-                            {(documentId || createDocument) && (
-                                <DocumentView
-                                    create={createDocument}
-                                    collectionPath={`${levelPath ? levelPath : '/'}${collectionId}`}
-                                    documentId={documentId}
-                                    editing={editing}
-                                    onDocumentIdChange={onDocumentSelect}
-                                    onSubCollectionClick={handleSubCollectionTransition} />)}
+                            </Paper>
 
-                        </Paper>
-
-                        {editing && documentList && !createDocument && (
-                            <Fab className={classes.addDocumentIcon} color="primary" aria-label="add" onClick={handleCreateDocument}>
-                                <AddIcon />
-                            </Fab>)}
-                    </Box>
-                </Grid>
+                            {editing && !createDocument && (
+                                <Fab className={classes.addDocumentIcon} color="primary" aria-label="add" onClick={handleCreateDocument}>
+                                    <AddIcon />
+                                </Fab>)}
+                        </Box>
+                    </Grid>
+                </>}
             </Grid>
         </div>
     )

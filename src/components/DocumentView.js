@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Grid, IconButton, Icon, TextField, Button, AppBar, Tabs, Tab, Box, useTheme } from '@material-ui/core'
+import { Grid, IconButton, Icon, TextField, Button, AppBar, Tabs, Tab, Box, useTheme, Accordion, AccordionSummary, makeStyles, Typography, AccordionDetails } from '@material-ui/core'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { getDocument, deleteCollection, updateThing, addSubCollection } from '../firebase/storage'
 import { useForm} from 'react-hook-form';
@@ -7,9 +8,18 @@ import { useSession } from '../firebase/UserProvider';
 import { useWorkspace } from './WorkspaceProvider';
 import AttributesManualEditor from './document/AttributesManuelEditor';
 import { useSnackbar } from 'notistack';
+const useStyles = makeStyles((theme) => ({
+    root: {
+      width: '100%',
+    },
+    heading: {
+      fontSize: theme.typography.pxToRem(15),
+      fontWeight: theme.typography.fontWeightRegular,
+    },
+  }));
 
-
-function DocumentView({ create, collectionPath, documentId, onSubCollectionClick, editing, onDocumentIdChange }) {
+function DocumentView({ create, collectionPath, collectionId, documentId, onSubCollectionClick, editing, onDocumentIdChange }) {
+    const classes = useStyles();
     const { enqueueSnackbar } = useSnackbar();
     const [document, setDocument] = useState()
     const { claims } = useSession()
@@ -49,6 +59,8 @@ function DocumentView({ create, collectionPath, documentId, onSubCollectionClick
 
 
     }, [tenantId, wid, collectionPath, documentId, create])
+
+    
 
 
     const handleClick = (subCollectionName) => {
@@ -109,7 +121,19 @@ function DocumentView({ create, collectionPath, documentId, onSubCollectionClick
 
                 {editing ? (
                     <Grid item xs={10}>
-                        
+                        <div className={classes.root}>
+                            <Accordion>
+                                <AccordionSummary
+                                expandIcon={<ExpandMoreIcon />}
+                                aria-controls="panel1a-content"
+                                id="panel1a-header">
+                                    <Typography className={classes.heading}>Schema for {collectionId}</Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    
+                                </AccordionDetails>
+                            </Accordion>
+                        </div>
                         <EditAttributes create={create} doc={document} onSaveThing={onSaveThing} dbKey={dbKey}></EditAttributes>
                         <h2>Collections</h2>
                         <EditDocChildren doc={document} onAddChild={handleAddChild} onRemoveChild={handleRemoveChild} />
@@ -117,7 +141,7 @@ function DocumentView({ create, collectionPath, documentId, onSubCollectionClick
                 ) : (
                         <Grid item xs={10}>
                             <h2>Attributes</h2>
-                            {document?.thing && Object.keys(document.thing)
+                            {document?.thing && Object.getOwnPropertyNames(document.thing)
                                 .filter((key) => key !== 'metaInfo')
                                 .map((attib) => <div key={attib}>{attib} = {document.thing[attib]}</div>)}
 

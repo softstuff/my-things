@@ -20,7 +20,7 @@ const NotFoundPage = () => {
     return (
         <div className={classes.root} >
             <Link to="/">
-            <img src={notFoundImage} className={classes.img} />
+            <img src={notFoundImage} className={classes.img} alt='Not found'/>
                 <a href="http://www.freepik.com">Designed by pikisuperstar / Freepik</a>
 
                 <p>{message}</p>
