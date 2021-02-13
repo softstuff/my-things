@@ -1,0 +1,26 @@
+{
+    "definitions": {
+        "main": {
+            "type": "object",
+            "properties": {
+              "$schema": { "type": "string" },
+              "$id":           { "type": "string" },
+              "title":          { "type": "string" },
+              "type":          { "type": "string" },
+              "properties":     { "type": "object" },
+            },
+        "required": [
+            "$schema",
+            "$id",
+            "title",
+            "type",
+            "properties"
+        ],
+    
+        "collection": {
+            "properties": {
+            "description":  { "type": "string" },
+            "type":  { "type": "string" },
+            "items": { "type": "object" }
+        }
+    }

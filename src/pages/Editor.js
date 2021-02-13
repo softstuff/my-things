@@ -6,11 +6,11 @@ import AddIcon from '@material-ui/icons/Add';
 import ThingsBreadcrumbs from '../components/ThingsBreadcrumbs';
 
 import { useSession } from '../firebase/UserProvider';
-import { useWorkspace } from '../components/WorkspaceProvider';
 import CollectionList from '../components/CollectiontList';
 import DocumentView from '../components/DocumentView';
 import { useSnackbar } from 'notistack';
 import CollectionView from '../components/CollectionView';
+import { useWorkspace } from '../components/workspace/useWorkspace';
 
 
 
@@ -56,7 +56,7 @@ function Editor() {
     const { enqueueSnackbar } = useSnackbar();
     const [ editing, setEditing] = useState(false)
     const { claims } = useSession()
-    const { workspace } = useWorkspace()
+    const { wid } = useWorkspace()
     const [ levelPath, setLevelPath] = useState('/')
     const [ collectionList, setCollectionList] = useState([])
     const [ collectionId, setCollectionId] = useState()
@@ -64,7 +64,6 @@ function Editor() {
     const [createDocument, setCreateDocument] = useState(false)
 
     const tenantId = claims.myThings.tenantId
-    const wid = workspace.id
 
     useEffect(() => {
         const unsubscribe = getLevelInfo(tenantId, wid, levelPath,
@@ -216,10 +215,10 @@ function Editor() {
                             </>)}
                     </Box>
                 </Grid>
-                {!documentId && !collectionId && 
+                {!documentId && !collectionId && !createDocument  && 
                     <p>Welcome add or select your collection</p>
                 }
-                {!documentId && collectionId && 
+                {!documentId && collectionId && !createDocument &&
                     <CollectionView 
                         tenantId={tenantId}
                         wid={wid}
@@ -227,25 +226,21 @@ function Editor() {
                         collectionId={collectionId} 
                         documentId={documentId} 
                         editing={editing}
-                        onDocumentSelect={onDocumentSelect} /> }
-                {documentId && <>
+                        onDocumentSelect={onDocumentSelect}
+                        onDocumentCreate={handleCreateDocument} /> }
+                {(documentId || createDocument) && <>
                     
                     <Grid item sm={6} md={9} lg={10}>
                         <Box className={classes.main}>
                             <Paper className={`${classes.paper} ${classes.thing}`}>
-
-                                {(documentId || createDocument) && (
-                                    <>
-                                        
-                                        <DocumentView
-                                            create={createDocument}
-                                            collectionPath={`${levelPath ? levelPath : '/'}${collectionId}`}
-                                            collectionId={collectionId}
-                                            documentId={documentId}
-                                            editing={editing}
-                                            onDocumentIdChange={onDocumentSelect}
-                                            onSubCollectionClick={handleSubCollectionTransition} />
-                                    </>)}
+                                <DocumentView
+                                    create={createDocument}
+                                    collectionPath={`${levelPath ? levelPath : '/'}${collectionId}`}
+                                    collectionId={collectionId}
+                                    documentId={documentId}
+                                    editing={editing}
+                                    onDocumentIdChange={onDocumentSelect}
+                                    onSubCollectionClick={handleSubCollectionTransition} />
 
                             </Paper>
 

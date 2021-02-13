@@ -3,6 +3,7 @@ const connectApp = require('./atlassian/connect-app')
 const tenant = require('./tenant/tenant')
 const metaController = require('./tenant/meta-controller')
 const fs = require('./firebase-service');
+const {getSchema} = require('./tenant/schema')
 const express = require("express");
 const cors = require('cors')
 
@@ -20,6 +21,7 @@ const app = express()
   .get('/api/auth/jira/login', connectApp.handleTokenExchange)
   .post('/api/tenant', fs.checkIfAuthenticated, tenant.createTenant)
 
+  .get('/api/schema/:tenantId/:wid/*.json', getSchema)
 
 
 

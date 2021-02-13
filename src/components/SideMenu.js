@@ -5,21 +5,14 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import InfoIcon from '@material-ui/icons/Info';
 import InputIcon from '@material-ui/icons/Input';
 import ExtensionIcon from '@material-ui/icons/Extension';
-import { Link, useHistory } from 'react-router-dom';
-import { useWorkspace } from './WorkspaceProvider';
+import { Link } from 'react-router-dom';
+import { useWorkspace } from './workspace/useWorkspace';
+
 
 const SiteMenu = (props) => {
-  const { workspace } = useWorkspace()
-  const history = useHistory()
+  const { wid } = useWorkspace()
 
-  const openUserProfile = () => {
-    history.push('/profile')
-  }
 
-  const openEditor = () => {
-    console.log('open editor')
-    history.push('/editor')
-  }
   // <div className={props.toolbar} />
 
   return (
@@ -42,12 +35,18 @@ const SiteMenu = (props) => {
         </ListItem>
       </List>
       <Divider />
-      { workspace && (<List>
+      { wid && (<List>
         <ListSubheader>
-          {`Workspace: ${workspace.id}`}
+          {`Workspace: ${wid}`}
         </ListSubheader>
 
-        <ListItem button onClick={openEditor}>
+        <ListItem button  component={Link} to={`/schema`} >
+          <ListItemIcon>
+            <InboxIcon />
+          </ListItemIcon>
+          <ListItemText primary='Schema' />
+        </ListItem>
+        <ListItem button  component={Link} to={`/editor`} >
           <ListItemIcon>
             <InboxIcon />
           </ListItemIcon>
@@ -62,7 +61,7 @@ const SiteMenu = (props) => {
       </List>)}
       <Divider />
       <List>
-        <ListItem button onClick={openUserProfile}>
+        <ListItem button component={Link} to={`/profile`} >
           <ListItemIcon>
             <AccountCircle />
           </ListItemIcon>

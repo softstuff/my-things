@@ -18,8 +18,8 @@ import { createWorkspace, getWorkspaces, removeWorkspace, updateWorkspace } from
 import { AccordionActions,Button, Divider, TextField, withStyles } from '@material-ui/core';
 import { useSession } from '../firebase/UserProvider';
 import { Link } from 'react-router-dom';
-import { useWorkspace } from '../components/WorkspaceProvider';
 import { useForm } from 'react-hook-form';
+import { useWorkspace } from '../components/workspace/useWorkspace';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -102,7 +102,7 @@ const useStyles = makeStyles((theme) => ({
 const Workspaces = () => {
     const classes = useStyles();
     const { claims } = useSession()
-    const { workspace, setWorkspace } = useWorkspace()
+    const { workspace, setWid } = useWorkspace()
     const [ workspaces, setWorkspaces ] = useState([])
     const tenantId = claims.myThings.tenantId
     const [expanded, setExpanded] = React.useState(false);
@@ -145,7 +145,7 @@ const Workspaces = () => {
         console.log('Clear to remove workspace', wid)
         await removeWorkspace(claims.myThings.tenantId, wid)
         if(workspace?.id === wid) {
-          setWorkspace()
+          setWid()
         }
       } else {
         console.log('Cancel removal of workspace', wid)
@@ -171,7 +171,7 @@ const Workspaces = () => {
         >
           <Typography className={classes.heading}>{ws.id}</Typography>
           {/* <Typography className={classes.secondaryHeading}>I am an accordion</Typography> */}
-          <Button size="small" color="secondary" onClick={()=>setWorkspace(ws)}>Use</Button>
+          <Button size="small" color="secondary" onClick={()=>setWid(ws.id)}>Use</Button>
         </AccordionSummary>
         <AccordionDetails>
           <Typography>
@@ -193,8 +193,8 @@ const Workspaces = () => {
 
           <Divider orientation="vertical" flexItem />
           
-          <Button size="small" color="secondary" onClick={()=>setWorkspace(ws)}>Use</Button>
-          <Button size="small" color="primary" component={Link} to={`/editor`} onClick={()=>setWorkspace(ws)}>Editor</Button>
+          <Button size="small" color="secondary" onClick={()=>setWid(ws.id)}>Use</Button>
+          <Button size="small" color="primary" component={Link} to={`/editor`} onClick={()=>setWid(ws.id)}>Editor</Button>
           
           <Divider orientation="vertical" flexItem />
           <ConfirmDeleteDialog open={confirmDelete === ws.id} onClose={handleDeleteWorkspace} workspace={ws} />

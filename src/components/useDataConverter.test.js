@@ -4,16 +4,16 @@ import useDataConverter from './useDataConverter'
 
 describe('serialize form data to json schema', ()=>{
     const title = 'test title'
+    const host = "http://localhost:1234"
     it('handle empty form', ()=>{
 
         const {result} = renderHook(() => useDataConverter())
         
         act(() => {
             const form = {}
-            const json = result.current.formToJsonSchema(title, form)
+            const json = result.current.formToJsonSchema(form)
             console.log('Converted', form, 'to', json)
 
-            expect(json.title).toBe(title)
             expect(json.type).toBe('object')
             expect(json.properties).toStrictEqual({})
         })
@@ -31,10 +31,9 @@ describe('serialize form data to json schema', ()=>{
                     {key: 'Balance', type: 'number', description: 'Testing args3', required: true}
                 ]
             }
-            const json = result.current.formToJsonSchema(title, form)
+            const json = result.current.formToJsonSchema(form)
             console.log('Converted', form, 'to', json)
 
-            expect(json.title).toBe(title)
             expect(json.type).toBe('object')
             expect(json.properties.Name.description).toStrictEqual(form.attribute[0].description)
             expect(json.properties.Name.type).toStrictEqual(form.attribute[0].type)
@@ -52,14 +51,21 @@ describe('serialize form data to json schema', ()=>{
     describe('convert json schema to form fields', ()=>{
         it('handle all attributes', ()=>{
             const schema = {
-                '$schema': 'http://json-schema.org/draft-07/schema#',
-                '$id': 'http://example.com/product.schema.json',
-                title: 'test title',
                 type: 'object',
                 properties: {
                     Name: { description: 'Testing args', type: 'string' },
                     Age: { description: 'Testing args2', type: 'integer' },
-                    Balance: { description: 'Testing args3', type: 'number' }
+                    Balance: { description: 'Testing args3', type: 'number' },
+                    Kiddo: {
+                        type: "array",
+                        description: 'Testing args4',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                ChildName: { description: 'Testing child args', type: 'string' },
+                            }
+                        }
+                    }
                 },
                 required: [ 'Name', 'Balance' ]
             }
@@ -70,7 +76,7 @@ describe('serialize form data to json schema', ()=>{
                 const fields = result.current.schemaPropsToList(schema)
                 console.log('Converted', schema, 'to', fields)
 
-                expect(fields.length).toBe(3)
+                expect(fields.length).toBe(4)
                 expect(fields[0].key).toBe('Name')
                 expect(fields[0].type).toBe(schema.properties.Name.type)
                 expect(fields[0].description).toBe(schema.properties.Name.description)
@@ -83,19 +89,74 @@ describe('serialize form data to json schema', ()=>{
                 expect(fields[2].type).toBe(schema.properties.Balance.type)
                 expect(fields[2].description).toBe(schema.properties.Balance.description)
                 expect(fields[2].required).toBe(true)
+                expect(fields[3].key).toBe('Kiddo')
+                expect(fields[3].type).toBe(schema.properties.Kiddo.type)
+                expect(fields[3].description).toBe(schema.properties.Kiddo.description)
+                expect(fields[3].required).toBe(false)
             })            
+        })
+
+        describe('convert json schema to form fields', ()=>{
+            it('handle a subcollections attributes', ()=>{
+                const schema = {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            Name: { description: 'Testing args', type: 'string' },
+                            Age: { description: 'Testing args2', type: 'integer' },
+                            Balance: { description: 'Testing args3', type: 'number' },
+                            Kiddo: {
+                                type: "array",
+                                description: 'Testing args4',
+                                items: {
+                                    "type": "object",
+                                    "required": [],
+                                    "additionalProperties": false,
+                                    "properties": {}
+                                  }
+                            }
+                        },
+                        required: [ 'Name', 'Balance' ]
+                    }
+                }
+    
+                const {result} = renderHook(() => useDataConverter())
+        
+                act(() => {  
+                    const fields = result.current.schemaPropsToList(schema)
+                    console.log('Converted', schema, 'to', fields)
+    
+                    expect(fields.length).toBe(4)
+                    expect(fields[0].key).toBe('Name')
+                    expect(fields[0].type).toBe(schema.items.properties.Name.type)
+                    expect(fields[0].description).toBe(schema.items.properties.Name.description)
+                    expect(fields[0].required).toBe(true)
+                    expect(fields[1].key).toBe('Age')
+                    expect(fields[1].type).toBe(schema.items.properties.Age.type)
+                    expect(fields[1].description).toBe(schema.items.properties.Age.description)
+                    expect(fields[1].required).toBe(false)
+                    expect(fields[2].key).toBe('Balance')
+                    expect(fields[2].type).toBe(schema.items.properties.Balance.type)
+                    expect(fields[2].description).toBe(schema.items.properties.Balance.description)
+                    expect(fields[2].required).toBe(true)
+                    expect(fields[3].key).toBe('Kiddo')
+                    expect(fields[3].type).toBe(schema.items.properties.Kiddo.type)
+                    expect(fields[3].description).toBe(schema.items.properties.Kiddo.description)
+                    expect(fields[3].required).toBe(false)
+                    expect(fields[3].items.type).toBe('object')
+                    expect(fields[3].items.properties).toMatchObject({})
+                    expect(fields[3].items.required).toMatchObject([])
+                })            
+            })
         })
 
         it('can handle missing required array', ()=>{
             const schema = {
-                '$schema': 'http://json-schema.org/draft-07/schema#',
-                '$id': 'http://example.com/product.schema.json',
-                title: 'test title',
                 type: 'object',
                 properties: {
                     Name: { description: 'Testing args', type: 'string' }
-                },
-                required: []
+                }
             }
 
             const {result} = renderHook(() => useDataConverter())
@@ -109,9 +170,6 @@ describe('serialize form data to json schema', ()=>{
 
         it('can handle missing description', ()=>{
             const schema = {
-                '$schema': 'http://json-schema.org/draft-07/schema#',
-                '$id': 'http://example.com/product.schema.json',
-                title: 'test title',
                 type: 'object',
                 properties: {
                     Name: { type: 'string' }
@@ -125,24 +183,6 @@ describe('serialize form data to json schema', ()=>{
                 console.log('Converted', schema, 'to', fields)
                 expect(fields[0].description).toBe('')
             })            
-        })
-
-        it('brum', ()=>{
-            
-            for(let i=0; i<1000; i++) {
-                const obj = {
-                    h: {name: 'H'},
-                    a: {name: 'A'},
-                    c: {name: 'C'},
-                    b: {name: 'B'},
-                    e: {name: 'E'},
-                    d: {name: 'D'},
-                    g: {name: 'G'},
-                    f: {name: 'F'},
-                }
-                const str = Object.getOwnPropertyNames(obj).join()
-                expect(str).toBe('h,a,c,b,e,d,g,f')
-            }
         })
     })
 })

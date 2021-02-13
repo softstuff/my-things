@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { Grid, IconButton, Icon, TextField, Button, AppBar, Tabs, Tab, Box, useTheme, Accordion, AccordionSummary, makeStyles, Typography, AccordionDetails } from '@material-ui/core'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { Grid, IconButton, Icon, TextField, Button, AppBar, Tabs, Tab, Box, useTheme,makeStyles } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete';
-import { getDocument, deleteCollection, updateThing, addSubCollection } from '../firebase/storage'
+import { getDocument, deleteCollection, updateThing, addSubCollection, getSchema } from '../firebase/storage'
 import { useForm} from 'react-hook-form';
 import { useSession } from '../firebase/UserProvider';
-import { useWorkspace } from './WorkspaceProvider';
-import AttributesManualEditor from './document/AttributesManuelEditor';
 import { useSnackbar } from 'notistack';
+import AttributesSchemaEditor from './document/AttributesSchemaEditor';
+import { useWorkspace } from './workspace/useWorkspace';
 const useStyles = makeStyles((theme) => ({
     root: {
       width: '100%',
@@ -22,6 +21,8 @@ function DocumentView({ create, collectionPath, collectionId, documentId, onSubC
     const classes = useStyles();
     const { enqueueSnackbar } = useSnackbar();
     const [document, setDocument] = useState()
+    const [schema, setSchema] = useState()
+    const [children, setChildren] = useState([])
     const { claims } = useSession()
     const { workspace } = useWorkspace()
     // const documentId = toDocumentId(path)
@@ -36,7 +37,7 @@ function DocumentView({ create, collectionPath, collectionId, documentId, onSubC
                 meta: {
                     children: []
                 },
-                thing: []
+                thing: {}
             })
             return null
         }
@@ -60,10 +61,35 @@ function DocumentView({ create, collectionPath, collectionId, documentId, onSubC
 
     }, [tenantId, wid, collectionPath, documentId, create])
 
+    useEffect(()=>{
+        return getSchema(tenantId, wid, collectionPath,
+            loaded => {
+                console.log('Loaded schema', loaded)
+                setSchema(loaded)
+
+                
+                const ch = Object.getOwnPropertyNames(loaded.properties).map(key=>{
+                        return {
+                            key: key,
+                            type: loaded.properties[key].type,
+                            order: loaded.properties[key].order
+                        }
+                    })
+                    .filter(item => item.type == 'array')
+                    .map(item => item.key)
+                console.log("Loaded children ", ch)
+                setChildren(ch)
+            },
+            error => {
+                console.log("Failed to load schema", error)
+                enqueueSnackbar(`Failed to load schema`, { variant: 'error' })
+            })
+
+    }, [tenantId, wid, collectionPath, getSchema, setSchema, enqueueSnackbar, setChildren])
     
 
 
-    const handleClick = (subCollectionName) => {
+    const handleSubCollectionClick = (subCollectionName) => {
         const newPath = `${collectionPath}/${documentId}/${subCollectionName}`
         console.log('selected a subcollection, opening ', newPath)
         onSubCollectionClick(subCollectionName)
@@ -121,22 +147,9 @@ function DocumentView({ create, collectionPath, collectionId, documentId, onSubC
 
                 {editing ? (
                     <Grid item xs={10}>
-                        <div className={classes.root}>
-                            <Accordion>
-                                <AccordionSummary
-                                expandIcon={<ExpandMoreIcon />}
-                                aria-controls="panel1a-content"
-                                id="panel1a-header">
-                                    <Typography className={classes.heading}>Schema for {collectionId}</Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    
-                                </AccordionDetails>
-                            </Accordion>
-                        </div>
-                        <EditAttributes create={create} doc={document} onSaveThing={onSaveThing} dbKey={dbKey}></EditAttributes>
+                        <AttributesSchemaEditor doc={document} onSaveThing={onSaveThing} create={create} schema={schema} />
                         <h2>Collections</h2>
-                        <EditDocChildren doc={document} onAddChild={handleAddChild} onRemoveChild={handleRemoveChild} />
+                        <EditDocChildren doc={document} onAddChild={handleAddChild} onRemoveChild={handleRemoveChild} onSubCollectionClick={handleSubCollectionClick} />
                     </Grid>
                 ) : (
                         <Grid item xs={10}>
@@ -146,8 +159,16 @@ function DocumentView({ create, collectionPath, collectionId, documentId, onSubC
                                 .map((attib) => <div key={attib}>{attib} = {document.thing[attib]}</div>)}
 
                             <h2>Collections</h2>
-                            {document?.meta?.children.map((collectionId) =>
-                                <div key={collectionId} ><Button onClick={() => handleClick(collectionId)}>{collectionId}</Button></div>)}
+                            {children.map(childCollectionId => (
+                                <div key={childCollectionId} >
+                                    <Button onClick={() => handleSubCollectionClick(childCollectionId)}>{childCollectionId}</Button>
+                                </div>
+                            ))}
+
+                            {/* {document?.meta?.children.map((collectionId) =>
+                                <div key={collectionId} >
+                                    <Button onClick={() => handleSubCollectionClick(collectionId)}>{collectionId}</Button>
+                                </div>)} */}
                         </Grid>
                     )}
                 <Grid item xs={10}>
@@ -160,7 +181,7 @@ function DocumentView({ create, collectionPath, collectionId, documentId, onSubC
 
 }
 
-function EditAttributes({ create, doc, onSaveThing }) {
+function EditAttributes({ create, doc, onSaveThing, schema }) {
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
 
@@ -186,10 +207,10 @@ function EditAttributes({ create, doc, onSaveThing }) {
             </AppBar>
 
             <TabPanel value={value} index={0} dir={theme.direction}>
-                <AttributesManualEditor doc={doc} onSaveThing={onSaveThing} create={create} />
+                <AttributesSchemaEditor doc={doc} onSaveThing={onSaveThing} create={create} schema={schema} />
             </TabPanel>
             <TabPanel value={value} index={1} dir={theme.direction}>
-                TODO edit by schema
+                <AttributesSchemaEditor doc={doc} onSaveThing={onSaveThing} create={create} schema={schema} />
             </TabPanel>
             <TabPanel value={value} index={2} dir={theme.direction}>
                 TODO edit by Json
@@ -226,7 +247,7 @@ function a11yProps(index) {
     };
 }
 
-function EditDocChildren({ doc, onAddChild, onRemoveChild }) {
+function EditDocChildren({ doc, onAddChild, onRemoveChild, onSubCollectionClick }) {
 
     const { register, handleSubmit, reset, errors } = useForm()
 
@@ -245,7 +266,7 @@ function EditDocChildren({ doc, onAddChild, onRemoveChild }) {
         <form>
             {doc?.meta?.children && doc.meta.children.map((name, index) =>
                 <div key={index}>
-                    {name}
+                    <Button onClick={() => onSubCollectionClick(name)}>{name}</Button>
                     <IconButton aria-label="delete" onClick={() => onDelete(name)}>
                         <DeleteIcon />
                     </IconButton>

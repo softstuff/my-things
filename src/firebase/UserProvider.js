@@ -7,6 +7,7 @@ import NewTenant from '../pages/NewTenant'
 import Signin from '../pages/Signin'
 import { CircularProgress } from '@material-ui/core'
 
+
 export const UserContext = React.createContext()
 
 export const UserProvider = (props) => {
@@ -99,7 +100,7 @@ export const UserProvider = (props) => {
 
     return (
         <>
-            <UserContext.Provider value={{claims, jira, loadClames}} >
+            
                 { (()=>{
                     if(loading){
                         return (<CircularProgress />)
@@ -109,12 +110,18 @@ export const UserProvider = (props) => {
                         }
                         return (<Signin/>)
                     } else if(!claims?.myThings?.tenantId) {
-                        return (<NewTenant/>)
+                        return (
+                            <UserContext.Provider value={{claims, jira, loadClames}} >
+                                <NewTenant/>
+                            </UserContext.Provider>)
                     } else {
-                        return (props.children)
+                        return (
+                            <UserContext.Provider value={{claims, jira, loadClames}} >
+                                {props.children}
+                            </UserContext.Provider>)
                     }
                 })()}
-            </UserContext.Provider>
+            
         </>
     )
 }

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { getSchema, listDocuments } from '../firebase/storage'
-import { Paper, Grid, makeStyles, Box, Typography, AppBar, Tabs, Tab, useTheme } from '@material-ui/core'
+import { Paper, Grid, makeStyles, Box, Typography, AppBar, Tabs, Tab, useTheme, Fab } from '@material-ui/core'
+import AddIcon from '@material-ui/icons/Add';
 import { useSnackbar } from 'notistack';
 import DocumentList from '../components/DocumentList';
-import SchemaEditor from './SchemaEditor';
+import SchemaEditor from '../schema/SchemaEditor';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -30,15 +31,21 @@ const useStyles = makeStyles((theme) => ({
         flex: '1',
         overflow: 'auto'
     },
+    addDocumentIcon: {
+        position: 'absolute',
+        right: '30px',
+        bottom: '15px'
+    }
 }));
 
-const CollectionView = ({tenantId, wid, levelPath, collectionId, documentId, editing, onDocumentSelect}) => {
+const CollectionView = ({ tenantId, wid, levelPath, collectionId, documentId, editing, onDocumentSelect, onDocumentCreate }) => {
     const classes = useStyles();
     const theme = useTheme();
     const { enqueueSnackbar } = useSnackbar();
-    const [ documentList, setDocumentList] = useState()
+    const [documentList, setDocumentList] = useState()
     const [tab, setTab] = React.useState(0);
     const [schema, setSchema] = useState()
+    const [createDocument, setCreateDocument] = useState(false)
 
     const collectionPath = `${levelPath}${collectionId}`
 
@@ -60,8 +67,8 @@ const CollectionView = ({tenantId, wid, levelPath, collectionId, documentId, edi
     }, [tenantId, wid, collectionPath])
 
     useEffect(() => {
-        
-        return getSchema(tenantId, wid, collectionPath, 
+
+        return getSchema(tenantId, wid, collectionPath,
             loaded => {
                 setSchema(loaded)
                 // setSchema(JSON.stringify(JSON.parse(loaded),null,2))
@@ -78,8 +85,8 @@ const CollectionView = ({tenantId, wid, levelPath, collectionId, documentId, edi
     };
 
     return (
-        <> 
-        {/* xs={6} md={3} xl={2} */}
+        <>
+            {/* xs={6} md={3} xl={2} */}
             <Grid item sm={6} md={3} lg={2} className={classes.block}>
                 <Box className={classes.main}>
                     <Paper className={`${classes.paper} ${classes.filter}`}>
@@ -90,53 +97,55 @@ const CollectionView = ({tenantId, wid, levelPath, collectionId, documentId, edi
                             <DocumentList selected={documentId} documentList={documentList} onDocumentSelect={onDocumentSelect} />}
 
                     </Paper>
+                    {editing && !createDocument && (
+                        <Fab className={classes.addDocumentIcon} color="primary" aria-label="add" onClick={onDocumentCreate}>
+                            <AddIcon />
+                        </Fab>)}
                 </Box>
             </Grid>
             <Grid item sm={12} md={6} lg={8} className={classes.block}>
 
                 <Box className={classes.main}>
                     <Paper className={`${classes.paper} ${classes.collection}`}>
+                        <Typography>{collectionId}</Typography>
+                        <AppBar position="static" color="default">
+                            <Tabs
+                                value={tab}
+                                onChange={handleTabChange}
+                                indicatorColor="primary"
+                                textColor="primary"
+                                variant="fullWidth"
+                                aria-label="full width tabs example"
+                            >
+                                <Tab label="Info" {...a11yProps(0)} />
+                                <Tab label="Schema" {...a11yProps(1)} />
+                                <Tab label="Import" {...a11yProps(2)} />
+                                <Tab label="Export" {...a11yProps(3)} />
+                                <Tab label="Automation" {...a11yProps(4)} />
+                            </Tabs>
+                        </AppBar>
 
-                    <Typography>{collectionId}</Typography>
-                    <AppBar position="static" color="default">
-                        <Tabs
-                            value={tab}
-                            onChange={handleTabChange}
-                            indicatorColor="primary"
-                            textColor="primary"
-                            variant="fullWidth"
-                            aria-label="full width tabs example"
-                        >
-                            <Tab label="Info" {...a11yProps(0)} />
-                            <Tab label="Schema" {...a11yProps(1)} />
-                            <Tab label="Import" {...a11yProps(2)} />
-                            <Tab label="Export" {...a11yProps(3)} />
-                            <Tab label="Automation" {...a11yProps(4)} />
-                        </Tabs>
-                    </AppBar>
-
-                    <TabPanel value={tab} index={0} dir={theme.direction}>
-                        Info
-                    </TabPanel>
-                    <TabPanel value={tab} index={1} dir={theme.direction}>
-                        <SchemaEditor 
-                                        tenantId={tenantId}
-                                        wid={wid}
-                                        collectionId={collectionId}
-                                        collectionPath={collectionPath}
-                                        schema={schema}
-                                        editing={editing} />
-                    </TabPanel>
-                    <TabPanel value={tab} index={2} dir={theme.direction}>
-                    Import
-                    </TabPanel>
-                    <TabPanel value={tab} index={3} dir={theme.direction}>
-                    Export
-                    </TabPanel>
-                    <TabPanel value={tab} index={4} dir={theme.direction}>
-                    Automation
-                    </TabPanel>
-
+                        <TabPanel value={tab} index={0} dir={theme.direction}>
+                            Info
+                        </TabPanel>
+                        <TabPanel value={tab} index={1} dir={theme.direction}>
+                            <SchemaEditor
+                                tenantId={tenantId}
+                                wid={wid}
+                                collectionId={collectionId}
+                                collectionPath={collectionPath}
+                                schema={schema}
+                                editing={editing} />
+                        </TabPanel>
+                        <TabPanel value={tab} index={2} dir={theme.direction}>
+                            Import
+                        </TabPanel>
+                        <TabPanel value={tab} index={3} dir={theme.direction}>
+                            Export
+                        </TabPanel>
+                        <TabPanel value={tab} index={4} dir={theme.direction}>
+                            Automation
+                        </TabPanel>
                     </Paper>
                 </Box>
             </Grid>
