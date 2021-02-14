@@ -59,6 +59,7 @@
   "devDependencies": {
     "@hookform/devtools": "^2.2.1",
     "@stryker-mutator/core": "^4.4.1",
-    "react-test-renderer": "^17.0.1"
+    "react-test-renderer": "^17.0.1",
+    "rewire": "^5.0.0"
   }
 }

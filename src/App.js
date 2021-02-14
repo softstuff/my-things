@@ -19,6 +19,7 @@ import { SnackbarProvider } from "notistack";
 import NotFoundPage from "./pages/NotFoundPage";
 import Error from "./pages/Error";
 import SchemaView from "./pages/SchemaView";
+import ImportPage from "./pages/ImportPage";
 import { WorkspaceProvider } from "./components/workspace/WorkspaceProvider";
 import { ConfirmProvider } from 'material-ui-confirm';
 
@@ -79,6 +80,7 @@ function App() {
                         <Route exact path="/profile" component={Profile} />
                         <Route path="/workspaces" component={Workspaces} />
                         <Route path="/schema" component={SchemaView} />
+                        <Route path="/import" component={ImportPage} />
                         <Route path="/">
                           <Redirect to="/signin" />
                         </Route>
@@ -97,4 +99,3 @@ function App() {
 }
 
 export default App;
-

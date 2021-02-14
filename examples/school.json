@@ -1,0 +1,29 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Workspace default",
+    "type": "object",
+    "properties": {
+      "Skola": {
+        "description": "",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [],
+          "additionalProperties": false,
+          "properties": {
+            "Klass": {
+              "description": "",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [],
+                "additionalProperties": false,
+                "properties": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "$id": "http://localhost:3000/api/schema/default.json"
+}

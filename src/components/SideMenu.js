@@ -52,6 +52,12 @@ const SiteMenu = (props) => {
           </ListItemIcon>
           <ListItemText primary='Editor' />
         </ListItem>
+        <ListItem button  component={Link} to={`/import`}>
+          <ListItemIcon>
+            <ExtensionIcon />
+          </ListItemIcon>
+          <ListItemText primary='Import' />
+        </ListItem>
         <ListItem button>
           <ListItemIcon>
             <ExtensionIcon />
