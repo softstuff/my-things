@@ -3,6 +3,7 @@ import { useWorkspace } from "../components/workspace/useWorkspace"
 import { saveSchema} from "../firebase/storage"
 import jp from 'json-pointer'
 import { useUser } from "../components/user/useUser"
+import { useCallback } from "react"
 
 export const useSchema = () => {
 
@@ -22,7 +23,7 @@ export const useSchema = () => {
         }
     }
 
-    const addNewCollection = (pointer, key, description) => {
+    const addNewCollection = useCallback( (pointer, key, description) => {
         console.log("addNewCollection", pointer, key, description, schema)
 
 
@@ -46,9 +47,9 @@ export const useSchema = () => {
 
         saveSchema(tenantId, wid, schemaToSave)
         return `${subPointer}/${key}`
-    }
+    },[])
 
-    const deleteCollection = (pointer) => {
+    const deleteCollection = useCallback( (pointer) => {
         console.log("deleteCollection", pointer)
 
         let schemaToSave = Object.assign({}, schema)
@@ -57,9 +58,9 @@ export const useSchema = () => {
         console.log("- schemaToSave", schemaToSave)
 
         saveSchema(tenantId, wid, schemaToSave)
-    }
+    },[])
 
-    const saveProperty = (pointer, properties) => {
+    const saveProperty = useCallback( (pointer, properties) => {
         console.log("init saveProperty", pointer, properties)
         let schemaToSave = Object.assign({}, schema)
         jp.set(schemaToSave, pointer, properties)
@@ -67,9 +68,9 @@ export const useSchema = () => {
         console.log('saveProperty', schemaToSave)
         saveSchema(tenantId, wid, schemaToSave)
         return schemaToSave
-    }
+    },[])
 
-    const addProperty = (parentPointer, key, required, data) => {
+    const addProperty = useCallback( (parentPointer, key, required, data) => {
         console.log("init addProperty", parentPointer, key, 'required:',required, data)
         const propertyPointer = `${parentPointer}/items/properties/${key}`
         const requeredPointer = `${parentPointer}/items/required`
@@ -92,9 +93,9 @@ export const useSchema = () => {
         console.log('saveProperty', schemaToSave)
         saveSchema(tenantId, wid, schemaToSave)
         return schemaToSave
-    }
+    },[])
 
-    const deleteProperty = (parentPointer, key) => {
+    const deleteProperty = useCallback( (parentPointer, key) => {
         console.log("init deleteProperty", parentPointer, key)
         const propertyPointer = `${parentPointer}/items/properties/${key}`
         const requeredPointer = `${parentPointer}/items/required`
@@ -110,35 +111,40 @@ export const useSchema = () => {
         console.log('saveProperty', schemaToSave)
         saveSchema(tenantId, wid, schemaToSave)
         return schemaToSave
-    }
+    },[])
 
-    const cleanEmptyValues = (obj) => {
+    const cleanEmptyValues = useCallback( obj => {
         for (var propName in obj) {
           if (obj[propName] === null || obj[propName] === undefined || obj[propName] === '') {
             delete obj[propName];
           }
         }
         return obj
-      }
+      },[])
 
-    const save = schema => {
+    const save = useCallback( schema => {
         saveSchema(tenantId, wid, schema)
-    }
+    },[])
 
-    const getPropertyFor = pointer => {
+    const getPropertyFor = useCallback( pointer => {
         return  jp.get(schema, pointer)
-    }
+    },[])
 
-    const collectionIdFor = pointer =>  {
+    const collectionIdFor = useCallback( pointer =>  {
         return pointer.substring(pointer.lastIndexOf('/')+1)
-    }
+    },[])
 
-    const collectionIdPath = pointer =>  {
+    const collectionIdPath = useCallback( pointer =>  {
         const regex = /(\/items\/properties|\/properties)/ig
         let path = pointer.replace(regex, '')
         path = path.replace(/^\//, '');
         return path.split('/')
-    }
+    },[])
+
+    const getPointerFor = useCallback( collectionPath => {
+        let result = '/properties/' + collectionPath.slice(1).replace(/\//ig, '/items/properties/')
+        return result
+    },[])
     
     return {
         schema,
@@ -151,6 +157,7 @@ export const useSchema = () => {
         getPropertyFor,
         collectionIdFor,
         collectionIdPath,
+        getPointerFor
     }
 
 

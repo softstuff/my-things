@@ -127,3 +127,37 @@ describe('verify collectionIdPath', () => {
         })
     })
 })
+
+describe('validate collectionPath to pointer', () => {
+    it('validate level 0', ()=>{
+        const { result } = renderHook(() => useSchema(), { wrapper: makeWrapper() })
+
+        const collectionPath = '/foo'
+        act(() => {
+            const pointer = result.current.getPointerFor(collectionPath)
+            expect(pointer).toBe("/properties/foo")
+        })
+    })
+
+    it('validate level 1', ()=>{
+        const { result } = renderHook(() => useSchema(), { wrapper: makeWrapper() })
+
+        const collectionPath = '/foo/bar'
+        act(() => {
+            const pointer = result.current.getPointerFor(collectionPath)
+            expect(pointer).toBe("/properties/foo/items/properties/bar")
+        })
+    })
+
+    
+    it('validate level 3', ()=>{
+        const { result } = renderHook(() => useSchema(), { wrapper: makeWrapper() })
+
+        const collectionPath = '/foo/bar/wii'
+        act(() => {
+            const pointer = result.current.getPointerFor(collectionPath)
+            expect(pointer).toBe("/properties/foo/items/properties/bar/items/properties/wii")
+        })
+    })
+
+})

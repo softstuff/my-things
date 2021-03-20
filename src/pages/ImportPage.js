@@ -3,6 +3,7 @@ import { Button, makeStyles } from '@material-ui/core'
 import ImportConfigEditor from '../imports/ImportConfigEditor'
 import ImportWizard from '../imports/ImportWizard'
 
+
 const useStyles = makeStyles((theme) => ({
     container: {
         display: 'flex',
@@ -56,9 +57,27 @@ const CreateImport = ({onAbort, onCreated}) => {
 
   return (
     <div>
-      <p>Create import</p>
+      <p>Create import</p>    
       <ImportWizard />
     </div>)
 }
 
 export default ImportPage
+
+
+  // const inputs=[{id: '1', name: 'förnamn'}, {id: '2', name: 'efternamn'}, {id: '3', name: 'age'}]
+  // const outputs=[{id: '100', key: 'yes', name: 'Namn'}, {id: '101', required: 'yes', name: 'Ålder'}, {id: '102', name: 'Kön'}]
+  // const actions=[{
+  //   id: '50',
+  //   type: 'join',
+  //   data: { joiner: "XX"},
+  //   position: { x: 250, y: 75 }
+  // }]
+  // const edges=[{source: '1', target: '50', targetHandle: 'a'},
+  //  {source: '2', target: '50', targetHandle: 'b'},  {source: '50', target: '100'},
+  //  {source: '3', target: '101'}]
+  //  <MapData 
+  //  inputs={inputs}
+  //  outputs={outputs}
+  //  actions={actions}
+  //  edges={edges} />

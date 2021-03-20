@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://localhost:3000/api/schema/wQBjDfnZ6mKv1YlTx6Fg.json",
+    "title": "Workspace wQBjDfnZ6mKv1YlTx6Fg",
+    "type": "object",
+    "properties": {
+      "Personer": {
+        "description": "",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "Förnamn": {
+              "type": "string",
+              "minLength": "3",
+              "maxLength": "99"
+            },
+            "Efternamn": {
+              "type": "string",
+              "minLength": "2",
+              "maxLength": "99"
+            },
+            "Ålder": {
+              "type": "integer",
+              "minimum": "0",
+              "maximum": "200"
+            },
+            "Kön": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "Förnamn",
+            "Efternamn"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  }

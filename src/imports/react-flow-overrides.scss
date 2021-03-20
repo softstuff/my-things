@@ -1,0 +1,96 @@
+$actionColor: rgb(68, 48, 73);
+$argumentKeyColor: rgb(109, 116, 49);
+$argumentColor: rgb(44, 100, 39);
+
+// All nodes
+.react-flow__handle {
+    width: 10px;
+    height: 10px;
+}
+
+.react-flow__handle-left {
+  left: -8px;
+}
+
+.react-flow__handle-right {
+  right: -8px;
+}
+
+// Output arguments
+.react-flow__node-argument {
+  border: 1px solid $argumentColor;
+  padding: 10px;
+  border-radius: 3px;
+  width: 150px;
+  font-size: 12px;
+  color: #222;
+  text-align: center;
+  background: #fff;
+}
+
+.react-flow__node-argument .react-flow__handle {
+  background: $argumentColor;
+}
+
+.react-flow__node-argument.selected,
+.react-flow__node-argument.selected:hover {
+  box-shadow: 0 0 0 0.5px $argumentColor;
+}
+
+.react-flow__node-argument.selectable:hover {
+  box-shadow: 0 1px 4px 1px rgba(black,  0.08);
+}
+
+.react-flow__node-argumentKey {
+  border: 1px solid $argumentKeyColor;
+  padding: 10px;
+  border-radius: 3px;
+  width: 150px;
+  font-size: 12px;
+  color: #222;
+  text-align: center;
+  background: #fff;
+}
+
+.react-flow__node-argumentKey .react-flow__handle {
+  background: $argumentKeyColor;
+}
+
+.react-flow__node-argumentKey.selected,
+.react-flow__node-argumentKey.selected:hover {
+  box-shadow: 0 0 0 0.5px $argumentKeyColor;
+}
+
+.react-flow__node-argumentKey.selectable:hover {
+  box-shadow: 0 1px 4px 1px rgba(black,  0.08);
+}
+
+// Actions
+.react-flow__node-join,
+.react-flow__node-lower,
+.react-flow__node-upper {
+  border: 1px solid $actionColor;
+  padding: 10px;
+  background: #fff;
+}
+
+.react-flow__node-join  .react-flow__handle, 
+.react-flow__node-upper .react-flow__handle,
+.react-flow__node-lower .react-flow__handle {
+  background: $actionColor;
+}
+.react-flow__node-lower .react-flow__handle-left::after {
+  left: 5px;
+}
+
+.react-flow__node-join.selected,
+.react-flow__node-upper.selected,
+.react-flow__node-lower.selected {
+  box-shadow: 0 0 0 0.5px $actionColor;
+}
+
+.react-flow__node-lower.selectable:hover,
+.react-flow__node-join.selectable:hover,
+.react-flow__node-upper.selectable:hover {
+  box-shadow: 0 1px 4px 1px rgba(black,  0.08);
+}
