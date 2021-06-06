@@ -24,11 +24,10 @@ export const EditorProvider = (props) => {
 
     useEffect(()=>{
         let mounted = true
-        const unsubscribe = subscribeDocument(tenantId, wid, collectionId, documentId,
+        subscribeDocument(tenantId, wid, collectionId, documentId,
             ({id, loaded}) => {
                 if(!mounted) {
                     console.log("document", documentId, "is not mounted")
-                    unsubscribe()
                     return 
                 }
                 
@@ -44,7 +43,6 @@ export const EditorProvider = (props) => {
             })
         return ()=>{
             mounted = false
-            unsubscribe()
         }
     }, [documentId])
 

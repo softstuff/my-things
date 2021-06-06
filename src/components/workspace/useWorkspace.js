@@ -16,7 +16,7 @@ export const WorkspaceProvider = (props) => {
 
     const [loading, setLoading] = useState(true)
     const [workspace, setWorkspace] = useState()
-    const [schema, setSchema] = useState()
+    const [schema] = useState()
     const [wid, setWid] = useState()
     const [widList, setWidList] = useState([])
     const { tenantId } = useUser()

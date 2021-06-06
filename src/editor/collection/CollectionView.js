@@ -1,14 +1,13 @@
 import React, { useState } from 'react'
-import {AppBar, Box, Fab, Grid, makeStyles, Paper, Tab, Tabs, Typography, useTheme} from '@material-ui/core'
+import {AppBar, Box, Fab,id, makeStyles, Tab, Tabs, useTheme} from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add';
 import {useSnackbar} from 'notistack';
-import DocumentList from '../editor/DocumentList';
-import {useEditor} from './useEditor';
+import DocumentList from './DocumentList';
+import {useEditor} from '../useEditor';
 import CollectionInfo from "./CollectionInfo";
-import AddDocumentDialog from './document/AddDocumentDialog';
-import { createThing } from '../firebase/storage';
-import { useSession } from '../firebase/UserProvider';
-import { useWorkspace } from '../components/workspace/useWorkspace';
+import AddDocumentDialog from '../document/AddDocumentDialog';
+import { createThing } from '../../firebase/storage';
+import { useWorkspace } from '../../components/workspace/useWorkspace';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -43,7 +42,6 @@ const useStyles = makeStyles((theme) => ({
 const CollectionView = () => {
     const classes = useStyles();
     const theme = useTheme();
-    const {enqueueSnackbar} = useSnackbar();
     const {tenantId, wid} = useWorkspace()
     const {collectionId} = useEditor()
     const [showAddNewDocumentDialog, setShowAddNewDocumentDialog] = useState(false)

@@ -3,10 +3,10 @@ import {addNewCollection, deleteCollection} from '../firebase/storage'
 import {FormControlLabel, Grid, makeStyles, Paper, Switch} from '@material-ui/core'
 import ThingsBreadcrumbs from '../components/ThingsBreadcrumbs';
 import {useSession} from '../firebase/UserProvider';
-import CollectionList from '../editor/CollectiontList';
+import CollectionList from './collection/CollectiontList';
 import DocumentView from './document/DocumentView';
 import {useSnackbar} from 'notistack';
-import CollectionView from '../editor/CollectionView';
+import CollectionView from './collection/CollectionView';
 import {useWorkspace} from '../components/workspace/useWorkspace';
 import {useEditor} from './useEditor';
 
@@ -55,7 +55,7 @@ function Editor() {
     const {enqueueSnackbar} = useSnackbar()
     const {
         editing, setEditing,
-        collectionList, setCollectionList,
+        collectionList,
         collectionId, setCollectionId,
         documentId, setDocumentId,
         createDocument, setCreateDocument
@@ -65,61 +65,6 @@ function Editor() {
     const [levelPath, setLevelPath] = useState('/')
 
     const tenantId = claims.myThings.tenantId
-
-    // useEffect(() => {
-    //     const unsubscribe = getLevelInfo(tenantId, wid, levelPath,
-    //         (meta) => {
-    //             console.log(`Load level info at levelPath '${levelPath}'`, meta)
-    //             setCollectionList(meta?.children || [])
-    //         }, (error) => {
-    //             console.log(`Failed to load level info ${levelPath}`, error)
-    //             enqueueSnackbar(`Failed to load  level info ${levelPath}`, { variant: 'error' })
-    //         }
-    //     )
-    //     return unsubscribe
-
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [tenantId, wid, levelPath])
-
-
-    // const onMetaSave =  (meta) => {
-    //    console.log('onMetaSave', meta)
-    //    updateCollectionMetadata(tenantId, wid, meta.id, meta.displayName)
-
-    // }
-
-    // const onCreateFirstCollection =  (data) => {
-    //     console.log('onCreateFirstCollection', data)
-    //     addNewCollection(tenantId, wid,  data.name)
-    //     setOpenCreateCollectionDialog(false)
-    //  }
-    // const onCreateFirstCollectionOld =  (meta) => {
-    //     console.log('onCreateFirstCollection', meta)
-    //     addNewCollection(tenantId, wid,  meta.id, meta.displayName)
-
-    //  }
-
-    const handleCreateCollection = () => {
-        console.log("Create collection")
-        const id = window.prompt("Enter the identifyer for the collection")
-        try {
-            if (id) {
-
-                console.log(`test`, id, collectionList)
-                if (collectionList.includes(id)) {
-                    enqueueSnackbar(`Collection ${id} already exists`, {variant: 'error'})
-                } else {
-
-                    addNewCollection(tenantId, wid, id)
-                    setCollectionId(id)
-                    setDocumentId()
-                }
-            }
-        } catch (error) {
-            console.log('FAILED handleCreateCollection', error, id)
-            enqueueSnackbar(`Collection ${id} could not be created`, {variant: 'error'})
-        }
-    }
 
     const handleCreateDocument = () => {
         console.log('handleCreateDocument', createDocument)
@@ -144,24 +89,6 @@ function Editor() {
         setCreateDocument(false)
         setDocumentId(documentId)
 
-    }
-    const onCollectionSelected = async (_collectionId) => {
-        console.log('onCollectionSelected', _collectionId)
-        try {
-            setCreateDocument(false)
-            setCollectionId(_collectionId)
-            setDocumentId()
-        } catch (error) {
-            console.log('FAILED onCollectionSelected', error)
-        }
-    }
-
-
-    const handlePathChange = ({levelPath, collectionId, documentId}) => {
-        console.log('handlePathChange', levelPath, collectionId, documentId)
-        setDocumentId(documentId)
-        setCollectionId(collectionId)
-        setLevelPath(levelPath)
     }
 
     const handleSubCollectionTransition = subCollectonId => {

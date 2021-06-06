@@ -61,10 +61,6 @@ const AttributeEditor = (props) => {
       return ["string", "number", "integer", "null"].includes(type)
     }
 
-    const showInBlock = () => {
-      return ["array", "map"].includes(type)
-    }
-
     const handleFieldChange = newField => {
       console.log("handleFieldChange type: ", newField)
       setField(newField)
@@ -227,9 +223,7 @@ const AttributeEditor = (props) => {
   };
   
   const IntegerEditor = ({renderField, formState }) => {
-    const {
-      formState: { errors },
-    } = useFormContext();
+    
     
     return (
       <TextField
@@ -246,7 +240,7 @@ const AttributeEditor = (props) => {
   
   const ArrayEditorController = ({ fieldName, defaultValue }) => {
 
-    const {control, getValues} = useFormContext()
+    const {control} = useFormContext()
     const { fields, append, remove} = useFieldArray(
       {
         control,
@@ -319,7 +313,7 @@ const AttributeEditor = (props) => {
 
     useEffect(()=>{
       console.log("ArrayItem fifieldNameeld", fieldName, "value", value)
-    },[fieldName])
+    },[fieldName, value])
 
     useEffect(()=>{
       console.log("ArrayItem type", type)

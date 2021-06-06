@@ -2,7 +2,7 @@
 import {Button, makeStyles, TextField, Typography} from '@material-ui/core'
 import React from 'react'
 import {useForm} from 'react-hook-form'
-import {useEditor} from "./useEditor";
+import {useEditor} from "../useEditor";
 
 const useStyles = makeStyles((theme) => ({
     editRow: {

@@ -4,9 +4,6 @@ import firebase from 'firebase/app'
 
 const metaDocumentName = "_meta_"
 
-const metaTag = "meta"
-
-
 export const subscribeDocument = (tenantId, wid, collectionId, documentId, onLoaded, onError) => {
     const path = `${getWorkspacePath(tenantId, wid)}/${collectionId}/${documentId}`
     console.log('subscribeDocument', path)
