@@ -1,6 +1,6 @@
 import { useEditor } from "../useEditor";
 
-export default () => {
+const DocumentViewer = () => {
     const { document } = useEditor();
 
     return (
@@ -14,3 +14,5 @@ export default () => {
       ))}
   </>)
 }
+
+export default DocumentViewer

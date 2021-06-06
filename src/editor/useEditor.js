@@ -23,6 +23,9 @@ export const EditorProvider = (props) => {
     const {tenantId, wid,} = useWorkspace()
 
     useEffect(()=>{
+        if(!documentId) {
+            return
+        }
         let mounted = true
         subscribeDocument(tenantId, wid, collectionId, documentId,
             ({id, loaded}) => {

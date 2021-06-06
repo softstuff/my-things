@@ -241,15 +241,15 @@ const SetCollection = ({onValidation, myStep}) => {
     onValidation(true)
   };
 
-  const renderSchemaRoot = (schema) => {
-    return (<ul>
-      {Reflect.ownKeys(schema.properties).map(collection => {
-        if(schema.properties[collection]?.items) {
-          return renderSchema(schema.properties, '', collection, `properties/${collection}`)
-        }
-      })}
-    </ul>)
-  }
+  // const renderSchemaRoot = (schema) => {
+  //   return (<ul>
+  //     {Reflect.ownKeys(schema.properties).map(collection => {
+  //       if(schema.properties[collection]?.items) {
+  //         return renderSchema(schema.properties, '', collection, `properties/${collection}`)
+  //       }
+  //     })}
+  //   </ul>)
+  // }
 
 const renderSchema = (level, path, collection) => {
   const collectionPath = `${path}/${collection}`
@@ -267,7 +267,7 @@ const renderSchema = (level, path, collection) => {
     </li>)
 }
 
-const renderedSchema = renderSchemaRoot(schema, "", "", "")
+// const renderedSchema = renderSchemaRoot(schema, "", "", "")
 
   return (<div>
 
@@ -275,7 +275,7 @@ const renderedSchema = renderSchemaRoot(schema, "", "", "")
       <FormControl component="fieldset">
       <FormLabel component="legend">Collection to import</FormLabel>
       <RadioGroup aria-label="collection" name="selectedCollection" value={selected} onChange={handleChange}>
-        {renderedSchema}
+        {/* {renderedSchema} */}
         </RadioGroup>
     </FormControl>
     </div>)

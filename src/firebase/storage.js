@@ -183,6 +183,23 @@ export const updateWorkspace = async (tenantId, wid, description) => {
     console.log('updateWorkspace ', wid)
 }
 
+export const deleteWorkspaceField = (tenantId, wid, field) => {
+    const path = `${getWorkspacePath(tenantId, wid)}`
+    
+    console.log('deleteWorkspaceField', path, field)
+    const docRef = firestore.doc(path)
+    return docRef.update({
+            [field]: firebase.firestore.FieldValue.delete()
+        })
+        .then(() => {
+            console.log("Document successfully updated!");
+        })
+        .catch((error) => {
+            // The document probably doesn't exist.
+            console.error("Error updating document: ", error);
+        })
+}
+
 export const removeWorkspace = async (tenantId, wid) => {
     
     const ref = await firestore.doc(`tenants/${tenantId}/workspaces/${wid}`)
