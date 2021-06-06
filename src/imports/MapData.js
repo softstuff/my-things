@@ -1,12 +1,6 @@
-import { makeStyles } from '@material-ui/core';
-import React, { useState, useRef, useEffect } from 'react';
-import ReactFlow, {
-  ReactFlowProvider,
-  addEdge,
-  removeElements,
-  Controls,
-  Background,
-} from 'react-flow-renderer';
+import {makeStyles} from '@material-ui/core';
+import React, {useEffect, useRef, useState} from 'react';
+import ReactFlow, {addEdge, Background, Controls, ReactFlowProvider, removeElements,} from 'react-flow-renderer';
 import InputNode from './actions/InputNode';
 import JoinActionNode from './actions/JoinActionNode'
 import ToLowerCaseActionNode from './actions/ToLowerCaseActionNode';
@@ -56,13 +50,15 @@ export default ({inputs, outputs, actions, edges, setRfInstance}) => {
     const [elements, setElements] = useState();
 
     const onConnect = (params) => {
+      console.log("addEdge ", params)
       setElements((els) => addEdge(params, els));
     }
     const onElementsRemove = (elementsToRemove) => {
-      console.log('onElementsRemove', elementsToRemove)
-      
       if( elementsToRemove.some(element =>  unremmovableNodeTypes.includes(element.type)) == false) {
+        console.log('onElementsRemove', elementsToRemove)
         setElements((els) => removeElements(elementsToRemove, els));
+      } else {
+        console.log('onElementsRemove, can not be removed', elementsToRemove)
       }
     }
     const onLoad = (_reactFlowInstance) => {

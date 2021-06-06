@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import { Button, makeStyles } from '@material-ui/core'
+import {Button, makeStyles} from '@material-ui/core'
 import ImportConfigEditor from '../imports/ImportConfigEditor'
 import ImportWizard from '../imports/ImportWizard'
 

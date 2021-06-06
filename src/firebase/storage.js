@@ -1,5 +1,5 @@
 //@flow
-import { firestore } from "./config"
+import {firestore} from "./config"
 import firebase from 'firebase/app'
 
 const metaDocumentName = "_meta_"
@@ -7,17 +7,17 @@ const metaDocumentName = "_meta_"
 const metaTag = "meta"
 
 
-export const getDocument = (tenantId, wid, collectionPath, documentId, onLoaded, onError) => {
-    const path = `${getWorkspacePath(tenantId, wid)}${collectionPath}/${documentId}`
-    console.log('getDocument', path)
+export const subscribeDocument = (tenantId, wid, collectionId, documentId, onLoaded, onError) => {
+    const path = `${getWorkspacePath(tenantId, wid)}/${collectionId}/${documentId}`
+    console.log('subscribeDocument', path)
     return firestore.doc(path).onSnapshot(async (snapshot) => {
 
         if (snapshot.exists) {
-            console.log('Loaded data: ', snapshot.data())
-            const loaded = { id: snapshot.id, ...snapshot.data() }
-            onLoaded(loaded)
+            const loaded = snapshot.data()
+            console.log('Loaded data: ', loaded)
+            onLoaded({ id: snapshot.id, loaded})
         } else {
-            onLoaded()
+            onLoaded({})
         }
     }, (error) => {
         onError(error)
@@ -25,54 +25,81 @@ export const getDocument = (tenantId, wid, collectionPath, documentId, onLoaded,
     })
 }
 
-export const updateThing = async (tenantId, wid, collectionPath, documentId, thing) => {
-        const path = getDocPath(tenantId, wid, collectionPath, documentId)
-        console.log('updateDocument', path, thing)
-        await firestore.doc(path).update({thing})
-        console.log('Updated successfully')
+export const updateThing = (tenantId, wid, collectionId, documentId, thing) => {
+        const path = `${getWorkspacePath(tenantId, wid)}/${collectionId}/${documentId}`
+        console.log('updateThing', path, thing)
+        const docRef = firestore.doc(path)
+        return docRef.update(thing)
+            .then(() => {
+                console.log("Document successfully updated!");
+            })
+            .catch((error) => {
+                // The document probably doesn't exist.
+                console.error("Error updating document: ", error);
+            })
+}
+
+export const updateFields = (tenantId, wid, collectionId, documentId, key, value) => {
+    const path = `${getWorkspacePath(tenantId, wid)}/${collectionId}/${documentId}`
+    
+    console.log('updateFields', path, key, value)
+    const docRef = firestore.doc(path)
+    return docRef.update(key, value)
+        .then(() => {
+            console.log("Document successfully updated!");
+        })
+        .catch((error) => {
+            // The document probably doesn't exist.
+            console.error("Error updating document: ", error);
+        })
 }
 
 
-export const createDocument = async (tenantId, wid, collectionId, documentId) => {
+export const deleteField = (tenantId, wid, collectionId, documentId, key) => {
+    const path = `${getWorkspacePath(tenantId, wid)}/${collectionId}/${documentId}`
     
-    const path = getCollectionPath(tenantId, wid, collectionId, documentId)
-    console.log('createDocument', path, documentId)
-    await firestore.collection(path).doc(documentId).set({
-        meta:{
-            id: documentId,
-            children: []
-        },
-        thing: {}
-    })
+    console.log('deleteField', path, key)
+    const docRef = firestore.doc(path)
+    return docRef.update({
+            [key]: firebase.firestore.FieldValue.delete()
+        })
+        .then(() => {
+            console.log("Document successfully updated!");
+        })
+        .catch((error) => {
+            // The document probably doesn't exist.
+            console.error("Error updating document: ", error);
+        })
+}
+
+export const createThing = async (tenantId, wid, collectionId, documentId, thing) => {
+    
+    const path = `${getWorkspacePath(tenantId, wid)}/${collectionId}`
+
+    console.log('createThing', path, documentId, thing)
+    if (documentId) {
+        return await firestore.collection(path).doc(documentId).set(thing)
+    } else {
+        return await firestore.collection(path).add(thing)
+    }
 }
 
 export const addNewCollection = async (tenantId, wid, collectionId) => {
-    const path = getWorkspacePath(tenantId, wid)
+    const workspacePath = getWorkspacePath(tenantId, wid)
 
-    console.log('Adding new collection',collectionId, 'to', path)
-    const docRef = firestore.doc(path)
-    const colRef = docRef.collection(collectionId)
-    const metaRef = colRef.doc(metaDocumentName)
-
-    if(colRef.exists){
-        new Error(`Collection ${collectionId} already exists`)
-    }
+    console.log('Adding new collection',collectionId, 'to', workspacePath)
+    const wsRef = firestore.doc(workspacePath)
     
-    await metaRef.set( {
-        created: firebase.firestore.FieldValue.serverTimestamp()
-    })
-
-    const parentMetaRef = await docRef.get()
-    console.log('parentMetaRef', parentMetaRef.exists, parentMetaRef.data(), parentMetaRef.data() || 'not found' )
-    const parentMetaData = parentMetaRef.data()
+    const ws = await wsRef.get()
+    const wsData = ws.data()
+    console.log('wsData', ws.exists, wsData)
     // const meta = parentMetaData[metaTag] || {}
     // let children = meta.children || {}
-    parentMetaData[metaTag] = {
-        children: firebase.firestore.FieldValue.arrayUnion(colRef.id)
-    }
+    wsData.collections =  firebase.firestore.FieldValue.arrayUnion(collectionId)
+
     // meta.children = children
     // parentMetaData.meta = meta
-    await docRef.set(parentMetaData, { merge: true })
+    await wsRef.set(wsData, { merge: true })
 
     console.log('Added new collection', collectionId )
 }
@@ -119,7 +146,7 @@ export const getWorkspaceIdList = (tenantId, onLoaded, onError) => {
     }, (error) => {
         onError(error)
         console.log(`Error reading workspaces for tenant: ${tenantId}`, error)
-    }, ()=> console.log('getWorkspaces complete'))
+    })
 }
 
 export const getWorkspaces = (tenantId, onLoaded, onError) => {
@@ -168,21 +195,21 @@ export const removeWorkspace = async (tenantId, wid) => {
     return ref.id
 }
 
-export const getLevelInfo = (tenantId, wid, levelPath, onLoad, onError) => {
+// export const getWorkspace = (tenantId, wid, onLoad, onError) => {
 
-    const path = `${getWorkspacePath(tenantId, wid)}${levelPath}`
-    console.log('getLevelInfo', path)
-    return firestore.doc(path).onSnapshot(snap => {
-        if (snap.exists) {
-                console.log('getLevelInfo loaded', snap.data())
-                onLoad( snap.data().meta)
-            } else {
-                console.log('getLevelInfo do not exists')
-                onLoad()
-            }
-        }, error => onError(error)
-    )
-}
+//     const path = `${getWorkspacePath(tenantId, wid)}/`
+//     console.log('getCollections', path)
+//     return firestore.doc(path).onSnapshot(snap => {
+//         if (snap.exists) {
+//                 console.log('getLevelInfo loaded', snap.data())
+//                 onLoad( snap.data().meta)
+//             } else {
+//                 console.log('getLevelInfo do not exists')
+//                 onLoad()
+//             }
+//         }, error => onError(error)
+//     )
+// }
 
 export const subscribeOnSchema = async (tenantId, wid, onLoaded, onError) => {
 
@@ -218,20 +245,26 @@ export const getSchema = async (tenantId, wid, collectionPath, onLoaded, onError
 }
 
 
-export const listDocuments = async (tenantId, wid, collectionPath, onLoaded, onError) => {
-    if(!collectionPath){
+export const listDocuments = (tenantId, wid, collectionId, onLoaded, onError) => {
+    if(!collectionId){
         console.log('No collection id found, ')
         onLoaded([])
         return null
     }
-    const path = getCollectionPath(tenantId, wid, collectionPath)
+    const path = `${getWorkspacePath(tenantId, wid)}/${collectionId}`
 
-    return firestore.collection(path).onSnapshot(
-        snap => {
-            console.log('listDocuments', path, snap.size)
-            onLoaded(snap.docs.map(doc => doc.id).filter(id=>id !== metaDocumentName))
-        },
-        error => onError(error))
+    return firestore.collection(path).get()
+        .then(querySnapshot => {
+            if (querySnapshot.empty) {
+                onLoaded({})
+            } else {
+                const docs = querySnapshot.docs.map(doc => ({ id:doc.id, doc:doc.data()}))
+                console.log('Loaded data: ', docs)
+                onLoaded(docs)
+            }
+        })
+        .catch( error => onError(error))
+
 }
 
 

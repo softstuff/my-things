@@ -1,7 +1,7 @@
-import { TextField } from '@material-ui/core';
-import React,  { useState } from 'react';
-import { Handle, Position } from 'react-flow-renderer';
-import { useEdge } from './useEdge';
+import {TextField} from '@material-ui/core';
+import React, {useState} from 'react';
+import {Handle, Position} from 'react-flow-renderer';
+import {useEdge} from './useEdge';
 
 const JoinActionNode = ({data}) => {
     const [separator, setSeparator] = useState(data.joiner)

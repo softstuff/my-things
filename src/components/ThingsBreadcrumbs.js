@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
-import { Link, Breadcrumbs, TextField, makeStyles, Tooltip} from '@material-ui/core';
+import React, {useState} from 'react'
+import {Breadcrumbs, Link, makeStyles, TextField, Tooltip, Typography} from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
 import BorderColorIcon from '@material-ui/icons/BorderColor';
-import { useForm } from 'react-hook-form';
+import {useForm} from 'react-hook-form';
+import {useEditor} from '../editor/useEditor';
 
 
 export const processToCrumData = (levelPath, collectionId, documentId) => {
@@ -40,77 +41,66 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
     
-const ThingsBreadcrumbs = ({ levelPath, collectionId, documentId, onPathChange}) => {
+const ThingsBreadcrumbs = () => {
     const classes = useStyles();
-    const [crums, setCrums] = useState([])
+    const {collectionId, documentId, setCollectionId, setDocumentId} = useEditor()
     const [manual, setManual] = useState(false)
-    const { register, handleSubmit, setValue} = useForm()
+    const { register, handleSubmit} = useForm()
+
+    const handleChange = (newCollectionId, newDocumentId) => {
+        setDocumentId(newDocumentId)
+        setCollectionId(newCollectionId)
+    }
 
     const onSubmit = data => {
            console.log("onSubmit", data)
            const npath = data.newPath.trim().replace(/\/+$/, "").split('/')
            
-           onPathChange(npath)
+           console.log("onSubmit to path ", npath)
            setManual(false)
     }
+
     const onBlur = () => {
-        toggle()
+        toggleManual()
     }
-    const toggle = () => {
+
+    const toggleManual = () => {
         setManual(!manual)
     }
-
-    const path = [collectionId, documentId]
     
-    
-
-    const joinToPath = (levelPath, collectionId, documentId) => `${levelPath}${collectionId ? `/${collectionId}` : ''}${documentId ? `/${documentId}` : ''}`
-    
-    useEffect(()=>{
-        
-        const path = joinToPath(levelPath, collectionId, documentId)
-        
-        setValue('newPath', path)
-
-        const crumDataList = processToCrumData(levelPath, collectionId, documentId)
-
-        var links = []
-        crumDataList.forEach( data =>  {                   
-            links.push({levelPath: data.levelPath, collectionId: data.collectionId, title: data.collectionId})
-            if (data.documentId) {
-                links.push({...data, title: data.documentId})
-            }
-        })
-        setCrums( links )
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[levelPath, collectionId, documentId])
-
-
-    
-
     return (
         <div style={{width: '50%', display: 'flex'}}>
-            <BorderColorIcon style={{marginRight: '1rem'}} onClick={toggle}>ss</BorderColorIcon>
+            <BorderColorIcon style={{marginRight: '1rem'}} onClick={toggleManual}>ss</BorderColorIcon>
 
             { manual ? (
                 <div style={{width: '100%'}}>
                 <form onSubmit={handleSubmit(onSubmit)} >
-                        <TextField name='newPath' inputRef={register} onBlur={onBlur} defaultValue={path.join('/')} fullWidth={true}/>
+                        <TextField name='newPath' {...register("newPath")} onBlur={onBlur} defaultValue={`${collectionId}/${documentId}`} fullWidth={true}/>
                 </form>
                 </div>
             ) : (
                 <Breadcrumbs aria-label="breadcrumb">
-                    <Link color="inherit" onClick={()=>onPathChange( {levelPath: '/'})}>
+                    <Link color="inherit" onClick={()=>handleChange( null, null)}>
                         <Tooltip title="Back to workspace" aria-label="to workspace">
                             <HomeIcon className={classes.icon}/>
                         </Tooltip>
+                        Editor
                     </Link>
 
-                    {crums.map( (crum, index) => 
-                        <Link key={index} color="inherit" onClick={()=>onPathChange(crum)}>
-                            {crum.title}
-                        </Link>)}
+                    {collectionId && documentId && (                        
+                        <Link color="inherit" onClick={()=>handleChange(collectionId, null)}>
+                            {collectionId}
+                        </Link>
+                    )}
+
+                    {collectionId && !documentId && (
+                        <Typography color="textPrimary">{collectionId}</Typography>
+                    )}
+
+                    {documentId && (
+                        <Typography color="textPrimary">{documentId}</Typography>
+                    )}
+                    
                 </Breadcrumbs>
             )}
             

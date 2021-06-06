@@ -1,7 +1,7 @@
 //@flow
-import { Button, makeStyles, TextField } from '@material-ui/core'
+import {Button, makeStyles, TextField} from '@material-ui/core'
 import React from 'react'
-import { useForm } from 'react-hook-form'
+import {useForm} from 'react-hook-form'
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -28,7 +28,7 @@ const CreateNewCollection = ({onCreate}) => {
                     name='id'
                     label="Collection key"
                     required={true}
-                    inputRef={register({
+                    {...register("id",{
                         required: 'You forgot set a key for your new collection'})
                     }
                     helperText={errors.id?.message || 'This can NOT be changed later'}
@@ -39,7 +39,7 @@ const CreateNewCollection = ({onCreate}) => {
                     name='displayName'
                     label="Display name"
                     required={true}
-                    inputRef={register({
+                    {...register("displayName",{
                         required: 'You forgot to name your new collection'})
                     }
                     helperText={errors.displayName?.message || 'This can be changed later'}

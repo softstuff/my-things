@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import React, {useEffect, useState} from 'react';
+import {makeStyles} from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -7,12 +7,11 @@ import StepContent from '@material-ui/core/StepContent';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from '@material-ui/core';
+import {FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField} from '@material-ui/core';
 import Ajv from "ajv"
 import MapData from './MapData';
-import { useWorkspace } from '../components/workspace/useWorkspace';
-import { ImportConfigContext, useImportConfig } from './useImportConfig';
-import { useSchema } from '../schema/useSchema';
+import {ImportConfigContext, useImportConfig} from './useImportConfig';
+import {useSchema} from '../schema/useSchema';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -307,11 +306,16 @@ const MapFields = ({onValidation, myStep}) => {
 
       const property = getPropertyFor(config.pointer)
 
-      const attributeNodes = Reflect.ownKeys(property.items.properties).map( (attribute, index) => (
-        {id: `${index + 1000}`,
-           required: property.items?.required.includes(attribute) ? 'yes': 'no', 
-           name: attribute}
-      ))
+      const attributeNodes = Reflect.ownKeys(property.items.properties).reduce( (nodes, attribute, index) => {
+        if( property.items.properties[attribute]?.type !== 'array'){
+          nodes.push({
+            id: `${index + 1000}`,
+            required: property.items?.required.includes(attribute) ? 'yes': 'no', 
+            name: attribute})
+        }
+        return nodes
+      }, [])
+
       attributeNodes.unshift({ id: config.collectionPath, name: config.collectionId, key: 'yes', data: {collectionPath: config.collectionPath}})
       const inputNodes = config.structure.columns.map((column,index)=>({id: `${index}`, name: column}))
       setInputs(inputNodes)
@@ -349,13 +353,18 @@ const MapFields = ({onValidation, myStep}) => {
     return connections
   }
 
-  return (
-
-    <MapData
-        inputs={inputs}
-        outputs={outputs}
-        actions={actions}
-        edges={edges} 
-        setRfInstance={setRfInstance}/>
-  )
+  return <>
+    {myStep == activeStep && 
+      <MapData
+          inputs={inputs}
+          outputs={outputs}
+          actions={actions}
+          edges={edges} 
+          setRfInstance={setRfInstance}
+          />
+    }
+  </>
 }
+
+
+

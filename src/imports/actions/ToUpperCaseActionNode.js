@@ -1,7 +1,6 @@
-
 import React from 'react';
-import { Handle, Position } from 'react-flow-renderer';
-import { useEdge } from './useEdge';
+import {Handle, Position} from 'react-flow-renderer';
+import {useEdge} from './useEdge';
 
 const ToUpperCaseActionNode = () => {
   const {onlySingleEdge} = useEdge()

@@ -1,15 +1,15 @@
 import React from 'react'
-import { Drawer, Divider, List, ListItem, ListItemIcon, ListItemText, ListSubheader } from '@material-ui/core'
+import {Divider, Drawer, List, ListItem, ListItemIcon, ListItemText, ListSubheader} from '@material-ui/core'
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import InfoIcon from '@material-ui/icons/Info';
 import InputIcon from '@material-ui/icons/Input';
 import ExtensionIcon from '@material-ui/icons/Extension';
-import { Link } from 'react-router-dom';
-import { useWorkspace } from './workspace/useWorkspace';
+import {Link} from 'react-router-dom';
+import {useWorkspace} from './workspace/useWorkspace';
 
 
-const SiteMenu = (props) => {
+const LeftSiteMenu = (props) => {
   const { wid } = useWorkspace()
 
 
@@ -40,12 +40,12 @@ const SiteMenu = (props) => {
           {`Workspace: ${wid}`}
         </ListSubheader>
 
-        <ListItem button  component={Link} to={`/schema`} >
+        {/* <ListItem button  component={Link} to={`/schema`} >
           <ListItemIcon>
             <InboxIcon />
           </ListItemIcon>
           <ListItemText primary='Schema' />
-        </ListItem>
+        </ListItem> */}
         <ListItem button  component={Link} to={`/editor`} >
           <ListItemIcon>
             <InboxIcon />
@@ -85,4 +85,4 @@ const SiteMenu = (props) => {
   )
 }
 
-export default SiteMenu
+export default LeftSiteMenu

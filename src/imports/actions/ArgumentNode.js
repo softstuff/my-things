@@ -1,12 +1,11 @@
-import React  from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import React, {useRef} from 'react';
+import {makeStyles} from '@material-ui/core/styles';
 import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
 import InfoIcon from '@material-ui/icons/Info';
-import { Handle, Position } from 'react-flow-renderer';
-import { useEdge } from './useEdge';
-import { Box } from '@material-ui/core';
-import { useRef } from 'react';
+import {Handle, Position} from 'react-flow-renderer';
+import {useEdge} from './useEdge';
+import {Box} from '@material-ui/core';
 
 
 const useStyles = makeStyles((theme) => ({

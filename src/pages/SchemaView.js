@@ -1,26 +1,25 @@
-import React, { useEffect, useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import TreeView from '@material-ui/lab/TreeView';
 import TreeItem from '@material-ui/lab/TreeItem';
 import Typography from '@material-ui/core/Typography';
 
 import AddIcon from '@material-ui/icons/Add';
-import DeleteIcon from '@material-ui/icons/Delete';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 import Label from '@material-ui/icons/Label';
 import DirectionsRunIcon from '@material-ui/icons/DirectionsRun';
 
-import { useUser } from '../components/user/useUser';
-import { useWorkspace } from '../components/workspace/useWorkspace';
+import {useUser} from '../components/user/useUser';
+import {useWorkspace} from '../components/workspace/useWorkspace';
 import Paper from '@material-ui/core/Paper';
-import { Button, Grid, IconButton } from '@material-ui/core';
+import {Button, Grid} from '@material-ui/core';
 import useDataConverter from '../components/useDataConverter';
 import RawEditor from '../schema/RawEditor';
 import AddSchemaCollectionForm from '../schema/AddSchemaCollectionForm';
-import { useSchema } from '../schema/useSchema';
-import { useConfirm } from 'material-ui-confirm';
+import {useSchema} from '../schema/useSchema';
+import {useConfirm} from 'material-ui-confirm';
 import PropertiesEditor from '../schema/PropertiesEditor';
 
 

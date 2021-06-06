@@ -1,7 +1,7 @@
-import { Backdrop, Button, Card, CardContent, CardHeader, Divider, Grid, makeStyles } from '@material-ui/core'
+import {Backdrop, Button, Card, CardContent, CardHeader, Divider, Grid, makeStyles} from '@material-ui/core'
 import React from 'react'
-import { auth } from '../firebase/config'
-import { useSession } from '../firebase/UserProvider';
+import {auth} from '../firebase/config'
+import {useSession} from '../firebase/UserProvider';
 
 const useStyles = makeStyles((theme) => ({
     backdrop: {

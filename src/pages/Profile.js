@@ -1,6 +1,6 @@
 import React from 'react'
 import {useSession} from '../firebase/UserProvider'
-import { auth } from '../firebase/config'
+import {auth} from '../firebase/config'
 
 const Profile = () => {
     const { claims } = useSession()

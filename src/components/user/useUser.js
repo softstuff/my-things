@@ -1,5 +1,5 @@
-import { useContext } from "react"
-import { UserContext } from "../../firebase/UserProvider"
+import {useContext} from "react"
+import {UserContext} from "../../firebase/UserProvider"
 
 
 export const useUser = () => {

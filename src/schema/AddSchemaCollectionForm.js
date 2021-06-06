@@ -1,7 +1,6 @@
-import { Button, Grid, IconButton, TextField } from "@material-ui/core"
-import { useForm } from "react-hook-form"
+import {Button, Grid, TextField} from "@material-ui/core"
+import {useForm} from "react-hook-form"
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
-
 
 
 const AddSchemaCollectionForm = ({ forbiddenNames, pointer, onNewCollection }) => {
@@ -23,7 +22,7 @@ const AddSchemaCollectionForm = ({ forbiddenNames, pointer, onNewCollection }) =
                 spacing={2}
             >
                 <Grid item xs={12}>
-                    <TextField name='key' label="Name" required={true} inputRef={register({
+                    <TextField name='key' label="Name" required={true} {...register("key",{
                         required: 'You forgot to name your new collection',
                         validate: value => {
                             console.log('validate ', value, forbiddenNames)
@@ -40,7 +39,7 @@ const AddSchemaCollectionForm = ({ forbiddenNames, pointer, onNewCollection }) =
                 <Grid item xs={12}>
                     <TextField
                         name='description'
-                        inputRef={register()}
+                        {...register("description")}
                         label='Description' />
                 </Grid>
                 <Grid item xs={12}>

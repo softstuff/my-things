@@ -1,6 +1,6 @@
-import React  from 'react';
-import { Handle, Position } from 'react-flow-renderer';
-import { useEdge } from './useEdge';
+import React from 'react';
+import {Handle, Position} from 'react-flow-renderer';
+import {useEdge} from './useEdge';
 
 const ArgumentKeyNode = ({data}) => {
   const {onlySingleEdge} = useEdge()

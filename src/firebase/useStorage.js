@@ -1,7 +1,7 @@
-import { useCallback } from "react"
-import { useUser } from "../components/user/useUser"
-import { useWorkspace } from "../components/workspace/useWorkspace"
-import { subscribeOnSchema, saveSchema, usageOf } from "./storage"
+import {useCallback} from "react"
+import {useUser} from "../components/user/useUser"
+import {useWorkspace} from "../components/workspace/useWorkspace"
+import {saveSchema, subscribeOnSchema, usageOf} from "./storage"
 
 
 export const useStorage = () => {

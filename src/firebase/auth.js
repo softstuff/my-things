@@ -1,4 +1,4 @@
-import { auth } from './config'
+import {auth} from './config'
 
 export const signup = async ({firstName, lastName, email, password}) => {
     const resp = await auth.createUserWithEmailAndPassword(email, password)

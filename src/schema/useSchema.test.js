@@ -1,12 +1,11 @@
 // @flow
 jest.mock('../firebase/storage')
 
-import { act, renderHook } from '@testing-library/react-hooks'
-import { WorkspaceContext } from '../components/workspace/WorkspaceProvider'
-import { UserContext } from '../firebase/UserProvider'
-import { saveSchema } from '../firebase/storage'
-import { useSchema } from './useSchema'
-
+import {act, renderHook} from '@testing-library/react-hooks'
+import {WorkspaceContext} from '../components/workspace/useWorkspace'
+import {UserContext} from '../firebase/UserProvider'
+import {saveSchema} from '../firebase/storage'
+import {useSchema} from './useSchema'
 
 
 const tenantId =  't1'

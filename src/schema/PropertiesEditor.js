@@ -1,16 +1,35 @@
-import React, { useEffect, useState } from 'react'
-import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Dialog, DialogActions as MuiDialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, FormHelperText, Grid, IconButton, InputLabel, makeStyles, NativeSelect, TextField, Typography } from '@material-ui/core';
+import React, {useEffect, useState} from 'react'
+import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
+    Box,
+    Button,
+    Dialog,
+    DialogActions as MuiDialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControl,
+    FormControlLabel,
+    FormHelperText,
+    Grid,
+    IconButton,
+    InputLabel,
+    makeStyles,
+    NativeSelect,
+    TextField,
+    Typography
+} from '@material-ui/core';
 import SaveIcon from '@material-ui/icons/Save';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SettingsIcon from '@material-ui/icons/Settings';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { useConfirm } from 'material-ui-confirm';
-import { useSnackbar } from 'notistack';
+import {useConfirm} from 'material-ui-confirm';
+import {useSnackbar} from 'notistack';
 import useDataConverter from '../components/useDataConverter';
-import { useSchema } from './useSchema'
-import { FormProvider, useForm, useFormContext } from 'react-hook-form';
-import { useStorage } from '../firebase/useStorage';
-
+import {useSchema} from './useSchema'
+import {FormProvider, useForm, useFormContext} from 'react-hook-form';
+import {useStorage} from '../firebase/useStorage';
 
 
 const usePropertiesEditorStyles = makeStyles((theme) => ({
@@ -182,17 +201,15 @@ const AddNewProperty = ({ property }) => {
         >
             {property?.key && (
                 <input
-                    name={`key`}
-                    ref={register()}
+                    {...register(`key`)}
                     defaultValue={property.key}
                     type='hidden'
                 />
             )}
             {!(property?.key) && (
                 <TextField
-                    name={`key`}
                     label='Attribute name'
-                    inputRef={register({ required: 'A attribute key is required' })}
+                    {...register("key", { required: 'A attribute key is required' })}
                     defaultValue={property?.key}
                     helperText={errors.key?.message}
                     error={errors.key ? true : false}
@@ -204,7 +221,7 @@ const AddNewProperty = ({ property }) => {
                 <NativeSelect
                     id='type'
                     name={`type`}
-                    inputRef={register({ required: 'Select type' })}
+                    {...register("type", { required: 'Select type' })}
                     defaultValue={property?.type}
                     label='Type'
                     aria-describedby="type-helper-text"
@@ -224,17 +241,17 @@ const AddNewProperty = ({ property }) => {
                         label='Min lenght'
                         name={`minLength`}
                         type="number"
-                        inputRef={register()}
+                        {...register("minLength")}
                         defaultValue={property?.minLength} />
                     <TextField
                         label='Max lenght'
                         name={`maxLength`}
                         type="number"
-                        inputRef={register()}
+                        {...register("maxLength")}
                         defaultValue={property?.maxLength} />
                     <TextField
                         name={`pattern`}
-                        inputRef={register()}
+                        {...register("pattern")}
                         label='Pattern'
                         defaultValue={property?.pattern} />
                 </>
@@ -245,13 +262,13 @@ const AddNewProperty = ({ property }) => {
                         label='Min value'
                         name={`minimum`}
                         type="number"
-                        inputRef={register()}
+                        {...register("minimum")}
                         defaultValue={property?.minimum} />
                     <TextField
                         label='Max value'
                         name={`maximum`}
                         type="number"
-                        inputRef={register()}
+                        {...register("maximum")}
                         defaultValue={property?.maximum} />
                 </>
             )}
@@ -261,19 +278,19 @@ const AddNewProperty = ({ property }) => {
                         label='Min value'
                         name={`minimum`}
                         type="number"
-                        inputRef={register()}
+                        {...register("minimum")}
                         defaultValue={property?.minimum} />
                     <TextField
                         label='Max value'
                         name={`maximum`}
                         type="number"
-                        inputRef={register()}
+                        {...register("maximum")}
                         defaultValue={property?.maximum} />
                 </>
             )}
             <TextField
                 name={`description`}
-                inputRef={register()}
+                {...register("description")}
                 label='Description'
                 defaultValue={property?.description} />
 

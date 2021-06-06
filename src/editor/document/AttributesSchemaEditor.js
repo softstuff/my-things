@@ -1,9 +1,9 @@
-import { Button, IconButton, makeStyles, TextField } from '@material-ui/core';
-import React, { useEffect } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form';
+import {Button, IconButton, makeStyles, TextField} from '@material-ui/core';
+import React, {useEffect} from 'react'
+import {useFieldArray, useForm} from 'react-hook-form';
 import DeleteIcon from '@material-ui/icons/Delete';
-import useDataConverter from '../useDataConverter';
-import useValidator from '../useValidator';
+import useDataConverter from './../../components/useDataConverter';
+import useValidator from './../../components/useValidator';
 
 const useStyles = makeStyles((theme) => ({
     editRow: {
@@ -88,7 +88,7 @@ const AttributesSchemaEditor = ({create, doc, onSaveThing, schema}) => {
         <>
             <form id='thing-form' onSubmit={handleSubmit(handleSave)}>
                 {create && (
-                    <TextField className={classes.editField} label='id' name='id' inputRef={register({ required: "The key is required"})}/>                
+                    <TextField className={classes.editField} label='id' name='id' {...register("id", { required: "The key is required"})}/>                
                 )}
                 <h2>Attributes</h2>
                 {fields.map((item, index) => (
@@ -97,7 +97,7 @@ const AttributesSchemaEditor = ({create, doc, onSaveThing, schema}) => {
                         name={item.name}
                         label={item.name}
                         type={item.type}
-                        inputRef={register({
+                        {...register(item.name,{
                             validate: item.validate
                         })}
                         defaultValue={item.value}

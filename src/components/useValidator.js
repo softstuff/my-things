@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import {useCallback} from 'react'
 import Ajv from "ajv"
 
 export default function useValidator() {

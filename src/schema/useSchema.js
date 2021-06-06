@@ -1,9 +1,9 @@
-import { useWorkspace } from "../components/workspace/useWorkspace"
+import {useWorkspace} from "../components/workspace/useWorkspace"
 
-import { saveSchema} from "../firebase/storage"
+import {saveSchema} from "../firebase/storage"
 import jp from 'json-pointer'
-import { useUser } from "../components/user/useUser"
-import { useCallback } from "react"
+import {useUser} from "../components/user/useUser"
+import {useCallback} from "react"
 
 export const useSchema = () => {
 

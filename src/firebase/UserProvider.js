@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useContext } from 'react'
-import { auth } from './config'
+import React, {useContext, useEffect, useState} from 'react'
+import {auth} from './config'
 import queryString from 'query-string'
-import { useHistory, useLocation } from 'react-router-dom'
-import { signInWithCustomToken } from './auth'
+import {useHistory, useLocation} from 'react-router-dom'
+import {signInWithCustomToken} from './auth'
 import NewTenant from '../pages/NewTenant'
 import Signin from '../pages/Signin'
-import { CircularProgress } from '@material-ui/core'
+import {CircularProgress} from '@material-ui/core'
 
 
 export const UserContext = React.createContext()
@@ -84,7 +84,7 @@ export const UserProvider = (props) => {
                         console.log('Failed to exchange tokens', error)
                         setClaims(null)
                         history.push('/error', { message: error })
-                        return
+
                     }
                 } else {
                     console.log('Not logged in and no Jira jwt was found, running standalone')

@@ -1,7 +1,6 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
 
-import { processToCrumData } from '../ThingsBreadcrumbs'
+import {processToCrumData} from '../ThingsBreadcrumbs'
 
 describe('handle crum', ()=>{
 

@@ -1,9 +1,10 @@
-import React, { useState } from "react"
-import { Link } from 'react-router-dom'
-import { useForm } from "react-hook-form"
-import { signup } from "../firebase/auth"
+import React, {useState} from "react"
+import {Link} from 'react-router-dom'
+import {useForm} from "react-hook-form"
+import {signup} from "../firebase/auth"
 import Grid from '@material-ui/core/Grid';
-import { Divider, Container, Card, CardHeader, TextField, Button, CircularProgress } from "@material-ui/core";
+import {Button, Card, CardHeader, CircularProgress, Container, Divider, TextField} from "@material-ui/core";
+
 function Signup(props) {
     const { register, handleSubmit, reset } = useForm()
     const [isLoading, setLoading] = useState(false)
@@ -36,16 +37,16 @@ function Signup(props) {
 
                         <Grid container spacing={3}>
                             <Grid item xs={6}>
-                                <TextField required  name="firstName" label="First name" inputRef={register} />
+                                <TextField required  name="firstName" label="First name" {...register("firstName")} />
                             </Grid>
                             <Grid item xs={6}>
-                                <TextField required name="lastName" label="Last name" inputRef={register} />
+                                <TextField required name="lastName" label="Last name" {...register("lastName")} />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField required name="email" label="Email adress" inputRef={register} />
+                                <TextField required name="email" label="Email adress" {...register("email")} />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField required name="password" label="Password" inputRef={register} />
+                                <TextField required name="password" label="Password" {...register("password")} />
                             </Grid>
                             <Button variant="contained" color="primary" type='submit'>
                                 Sign up

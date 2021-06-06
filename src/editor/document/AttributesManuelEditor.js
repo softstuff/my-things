@@ -1,7 +1,8 @@
-import { Button, Icon, IconButton, makeStyles, TextField } from '@material-ui/core';
-import React, { useEffect } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form';
+import {Button, Icon, IconButton, makeStyles, TextField} from '@material-ui/core';
+import React, {useEffect} from 'react'
+import {useFieldArray, useForm} from 'react-hook-form';
 import DeleteIcon from '@material-ui/icons/Delete';
+import {useEditor} from '../useEditor';
 
 const useStyles = makeStyles((theme) => ({
     editRow: {
@@ -24,10 +25,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const AttributesManualEditor = ({create, doc, onSaveThing}) => {
+const AttributesManualEditor = ({onSaveThing}) => {
     const classes = useStyles();
+    const {documentId, document, createDocument} = useEditor()
     const { register, handleSubmit, control} = useForm()
-    const { register: registerAddAttribute, handleSubmit: handleSubmitAddAttribute, reset: resetAddAttribute, errors} = useForm()
+    const { register: registerAddAttribute, handleSubmit: handleSubmitAddAttribute, reset: resetAddAttribute, formState: { errors}} = useForm()
     const { fields, append, remove } = useFieldArray({
         control,
         name: "thing", 
@@ -35,19 +37,15 @@ const AttributesManualEditor = ({create, doc, onSaveThing}) => {
 
     useEffect(() => {
         remove()
-        console.log('AttributesManualEditor - Init ', doc)
-        doc?.thing && Object.getOwnPropertyNames(doc.thing).forEach(attribute => {
-            append({name: attribute, value: doc.thing[attribute]})
+        console.log('AttributesManualEditor - Init ', document)
+        !createDocument && Object.getOwnPropertyNames(document).filter(attrb => attrb !== "id").forEach(attribute => {
+            append({name: attribute, value: document[attribute]})
         })
         
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [doc])
+    }, [createDocument, document])
     
-    const handleSave = (thing) => {
-        console.log('handleSave', thing)
-        onSaveThing(thing)
-    }
-   
+
     const onAddNewAttribute = (data) => {
         console.log(`Add attribute ${data.name}: ${data.value}`)
         append({name: data.name, value: data.value})
@@ -56,9 +54,9 @@ const AttributesManualEditor = ({create, doc, onSaveThing}) => {
     
     return (
         <>
-            <form id='thing-form' onSubmit={handleSubmit(handleSave)}>
-                {create && (
-                    <TextField className={classes.editField} label='id' name='id' inputRef={register}/>                
+            <form id='thing-form' onSubmit={handleSubmit(onSaveThing)}>
+                {createDocument && (
+                    <TextField className={classes.editField} label='id' name='id' {...register("id")}/>                
                 )}
                 <h2>Attributes</h2>
                 {fields.map((item, index) => (
@@ -67,7 +65,7 @@ const AttributesManualEditor = ({create, doc, onSaveThing}) => {
                         required
                         name={item.name}
                         label={item.name}
-                        inputRef={register()}
+                        {...register()}
                         defaultValue={item.value}/>
                         <IconButton aria-label="delete" onClick={()=>remove(index)}>
                             <DeleteIcon />
@@ -76,21 +74,31 @@ const AttributesManualEditor = ({create, doc, onSaveThing}) => {
                 ))}
                 </form>
 
-
-                
-            <form onSubmit={handleSubmitAddAttribute(onAddNewAttribute)}>
-                <div className={classes.editRow}>
-                    <TextField className={classes.newAttribName} placeholder='Name' name='name' inputRef={registerAddAttribute({
+                <TextField className={classes.newAttribName} placeholder='Name' name='name' {...registerAddAttribute("name",{
                         required: 'Attribute name is required',
                         validate: value => {
-                            console.log('validate ', value, doc.thing[value] )
-                            return !doc.thing[value] || 'Attribute name must be uniqe'
+                            console.log('validate ', value, document[value] )
+                            return !document[value] || 'Attribute name must be uniqe'
                         }
                     })}
                     helperText={errors.name?.message}
                     error={ errors.name ? true : false }
                     />
-                    <TextField className={classes.newAttribValue} placeholder='Value' name='value' inputRef={registerAddAttribute}/>
+
+                
+            <form onSubmit={handleSubmitAddAttribute(onAddNewAttribute)}>
+                <div className={classes.editRow}>
+                    <TextField className={classes.newAttribName} placeholder='Name' name='name' {...registerAddAttribute("name",{
+                        required: 'Attribute name is required',
+                        validate: value => {
+                            console.log('validate ', value, document[value] )
+                            return !document[value] || 'Attribute name must be uniqe'
+                        }
+                    })}
+                    helperText={errors.name?.message}
+                    error={ errors.name ? true : false }
+                    />
+                    <TextField className={classes.newAttribValue} placeholder='Value' name='value' {...registerAddAttribute("value")}/>
                     <IconButton aria-label="add" type='submit'>
                         <Icon>add_circle</Icon>
                     </IconButton>

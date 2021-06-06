@@ -1,5 +1,5 @@
 // @flow
-import { act, renderHook } from '@testing-library/react-hooks'
+import {act, renderHook} from '@testing-library/react-hooks'
 import useValidator from './useValidator'
 
 

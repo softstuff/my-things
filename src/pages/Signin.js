@@ -1,8 +1,18 @@
-import React, { useState } from "react"
-import { useForm } from "react-hook-form"
-import { signin, signup } from "../firebase/auth"
-import { Container, Card, CardHeader, CircularProgress, TextField, Button, Box, makeStyles, CardContent } from "@material-ui/core"
-import { useHistory } from "react-router-dom";
+import React, {useState} from "react"
+import {useForm} from "react-hook-form"
+import {signin, signup} from "../firebase/auth"
+import {
+    Box,
+    Button,
+    Card,
+    CardContent,
+    CardHeader,
+    CircularProgress,
+    Container,
+    makeStyles,
+    TextField
+} from "@material-ui/core"
+import {useHistory} from "react-router-dom";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -115,8 +125,8 @@ function Signin(props) {
                             {!signUp && (
                                 <form onSubmit={handleSubmit(onSignInSubmit)} className={classes.login}>
                                     <h3 className={classes.item}>with password</h3>
-                                    <TextField className={classes.item} required name="email" label="Email adress" inputRef={register} />
-                                    <TextField className={classes.item} required name="password" label="Password" inputRef={register} />
+                                    <TextField className={classes.item} required name="email" label="Email adress" {...register("email")} />
+                                    <TextField className={classes.item} required name="password" label="Password" {...register("password")} />
                                     {error && (<Box color="error.main">{error}</Box>)}
                                     <Button className={classes.item} variant="contained" color="primary" type='submit'>
                                         Sign in
@@ -132,10 +142,10 @@ function Signin(props) {
                             {signUp && (
                                 <form onSubmit={handleSubmit(onSignUpSubmit)} className={classes.login}>
                                     <h3 className={classes.item}>with password</h3>
-                                    <TextField className={classes.item} required name="firstName" label="First name" inputRef={register} />
-                                    <TextField className={classes.item} required name="lastName" label="Last name" inputRef={register} />
-                                    <TextField className={classes.item} required name="email" label="Email adress" inputRef={register} />
-                                    <TextField className={classes.item} required name="password" label="Password" inputRef={register} />
+                                    <TextField className={classes.item} required name="firstName" label="First name" {...register("firstName")} />
+                                    <TextField className={classes.item} required name="lastName" label="Last name" {...register("lastName")} />
+                                    <TextField className={classes.item} required name="email" label="Email adress" {...register("email")} />
+                                    <TextField className={classes.item} required name="password" label="Password" {...register("password")} />
                                     {error && (<Box color="error.main">{error}</Box>)}
                                     <Button className={classes.item} variant="contained" color="primary" type='submit'>
                                         Sign up

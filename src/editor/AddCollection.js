@@ -1,7 +1,7 @@
 // @flow
-import { Icon, IconButton, TextField } from '@material-ui/core'
+import {Icon, IconButton, TextField} from '@material-ui/core'
 import React from 'react'
-import { useForm } from 'react-hook-form'
+import {useForm} from 'react-hook-form'
 
 const AddCollection = ( { onAdd, forbiddenNames }) => {
 
@@ -20,7 +20,7 @@ const AddCollection = ( { onAdd, forbiddenNames }) => {
     
     return (
         <form onSubmit={handleSubmit(onSubmit)}> 
-            <TextField name='displayName' label="New collection" required='true' inputRef={register({
+            <TextField name='displayName' label="New collection" required='true' {...register("displayName", {
                 required: 'You forgot to name your new collection',
                 validate: value => {
                         console.log('validate ', value, forbiddenNames )
@@ -33,7 +33,7 @@ const AddCollection = ( { onAdd, forbiddenNames }) => {
                 })}
                 helperText={errors.name?.message}
                 error={ errors.name ? true : false }/>
-             <TextField name='id' label="Collection id" inputRef={register} />
+             <TextField name='id' label="Collection id" {...register("id")} />
             <IconButton aria-label="add" type='submit'>
                 <Icon>add_circle</Icon>
             </IconButton>

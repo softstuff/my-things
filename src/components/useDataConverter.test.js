@@ -1,5 +1,5 @@
 // @flow
-import {renderHook, act} from '@testing-library/react-hooks'
+import {act, renderHook} from '@testing-library/react-hooks'
 import useDataConverter from './useDataConverter'
 
 describe('serialize form data to json schema', ()=>{

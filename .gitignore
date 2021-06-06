@@ -30,3 +30,4 @@ emulator-snapshot/
 .history/
 
 tmp/*
+.idea/

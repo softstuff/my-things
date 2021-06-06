@@ -1,6 +1,6 @@
 //@flow
-import React, { useEffect, useState } from 'react'
-import { makeStyles } from '@material-ui/core/styles';
+import React, {useEffect, useState} from 'react'
+import {makeStyles} from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -14,12 +14,12 @@ import CloseIcon from '@material-ui/icons/Close';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
-import { createWorkspace, getWorkspaces, removeWorkspace, updateWorkspace } from '../firebase/storage'
-import { AccordionActions,Button, Divider, TextField, withStyles } from '@material-ui/core';
-import { useSession } from '../firebase/UserProvider';
-import { Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { useWorkspace } from '../components/workspace/useWorkspace';
+import {createWorkspace, getWorkspaces, removeWorkspace, updateWorkspace} from '../firebase/storage'
+import {AccordionActions, Button, Divider, TextField, withStyles} from '@material-ui/core';
+import {useSession} from '../firebase/UserProvider';
+import {Link} from 'react-router-dom';
+import {useForm} from 'react-hook-form';
+import {useWorkspace} from '../components/workspace/useWorkspace';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -266,8 +266,8 @@ const EditDialog = (props) => {
     </DialogTitle>
     <DialogContent dividers>
       <form onSubmit={handleSubmit(onSubmit)} className={dialogClasses.form}>
-        <TextField className={dialogClasses.item} required  name="title" label="Title" defaultValue={props.edit?.title} inputRef={register} />
-        <TextField className={dialogClasses.item} multiline={true} rows={3} name="description" label="Description" defaultValue={props.edit?.description} inputRef={register} />
+        <TextField className={dialogClasses.item} required  name="title" label="Title" defaultValue={props.edit?.title} {...register("title")} />
+        <TextField className={dialogClasses.item} multiline={true} rows={3} name="description" label="Description" defaultValue={props.edit?.description} {...register("description")} />
       </form>
     </DialogContent>
     <DialogActions>

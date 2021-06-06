@@ -1,8 +1,8 @@
-import { Button, makeStyles, TextField } from "@material-ui/core";
-import { useSnackbar } from "notistack";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { useSchema } from "./useSchema";
+import {Button, makeStyles, TextField} from "@material-ui/core";
+import {useSnackbar} from "notistack";
+import {useEffect} from "react";
+import {useForm} from "react-hook-form";
+import {useSchema} from "./useSchema";
 
 
 const useRawEditorStyles = makeStyles({
@@ -48,7 +48,7 @@ const RawEditor = ({  }) => {
                 <TextField
                     className={classes.editField}
                     name='raw'
-                    inputRef={register}
+                    {...register("raw")}
                     label='JSON'
                     rows={30}
                     multiline

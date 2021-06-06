@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom';
+import React, {useEffect, useState} from 'react'
+import {useLocation} from 'react-router-dom';
 import queryString from 'query-string'
-import { signInWithCustomToken } from '../firebase/auth'
-import { useSession } from '../firebase/UserProvider';
+import {signInWithCustomToken} from '../firebase/auth'
+import {useSession} from '../firebase/UserProvider';
 
 function Jira() {
     const [jiraUser, setJiraUser] = useState()

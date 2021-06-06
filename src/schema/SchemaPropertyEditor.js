@@ -1,11 +1,22 @@
 // @flow
-import React, { useEffect, useState, } from 'react'
-import { Button, Checkbox, FormControl, Icon, IconButton, InputLabel, makeStyles, NativeSelect,TextField, Tooltip } from '@material-ui/core'
+import React, {useEffect, useState,} from 'react'
+import {
+    Button,
+    Checkbox,
+    FormControl,
+    Icon,
+    IconButton,
+    InputLabel,
+    makeStyles,
+    NativeSelect,
+    TextField,
+    Tooltip
+} from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
-import { FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form'
-import { useSnackbar } from 'notistack';
+import {FormProvider, useFieldArray, useForm, useFormContext} from 'react-hook-form'
+import {useSnackbar} from 'notistack';
 import useDataConverter from '../components/useDataConverter';
 import useSchema from './useSchema';
 
@@ -246,14 +257,14 @@ const SchemaSubCollectionFieldFormProperty = ({ attribute, index, children }) =>
         <div className={classes.editRow} >
             <TextField
                 name={`attribute[${index}].key`}
-                inputRef={register()}
+                {...register()}
                 label='Collection name'
                 disabled={true}
                 defaultValue={attribute.key} />
 
             <TextField
                 name={`attribute[${index}].description`}
-                inputRef={register()}
+                {...register()}
                 label='Description'
                 defaultValue={attribute.description} />
             
@@ -286,7 +297,7 @@ const SchemaFieldFormProperty = ({ attribute, index, children }) => {
             <div className={classes.editRow} >
                 <TextField
                     name={`attribute[${index}].key`}
-                    inputRef={register()}
+                    {...register()}
                     label='Attribute name'
                     defaultValue={attribute.key} />
                 <FormControl className={classes.formControl}>
@@ -294,7 +305,7 @@ const SchemaFieldFormProperty = ({ attribute, index, children }) => {
                     <NativeSelect
                         id={`type_${index}`}
                         name={`attribute[${index}].type`}
-                        inputRef={register()}
+                        {...register()}
                         defaultValue={attribute.type}
                     >
                         <option aria-label="Select a type" value="" />
@@ -307,7 +318,7 @@ const SchemaFieldFormProperty = ({ attribute, index, children }) => {
                     <Checkbox
                         name={`attribute[${index}].required`}
                         color="primary"
-                        inputRef={register()}
+                        {...register()}
                         defaultChecked={attribute.required}
                         inputProps={{ 'aria-label': 'Is required' }}
                     />
@@ -324,17 +335,17 @@ const SchemaFieldFormProperty = ({ attribute, index, children }) => {
                             label='Min lenght'
                             name={`attribute[${index}].minLength`}
                             type="number"
-                            inputRef={register()}
+                            {...register()}
                             defaultValue={attribute.minLength} />
                         <TextField
                             label='Max lenght'
                             name={`attribute[${index}].maxLength`}
                             type="number"
-                            inputRef={register()}
+                            {...register()}
                             defaultValue={attribute.maxLength} />
                         <TextField
                             name={`attribute[${index}].pattern`}
-                            inputRef={register()}
+                            {...register()}
                             label='Pattern'
                             defaultValue={attribute.pattern} />
                     </>
@@ -345,13 +356,13 @@ const SchemaFieldFormProperty = ({ attribute, index, children }) => {
                             label='Min value'
                             name={`attribute[${index}].minimum`}
                             type="number"
-                            inputRef={register()}
+                            {...register()}
                             defaultValue={attribute.minimum} />
                         <TextField
                             label='Max value'
                             name={`attribute[${index}].maximum`}
                             type="number"
-                            inputRef={register()}
+                            {...register()}
                             defaultValue={attribute.maximum} />
                     </>
                 )}
@@ -361,19 +372,19 @@ const SchemaFieldFormProperty = ({ attribute, index, children }) => {
                             label='Min value'
                             name={`attribute[${index}].minimum`}
                             type="number"
-                            inputRef={register()}
+                            {...register()}
                             defaultValue={attribute.minimum} />
                         <TextField
                             label='Max value'
                             name={`attribute[${index}].maximum`}
                             type="number"
-                            inputRef={register()}
+                            {...register()}
                             defaultValue={attribute.maximum} />
                     </>
                 )}
                  <TextField
                     name={`attribute[${index}].description`}
-                    inputRef={register()}
+                    {...register()}
                     label='Description'
                     defaultValue={attribute.description} />
             </div>
@@ -399,7 +410,7 @@ const AddSchemaFormProperty = ({ onAdd }) => {
             <div className={classes.editRow} >
                 <TextField
                     name={`key`}
-                    inputRef={register()}
+                    {...register()}
                     label='Attribute name' />
 
                 <FormControl className={classes.formControl}>
@@ -407,7 +418,7 @@ const AddSchemaFormProperty = ({ onAdd }) => {
                     <NativeSelect
                         id='add-type'
                         name={`type`}
-                        inputRef={register()}
+                        {...register()}
                     >
                         <option aria-label="Select a type" value="" />
                         <option value='string'>Text</option>
@@ -420,7 +431,7 @@ const AddSchemaFormProperty = ({ onAdd }) => {
                         onChange={handleChange}
                         name={`required`}
                         color="primary"
-                        inputRef={register()}
+                        {...register()}
                     />
                 </Tooltip>
 

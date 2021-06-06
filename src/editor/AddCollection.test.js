@@ -1,7 +1,3 @@
-import { render, fireEvent, waitFor, screen } from '@testing-library/react';
-import renderer from 'react-test-renderer';
-import AddCollection from './AddCollection';
-
 describe('Adding a new collection', ()=>{
     // fit('verify regression', ()=>{
     //     const component = renderer.create(

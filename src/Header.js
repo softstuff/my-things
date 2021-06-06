@@ -1,12 +1,12 @@
-import React, { useState } from 'react'
-import { makeStyles } from '@material-ui/core/styles';
-import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem } from '@material-ui/core';
+import React, {useState} from 'react'
+import {makeStyles} from '@material-ui/core/styles';
+import {AppBar, Button, IconButton, Menu, MenuItem, Toolbar, Typography} from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
-import { logout } from './firebase/auth'
-import { useHistory } from 'react-router-dom'
-import { useSession } from './firebase/UserProvider'
+import {logout} from './firebase/auth'
+import {useHistory} from 'react-router-dom'
+import {useSession} from './firebase/UserProvider'
 
 
 const useStyles = makeStyles((theme) => ({

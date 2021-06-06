@@ -1,41 +1,40 @@
-import React, { useState, useEffect } from 'react'
-import { addNewCollection, deleteCollection, getLevelInfo } from '../firebase/storage'
-import { Paper, Grid, makeStyles, FormControlLabel, Switch, Box } from '@material-ui/core'
-import Fab from '@material-ui/core/Fab';
-import AddIcon from '@material-ui/icons/Add';
+import React, {useState} from 'react'
+import {addNewCollection, deleteCollection} from '../firebase/storage'
+import {FormControlLabel, Grid, makeStyles, Paper, Switch} from '@material-ui/core'
 import ThingsBreadcrumbs from '../components/ThingsBreadcrumbs';
-
-import { useSession } from '../firebase/UserProvider';
-import CollectionList from '../components/CollectiontList';
-import DocumentView from '../components/DocumentView';
-import { useSnackbar } from 'notistack';
-import CollectionView from '../components/CollectionView';
-import { useWorkspace } from '../components/workspace/useWorkspace';
-
-
-
+import {useSession} from '../firebase/UserProvider';
+import CollectionList from '../editor/CollectiontList';
+import DocumentView from './document/DocumentView';
+import {useSnackbar} from 'notistack';
+import CollectionView from '../editor/CollectionView';
+import {useWorkspace} from '../components/workspace/useWorkspace';
+import {useEditor} from './useEditor';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        flexGrow: 1,
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
     },
     paper: {
+        margin: theme.spacing(1),
         padding: theme.spacing(2),
         textAlign: 'left',
         color: theme.palette.text.secondary,
-
     },
     main: {
-        height: '70vh',
+        // height: '70vh',
         overflow: 'visible',
-        position: 'relative'
+        position: 'relative',
+
     },
     collection: {
-        height: '70vh',
+        // height: '70vh',
         overflow: 'auto'
     },
     thing: {
-        height: '70vh',
+        flexGrow: "1",
+        // height: '70vh',
         overflow: 'auto'
     },
     addCollectionIcon: {
@@ -52,36 +51,35 @@ const useStyles = makeStyles((theme) => ({
 
 function Editor() {
 
-    const classes = useStyles();
-    const { enqueueSnackbar } = useSnackbar();
-    const [ editing, setEditing] = useState(false)
-    const { claims } = useSession()
-    const { wid } = useWorkspace()
-    const [ levelPath, setLevelPath] = useState('/')
-    const [ collectionList, setCollectionList] = useState([])
-    const [ collectionId, setCollectionId] = useState()
-    const [ documentId, setDocumentId] = useState()
-    const [createDocument, setCreateDocument] = useState(false)
+    const classes = useStyles()
+    const {enqueueSnackbar} = useSnackbar()
+    const {
+        editing, setEditing,
+        collectionList, setCollectionList,
+        collectionId, setCollectionId,
+        documentId, setDocumentId,
+        createDocument, setCreateDocument
+    } = useEditor()
+    const {claims} = useSession()
+    const {wid} = useWorkspace()
+    const [levelPath, setLevelPath] = useState('/')
 
     const tenantId = claims.myThings.tenantId
 
-    useEffect(() => {
-        const unsubscribe = getLevelInfo(tenantId, wid, levelPath,
-            (meta) => {
-                console.log(`Load level info at levelPath '${levelPath}'`, meta)
-                setCollectionList(meta?.children || [])
-            }, (error) => {
-                console.log(`Failed to load level info ${levelPath}`, error)
-                enqueueSnackbar(`Failed to load  level info ${levelPath}`, { variant: 'error' })
-            }
-        )
-        return unsubscribe
+    // useEffect(() => {
+    //     const unsubscribe = getLevelInfo(tenantId, wid, levelPath,
+    //         (meta) => {
+    //             console.log(`Load level info at levelPath '${levelPath}'`, meta)
+    //             setCollectionList(meta?.children || [])
+    //         }, (error) => {
+    //             console.log(`Failed to load level info ${levelPath}`, error)
+    //             enqueueSnackbar(`Failed to load  level info ${levelPath}`, { variant: 'error' })
+    //         }
+    //     )
+    //     return unsubscribe
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tenantId, wid, levelPath])
-
-
-    
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [tenantId, wid, levelPath])
 
 
     // const onMetaSave =  (meta) => {
@@ -109,7 +107,7 @@ function Editor() {
 
                 console.log(`test`, id, collectionList)
                 if (collectionList.includes(id)) {
-                    enqueueSnackbar(`Collection ${id} already exists`, { variant: 'error' })
+                    enqueueSnackbar(`Collection ${id} already exists`, {variant: 'error'})
                 } else {
 
                     addNewCollection(tenantId, wid, id)
@@ -119,7 +117,7 @@ function Editor() {
             }
         } catch (error) {
             console.log('FAILED handleCreateCollection', error, id)
-            enqueueSnackbar(`Collection ${id} could not be created`, { variant: 'error' })
+            enqueueSnackbar(`Collection ${id} could not be created`, {variant: 'error'})
         }
     }
 
@@ -159,7 +157,7 @@ function Editor() {
     }
 
 
-    const handlePathChange = ({ levelPath, collectionId, documentId }) => {
+    const handlePathChange = ({levelPath, collectionId, documentId}) => {
         console.log('handlePathChange', levelPath, collectionId, documentId)
         setDocumentId(documentId)
         setCollectionId(collectionId)
@@ -175,87 +173,52 @@ function Editor() {
     }
     return (
         <div className={classes.root}>
-            <Grid container spacing={3}>
-                <Grid item xs={12}>
-                    <Paper className={`${classes.paper}`}>
-                        <Grid
-                            container
-                            direction="row"
-                            justify="space-between"
-                            alignItems="flex-start">
+            <Paper className={`${classes.paper}`}>
+                <Grid
+                    container
+                    direction="row"
+                    justify="space-between"
+                    alignItems="flex-start">
 
 
-                            <ThingsBreadcrumbs
-                                levelPath={levelPath}
-                                collectionId={collectionId}
-                                documentId={documentId}
-                                onPathChange={handlePathChange} />
+                    <ThingsBreadcrumbs/>
 
-                            <FormControlLabel
-                                control={<Switch checked={editing} onChange={() => setEditing(!editing)} />}
-                                label="Edit"
-                            />
-                        </Grid>
-                    </Paper>
+                    <FormControlLabel
+                        control={<Switch checked={editing} onChange={() => setEditing(!editing)}/>}
+                        label="Edit"
+                    />
                 </Grid>
-                
-                <Grid item sm={6} md={3} lg={2}>
-                    <Box className={classes.main}>
-                        <Paper className={`${classes.paper} ${classes.collection}`}>
+            </Paper>
+            <Paper className={`${classes.paper} ${classes.thing}`}>
+                {!collectionId && (
+                    <CollectionList onDelete={handleDeleteCollection}></CollectionList>
+                )}
 
-                            <CollectionList selected={collectionId} collections={collectionList} onCollectionSelected={onCollectionSelected}
-                                editing={editing} onDelete={handleDeleteCollection}></CollectionList>
-
-                        </Paper>
-                        {editing && (
-                            <>
-                                <Fab className={classes.addCollectionIcon} color="primary" aria-label="add" onClick={handleCreateCollection}>
-                                    <AddIcon />
-                                </Fab>
-                            </>)}
-                    </Box>
-                </Grid>
-                {!documentId && !collectionId && !createDocument  && 
-                    <p>Welcome add or select your collection</p>
-                }
-                {!documentId && collectionId && !createDocument &&
-                    <CollectionView 
+                {collectionId && !documentId && (
+                    <CollectionView
                         tenantId={tenantId}
                         wid={wid}
-                        levelPath={levelPath} 
-                        collectionId={collectionId} 
-                        documentId={documentId} 
-                        editing={editing}
+                        levelPath={levelPath}
+                        collectionId={collectionId}
+                        documentId={documentId}
                         onDocumentSelect={onDocumentSelect}
-                        onDocumentCreate={handleCreateDocument} /> }
-                {(documentId || createDocument) && <>
-                    
-                    <Grid item sm={6} md={9} lg={10}>
-                        <Box className={classes.main}>
-                            <Paper className={`${classes.paper} ${classes.thing}`}>
-                                <DocumentView
-                                    create={createDocument}
-                                    collectionPath={`${levelPath ? levelPath : '/'}${collectionId}`}
-                                    collectionId={collectionId}
-                                    documentId={documentId}
-                                    editing={editing}
-                                    onDocumentIdChange={onDocumentSelect}
-                                    onSubCollectionClick={handleSubCollectionTransition} />
+                        onDocumentCreate={handleCreateDocument}/>
+                )}
 
-                            </Paper>
-
-                            {editing && !createDocument && (
-                                <Fab className={classes.addDocumentIcon} color="primary" aria-label="add" onClick={handleCreateDocument}>
-                                    <AddIcon />
-                                </Fab>)}
-                        </Box>
-                    </Grid>
-                </>}
-            </Grid>
+                {(documentId || createDocument) && (
+                    <DocumentView
+                        create={createDocument}
+                        collectionPath={`${levelPath ? levelPath : '/'}${collectionId}`}
+                        collectionId={collectionId}
+                        documentId={documentId}
+                        editing={editing}
+                        onDocumentIdChange={onDocumentSelect}
+                        onSubCollectionClick={handleSubCollectionTransition}/>
+                )}
+            </Paper>
         </div>
     )
 }
-
 
 
 // function CollectionList({ path, onPathChange }) {
@@ -319,11 +282,9 @@ function Editor() {
 //                 </ol>
 
 
-
 //         </>
 //     )
 // }
-
 
 
 // const NewCollectionDialog = (props) => {
@@ -347,7 +308,7 @@ function Editor() {
 //             <DialogTitle id="confirmation-dialog-title">Name your new collection</DialogTitle>
 //             <DialogContent dividers>
 //                 <form id='formet' onSubmit={handleSubmit(onCreate)} >
-//                     <TextField name='name' label='Name' inputRef={register({
+//                     <TextField name='name' label='Name' {...register("Name",{
 //                         required: "You forgot to enter the name"
 //                     })}
 
