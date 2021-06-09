@@ -40,12 +40,15 @@ const ArgumentNode = ({data}) => {
     <>
     <Box display='flex' flexDirection="row" ref={boxEl}>
       <Handle type="target" position={Position.Left} isValidConnection={onlySingleEdge}  />
-      <Box flexGrow={1}>{data.name}{data.required === 'yes' ? '*':''}</Box>
-      <Box>
+      <Typography className={classes.typography}>
+        Attribute: {data.name} {data.required === 'yes' ? '*':''}
+      </Typography>
+      {/* <Box flexGrow={1}>{data.name}{data.required === 'yes' ? '*':''}</Box> */}
+      {/* <Box>
         <InfoIcon onClick={handleClick} fontSize="small" color="primary" />
-      </Box>
+      </Box> */}
     </Box>
-    <Popover 
+    {/* <Popover 
       id={id}
       open={open}
       anchorEl={anchorEl}
@@ -59,8 +62,10 @@ const ArgumentNode = ({data}) => {
         horizontal: 'center',
       }}
     >
- <Typography className={classes.typography}>The content of the Popover.</Typography>
-</Popover>
+ <Typography className={classes.typography}>
+   Attribute
+ </Typography>
+</Popover> */}
     </>
   );
 }

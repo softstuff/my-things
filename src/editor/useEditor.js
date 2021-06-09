@@ -13,7 +13,7 @@ export const useEditor = () => {
 
 export const EditorProvider = (props) => {
 
-    const [editing, setEditing] = useState(false)
+    const [editing, setEditing] = useState(true)
     const [collectionId, setCollectionId] = useState()
     const [documentId, setDocumentId] = useState()
     const [document, setDocument] = useState()

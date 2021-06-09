@@ -1,0 +1,137 @@
+import { useEffect, useState } from "react";
+import MapData from "../../../../imports/MapData";
+import { useWizzard } from "./useWizzard";
+
+export const WherePanel = () => {
+    
+
+    
+    return (
+      <>
+        <h2>Where</h2>
+
+        <MapFields />
+
+      </>
+    );
+  }
+
+
+  const MapFields = ({init}) => {
+    const [inputs, setInputs] = useState([]);
+    const [outputs, setOutputs] = useState([]);
+    const [actions, setActions] = useState([]);
+    const [edges, setEdges] = useState([]);
+    const [rfInstance, setRfInstance] = useState(null);
+    const {state, dispatch} = useWizzard()
+    // const {config, setConfig, activeStep} = useImportConfig()
+  
+    useEffect(()=>{
+      if (state.mappins) {
+        setRfInstance(state.mappins)
+      } else if(state.type === "CSV") {
+
+        setInputs(state.config.columns.map( (column, index) => ({id: `in_${index}`, name: column})))
+        setOutputs(state.config.columns.map( (column, index) => ({id: `out_${index}`, name: column, required: false})))
+        setActions([]);
+        setEdges(state.config.columns.map( (column, index) => ({source: `in_${index}`, target: `out_${index}`})))
+      }
+    }, [state])
+
+    useEffect(()=>{
+      dispatch({type: "SET_MAPPING", mappings: rfInstance?.toObject(), isValid: rfInstance !== null})
+      console.log("rfInstance update", rfInstance?.toObject())
+    }, [rfInstance])
+
+    // useEffect(()=>{
+    //   console.log(`Mapping step done activeStep ${activeStep} myStep: ${myStep}`)
+    //   if( myStep !== activeStep) {
+    //     const updatedConfig = {...config, mapper: rfInstance.toObject()}
+    //     setConfig(updatedConfig)
+    //     console.log("Saved data mapping", updatedConfig)
+    //   }
+    // },[activeStep])
+  
+    // useEffect(() => {
+      //   console.log('get property for pointer ', config.pointer, "From config ", config)
+      //   if(config.pointer) {
+  
+      // const property = getPropertyFor(config.pointer)
+  
+      // const attributeNodes = Reflect.ownKeys(property.items.properties).reduce( (nodes, attribute, index) => {
+      //   if( property.items.properties[attribute]?.type !== 'array'){
+      //     nodes.push({
+      //       id: `${index + 1000}`,
+      //       required: property.items?.required.includes(attribute) ? 'yes': 'no',
+      //       name: attribute})
+      //   }
+      //   return nodes
+      // }, [])
+  
+      // attributeNodes.unshift({ id: config.collectionPath, name: config.collectionId, key: 'yes', data: {collectionPath: config.collectionPath}})
+  
+      // const inputNodes = config.structure.columns.map((column,index)=>({id: `${index}`, name: column}))
+      // setInputs(inputNodes)
+      // setOutputs(attributeNodes)
+      // setEdges(guessConnections(inputNodes, attributeNodes))
+    //   setInputs([
+    //     { id: "1", name: "förnamn" },
+    //     { id: "2", name: "efternamn" },
+    //     { id: "3", name: "age" },
+    //   ]);
+    //   setOutputs([
+    //     { id: "100", key: "yes", name: "Namn" },
+    //     { id: "101", required: "yes", name: "Ålder" },
+    //     { id: "102", name: "Kön" },
+    //   ]);
+    //   setActions([
+    //     {
+    //       id: "50",
+    //       type: "join",
+    //       data: { joiner: "-" },
+    //       position: { x: 250, y: 75 },
+    //     },
+    //   ]);
+    //   setEdges([
+    //     { source: "1", target: "50", targetHandle: "a" },
+    //     { source: "2", target: "50", targetHandle: "b" },
+    //     { source: "50", target: "100" },
+    //     { source: "3", target: "101" },
+    //   ]);
+  
+    //   // setActions([])
+    //   //  setEdges([])
+  
+    //   // onValidation(true)
+    //   //   }
+    // }, []);
+  
+    // const guessConnections = (inputNodes, argumentNodes) => {
+    //   let connections = inputNodes
+    //     .map((inputNode) => {
+    //       const arg = argumentNodes.find((arg) => arg.name === inputNode.name);
+    //       if (arg) {
+    //         return { source: inputNode.id, target: arg.id };
+    //       } else {
+    //         return null;
+    //       }
+    //     })
+    //     .filter((conn) => conn !== null);
+  
+    //   return connections;
+    // };
+  
+    return (
+      <>
+        {/* {myStep == activeStep &&  */}
+        <MapData
+          inputs={inputs}
+          outputs={outputs}
+          actions={actions}
+          edges={edges}
+          setRfInstance={setRfInstance}
+        />
+        {/* } */}
+      </>
+    );
+  };

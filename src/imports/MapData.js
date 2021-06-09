@@ -94,7 +94,7 @@ export default ({inputs, outputs, actions, edges, setRfInstance}) => {
           id: node.id,
           type: node.type || 'input',
           data: { label: node.name },
-          position: node.position ||{ x: 0, y: (index + 1) * 50 },
+          position: node.position ||{ x: 0, y: index * 80 + 20},
           sourcePosition: 'right',
         }))
 
@@ -102,7 +102,7 @@ export default ({inputs, outputs, actions, edges, setRfInstance}) => {
         id: node.id,
         type: node.key ? 'argumentKey' : 'argument',
         data: { ...node },
-        position: node.position || { x: 600, y: (index + 1) * 50 },
+        position: node.position || { x: 500, y: index * 60 + 20},
         targetPosition: 'left',
       }))
 
