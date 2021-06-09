@@ -145,7 +145,7 @@ const ImportWizard = ({onAbort}) => {
       )}
       <p>
       state:
-        <textarea cols="100" rows="100">{JSON.stringify(state, null, 2)}</textarea>
+        <textarea cols="100" rows="100" value={JSON.stringify(state, null, 2)} />
       </p>
     </>
   );

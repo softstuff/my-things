@@ -30,7 +30,7 @@ export const WherePanel = () => {
     useEffect(() => {
       const handle = setInterval(() => {
        const elements = rfInstance?.toObject()
-        dispatch({type: "SET_MAPPING", mappings: elements, isValid: elements !== null})
+        dispatch({type: "SET_MAPPING", mapping: elements, isValid: elements !== null})
       }, 2000);
   
       return () => clearInterval(handle);

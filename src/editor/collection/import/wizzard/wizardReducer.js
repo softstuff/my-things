@@ -49,7 +49,7 @@ export function wizardReducer(state, action) {
             ...state.step,
             [`done_${state.step.active}`]: action.isValid
           },
-          mappings: action.mappings,
+          mapping: action.mapping,
         };
       }
     }
