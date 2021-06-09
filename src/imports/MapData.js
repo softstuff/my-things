@@ -1,6 +1,6 @@
 import {makeStyles} from '@material-ui/core';
 import React, {useEffect, useRef, useState} from 'react';
-import ReactFlow, {addEdge, Background, Controls, ReactFlowProvider, removeElements,} from 'react-flow-renderer';
+import ReactFlow, {addEdge, Background, Controls, ReactFlowProvider, removeElements, useStoreState,} from 'react-flow-renderer';
 import InputNode from './actions/InputNode';
 import JoinActionNode from './actions/JoinActionNode'
 import ToLowerCaseActionNode from './actions/ToLowerCaseActionNode';
@@ -9,6 +9,7 @@ import Sidebar from './Sidebar';
 import "./react-flow-overrides.scss"
 import ArgumentNode from './actions/ArgumentNode';
 import ArgumentKeyNode from './actions/ArgumentKeyNode';
+import { useDebounce } from '../utils/useDebounce';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -45,6 +46,7 @@ const getId = () => `dndnode_${id++}`;
 
 export default ({inputs, outputs, actions, edges, setRfInstance}) => {
   const classes = useStyles()
+  
     const reactFlowWrapper = useRef(null);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const [elements, setElements] = useState();
@@ -134,7 +136,7 @@ export default ({inputs, outputs, actions, edges, setRfInstance}) => {
                     onDragOver={onDragOver}
                     nodeTypes={nodeTypes}
                 >
-                  <Background
+                <Background
                     variant="lines"
                     gap={12}
                     size={1}

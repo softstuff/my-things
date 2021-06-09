@@ -26,22 +26,26 @@ export const WherePanel = () => {
     const {state, dispatch} = useWizzard()
     // const {config, setConfig, activeStep} = useImportConfig()
   
+    
+    useEffect(() => {
+      const handle = setInterval(() => {
+       const elements = rfInstance?.toObject()
+        dispatch({type: "SET_MAPPING", mappings: elements, isValid: elements !== null})
+      }, 2000);
+  
+      return () => clearInterval(handle);
+    }, [rfInstance]);
+
     useEffect(()=>{
       if (state.mappins) {
         setRfInstance(state.mappins)
       } else if(state.type === "CSV") {
-
         setInputs(state.config.columns.map( (column, index) => ({id: `in_${index}`, name: column})))
         setOutputs(state.config.columns.map( (column, index) => ({id: `out_${index}`, name: column, required: false})))
         setActions([]);
         setEdges(state.config.columns.map( (column, index) => ({source: `in_${index}`, target: `out_${index}`})))
       }
     }, [state])
-
-    useEffect(()=>{
-      dispatch({type: "SET_MAPPING", mappings: rfInstance?.toObject(), isValid: rfInstance !== null})
-      console.log("rfInstance update", rfInstance?.toObject())
-    }, [rfInstance])
 
     // useEffect(()=>{
     //   console.log(`Mapping step done activeStep ${activeStep} myStep: ${myStep}`)
@@ -123,7 +127,6 @@ export const WherePanel = () => {
   
     return (
       <>
-        {/* {myStep == activeStep &&  */}
         <MapData
           inputs={inputs}
           outputs={outputs}
@@ -131,7 +134,6 @@ export const WherePanel = () => {
           edges={edges}
           setRfInstance={setRfInstance}
         />
-        {/* } */}
       </>
     );
   };
