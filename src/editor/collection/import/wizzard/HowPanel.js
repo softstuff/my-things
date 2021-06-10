@@ -45,7 +45,7 @@ const CsvConfig = () => {
       <Controller
         name="columns"
         control={control}
-        defaultValue={["kalle"]}
+        defaultValue={["firstname", "lastname"]}
         rules={{ required: "Select the columns of the import file" }}
         render={({ field, fieldState:{invalid, error} }) => (
           <Autocomplete
