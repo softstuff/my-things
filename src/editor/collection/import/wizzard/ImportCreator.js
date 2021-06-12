@@ -78,7 +78,7 @@ const ImportWizard = ({onAbort}) => {
 
   return (
     <>
-      <a onClick={onAbort}>Back to list</a>
+      <a readOnly={true} onClick={onAbort}>Back to list</a>
       <p>Import Creator</p>
       <Stepper activeStep={state.step.active}>
         <Step>

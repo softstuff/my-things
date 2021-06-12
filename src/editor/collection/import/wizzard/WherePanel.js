@@ -22,6 +22,7 @@ export const WherePanel = () => {
     const [outputs, setOutputs] = useState([]);
     const [actions, setActions] = useState([]);
     const [edges, setEdges] = useState([]);
+    const [lastElements, setLastElements] = useState([]);
     const [rfInstance, setRfInstance] = useState(null);
     const {state, dispatch} = useWizzard()
     // const {config, setConfig, activeStep} = useImportConfig()
@@ -29,23 +30,53 @@ export const WherePanel = () => {
     
     useEffect(() => {
       const handle = setInterval(() => {
-       const elements = rfInstance?.toObject()
+        if(!rfInstance) {
+          console.log()
+          return
+        }
+       const elements = {...rfInstance?.toObject()}
+       delete elements.position
+       delete elements.zoom
+       if (JSON.stringify(elements) !== JSON.stringify(lastElements)){
+        console.log("Element changed", lastElements === elements, lastElements == elements, JSON.stringify(elements) === JSON.stringify(lastElements))
+        setLastElements(elements)
         dispatch({type: "SET_MAPPING", mapping: elements, isValid: elements !== null})
+       }
+      //  if(JSON.stringify(elements) !== JSON.stringify(state.mapping)) {
+      //    console.log("Update mapping, elements:", JSON.stringify(elements), "state.mapping:",JSON.stringify(state.mapping))
+      //     dispatch({type: "SET_MAPPING", mapping: elements, isValid: elements !== null})
+      //  } {
+      //   console.log("mapping has not changed")
+      //  }
       }, 2000);
   
       return () => clearInterval(handle);
-    }, [rfInstance]);
+    }, [rfInstance, lastElements]);
+
+    // useEffect(() => {
+    //   console.log("rfInstance is updated to ", rfInstance)
+    //   if (rfInstance) {
+    //     const elements = rfInstance?.toObject()
+    //     dispatch({type: "SET_MAPPING", mapping: elements, isValid: elements !== null})
+    //   }
+    // }, [rfInstance]);
+
 
     useEffect(()=>{
-      if (state.mappins) {
-        setRfInstance(state.mappins)
+      console.log("State changed, state:", state, "rfInstance", rfInstance)
+      if(rfInstance) {
+        console.log("Ignore reload")
+      } else if (state.mapping) {
+        console.log("Update mapping", state.mapping)
+        setRfInstance({...state.mapping})
       } else if(state.type === "CSV") {
+        console.log("Setup default CSV mapping")
         setInputs(state.config.columns.map( (column, index) => ({id: `in_${index}`, name: column})))
         setOutputs(state.config.columns.map( (column, index) => ({id: `out_${index}`, name: column, required: false})))
         setActions([]);
         setEdges(state.config.columns.map( (column, index) => ({source: `in_${index}`, target: `out_${index}`})))
       }
-    }, [state])
+    }, [state, rfInstance])
 
     // useEffect(()=>{
     //   console.log(`Mapping step done activeStep ${activeStep} myStep: ${myStep}`)
@@ -133,6 +164,7 @@ export const WherePanel = () => {
           actions={actions}
           edges={edges}
           setRfInstance={setRfInstance}
+          
         />
       </>
     );
