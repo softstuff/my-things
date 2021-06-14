@@ -1,9 +1,9 @@
 
 
-export const buildInitPayload = (config, data) => {
+export const buildInitPayload = (input, config) => {
 
     if (config.type === "CSV") {
-        const values = data.split(config.delimiter)
+        const values = input.split(config.delimiter)
         return values.reduce((map, value, index) => {
             map[config.columns[index]] = value;
             return map;
@@ -12,15 +12,18 @@ export const buildInitPayload = (config, data) => {
     throw new Error("Unsupported import type", config.type)
 }
 
-export const process = (payload, mapping) => {
+export const processChunk = (input, config, mapping) => {
+    let payload = buildInitPayload(input, config)
     console.log("process ", payload)
-    const out = Object.keys(payload).map((name, index) => {
-      const nodeId = mapping.inputNameToNodeId[name]
-      const node = mapping.nodeIdToNode[nodeId]
-      const value = payload[name]
-      return pushIt({node, value, payload, mapping})
-    })
-    return out
+
+    Object.keys(mapping.inputSelectorToInputNode)
+      .forEach(inputSelector => {
+        const inputNodeId = mapping.inputSelectorToInputNode[inputSelector]
+        payload[inputNodeId] = payload[inputSelector]
+        const firstEdge = mapping.nodeIdToedges[inputNodeId]
+        pushIt({edge: firstEdge, payload, mapping})
+      })
+    return payload
   }
 
   /*
@@ -31,49 +34,53 @@ in_1: {id: "in_1", type: "input", data: {…}, position: {…}, sourcePosition: 
 out_0: {id: "out_0", type: "argument", data: {…}, position: {…}, targetPosition: "left"}
 out_1: {id: "out_1", type: "argument", data: {…}, position: {…}, targetPosition: "left"}
   */
+
 export const pushIt = (args) => {
+    if (!args.edge) return args
+
+    const nextNode = args.mapping.nodeIdToNode[args.edge.target]
     
-    if (args.node?.type === "input") {
-      return pushIt(processInputNode(args))
-    } else if (args.node?.type === "lower") {
-      return pushIt(processActionLowerNode(args))
-    } else if (args.node?.type === "argumentKey") {
-    } else if (args.node?.type === "upper") {
-      return pushIt(processActionUpperNode(args))
-    } else if (args.node?.type === "argumentKey") {
-      return processOutputIdNode(args)
-    } else if (args.node?.type === "argument") {
-      return processOutputNode(args)
+    let nextArgs = null
+    if (nextNode.type === "lower") {
+      nextArgs = processActionLowerNode(args)
+    } else if (nextNode.type === "upper") {
+      nextArgs = processActionUpperNode(args)
+    } else if (nextNode.type === "join") {
+      nextArgs = processActionJoinNode(args)
+    } else if (nextNode.type === "argumentKey") {
+      nextArgs = processOutputIdNode(args)
+    } else if (nextNode.type === "argument") {
+      nextArgs = processOutputNode(args)
     }
-  }
-
-export const processInputNode = ({node, value, payload, mapping}) => {
-  const edge = mapping.nodeIdToedges[node.id]
-  const target = mapping.nodeIdToNode[edge.target]
-
-  return {node: target, value, payload, mapping}
+    return pushIt(nextArgs)
 }
 
-export const processOutputNode = ({node, value, payload, mapping}) => {
-  return {[node.data.name]: value}
+export const processInputNode = ({edge, payload, mapping}) => {
+  const resultedge = mapping.nodeIdToedges[edge.target]
+  payload[edge.target] = payload[edge.source]
+  return {edge: resultedge, payload, mapping}
 }
 
-export const processOutputIdNode = ({node, value, payload, mapping}) => {
-  return {[node.data.name]: value, _id: true}
+export const processOutputNode = ({edge, payload, mapping}) => {
+  const outputNode = mapping.nodeIdToNode[edge.target]
+  payload[outputNode.id] = payload[edge.source]
+  return payload
 }
 
-export const processActionLowerNode = ({node, value, payload, mapping}) => {
-  const edge = mapping.nodeIdToedges[node.id]
-  const target = mapping.nodeIdToNode[edge.target]
-  const newValue = value.toString().toLowerCase()
-  return {node: target, value: newValue, payload, mapping}
+export const processOutputIdNode = (args) => {
+  return processOutputNode(args)
 }
 
-export const processActionUpperNode = ({node, value, payload, mapping}) => {
-  const edge = mapping.nodeIdToedges[node.id]
-  const target = mapping.nodeIdToNode[edge.target]
-  const newValue = value.toString().toUpperCase()
-  return {node: target, value: newValue, payload, mapping}
+export const processActionLowerNode = ({edge, payload, mapping}) => {
+  const resultedge = mapping.nodeIdToedges[edge.target]
+  payload[edge.target] = payload[edge.source].toString().toLowerCase()
+  return {edge: resultedge, payload, mapping}
+}
+
+export const processActionUpperNode = ({edge, payload, mapping}) => {
+  const resultedge = mapping.nodeIdToedges[edge.target]
+  payload[edge.target] = payload[edge.source].toString().toUpperCase()
+  return {edge: resultedge, payload, mapping}
 }
 
 export const processActionJoinNode = ({edge, value, payload, mapping}) => {

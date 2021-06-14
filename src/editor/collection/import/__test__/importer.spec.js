@@ -7,6 +7,7 @@ import {
   processActionLowerNode,
   processActionUpperNode,
   processActionJoinNode,
+  processChunk,
 } from "../importer";
 
 describe("Verify buildInitPayload", () => {
@@ -17,8 +18,8 @@ describe("Verify buildInitPayload", () => {
         delimiter: ";",
         columns: ["firstName", "lastName", "age"],
       };
-      const data = "Foo;Bar;42";
-      const payload = buildInitPayload(config, data);
+      const input = "Foo;Bar;42";
+      const payload = buildInitPayload(input, config);
 
       expect(payload).toEqual({
         firstName: "Foo",
@@ -29,15 +30,13 @@ describe("Verify buildInitPayload", () => {
   });
 });
 
-describe("process", () => {
-  const payload = {
-    firstName: "Foo",
-    lastName: "Bar",
-  };
+describe("processChunk", () => {
+
   const mapping = {
-    inputNameToNodeId: {
+
+    inputSelectorToInputNode: {
       firstName: "in_0",
-      lastName: "in_1",
+      lastName: "in_1"
     },
     nodeIdToNode: {
       in_0: {
@@ -77,57 +76,50 @@ describe("process", () => {
   };
   describe("process", () => {
     test("Happy path", () => {
-      const result = process(payload, mapping);
-      expect(result).toEqual([{ firstName: "Foo" }, { lastName: "Bar" }]);
+      const input = "Foo;Bar"
+      const config = {
+        type: "CSV",
+        delimiter: ";",
+        columns: ["firstName", "lastName"]
+      }
+      const chunk = processChunk(input, config, mapping);
+      expect(chunk).toEqual({
+        firstName: "Foo", lastName: "Bar",
+        in_0: "Foo", in_1: "Bar",
+        out_0: "Foo", out_1: "Bar"
+      });
     });
   });
 
   describe("processInputNode", () => {
     const args = {
-      node: {
-        id: "in_0",
-        type: "input",
-        data: { label: "firstName" },
-        sourcePosition: "right",
-      },
-      value: "Foo",
-      payload: {},
+      edge: mapping.nodeIdToedges.in_0,
+      payload: {in_0: "Foo"},
       mapping,
     };
 
     test("Happy path", () => {
       const result = processInputNode(args);
-      const expected = { ...args, node: mapping.nodeIdToNode.out_0 };
+      const expected = { edge: undefined, payload:{in_0: "Foo", out_0: "Foo"}, mapping: args.mapping };
       expect(result).toEqual(expected);
     });
   });
 
   describe("processOutputNode", () => {
     const args = {
-      node: {
-        id: "out_0",
-        type: "argument",
-        data: { name: "firstName" },
-        targetPosition: "left",
-      },
-      value: "Foo",
-      payload: {},
+      edge: mapping.nodeIdToedges.in_0,
+      payload: {in_0: "Foo"},
       mapping,
     };
 
     test("validate output", () => {
       const result = processOutputNode(args);
-      const expected = { firstName: "Foo" };
-      expect(result).toEqual(expected);
+      expect(result).toEqual({in_0: "Foo", out_0: "Foo"});
     });
 
     test("validate output id", () => {
-      const result = processOutputIdNode({
-        ...args,
-        node: { ...args.node, type: "argumentKey" },
-      });
-      const expected = { firstName: "Foo", _id: true };
-      expect(result).toEqual(expected);
+      const result = processOutputIdNode(args);
+      expect(result).toEqual({in_0: "Foo", out_0: "Foo"});
     });
   });
 
@@ -136,9 +128,6 @@ describe("process", () => {
       firstName: "Foo",
     };
     const mapping = {
-      inputNameToNodeId: {
-        firstName: "in_0",
-      },
       nodeIdToNode: {
         in_0: {
           id: "in_0",
@@ -154,40 +143,46 @@ describe("process", () => {
           id: "a_0",
           type: "lower",
         },
+        a_1: {
+          id: "a_1",
+          type: "upper",
+        },
       },
       nodeIdToedges: {
         in_0: { id: "ein_0_out_0", source: "in_0", target: "a_0" },
-        a_0: { id: "ea_1_out_1", source: "a_1", target: "out_0" },
+        in_1: { id: "ein_1_out_0", source: "in_1", target: "a_1" },
+        a_0: { id: "ea_0_out_1", source: "a_0", target: "out_0" },
+        a_1: { id: "ea_1_out_1", source: "a_1", target: "out_0" },
       },
     };
-    const args = {
-      node: {
-        id: "a_0",
-        type: "lower",
-        data: {},
-      },
-      value: "Foo",
-      payload: {},
-      mapping,
-    };
+    
 
     test("Validate to lower", () => {
+      const args = {
+        edge: mapping.nodeIdToedges.in_0,
+        payload: {in_0: "Foo"},
+        mapping,
+      };
       const result = processActionLowerNode(args);
       const expected = {
         ...args,
-        value: "foo",
-        node: mapping.nodeIdToNode.out_0,
+        payload: {in_0: "Foo", a_0: "foo"},
+        edge: mapping.nodeIdToedges.a_0,
       };
       expect(result).toEqual(expected);
     });
 
     test("Validate to upper", () => {
-      const upperArgs = { ...args, node: { ...args.node, type: "upper" } };
-      const result = processActionUpperNode(upperArgs);
+      const args = {
+        edge: mapping.nodeIdToedges.in_1,
+        payload: {in_1: "Foo"},
+        mapping,
+      };
+      const result = processActionUpperNode(args);
       const expected = {
-        ...args,
-        value: "FOO",
-        node: mapping.nodeIdToNode.out_0,
+        payload: {in_1: "Foo", a_1: "FOO"},
+        edge: mapping.nodeIdToedges.a_1,
+        mapping
       };
       expect(result).toEqual(expected);
     });
@@ -199,9 +194,8 @@ describe("process", () => {
       lastName: "Bar",
     };
     const mapping = {
-      inputNameToNodeId: {
-        firstName: "in_0",
-        lastName: "in_1",
+      inputToNode: {
+        firstName: "in_0"
       },
       nodeIdToNode: {
         in_0: {

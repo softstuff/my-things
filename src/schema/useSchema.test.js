@@ -28,7 +28,7 @@ const makeWrapper = () => ({ children }) => (
 )
 
 describe('verify saveProperty', () =>{
-    it("validate level 0", () => {
+    it.skip("validate level 0", () => {
 
         const expected = {
             schema: {
