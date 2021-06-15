@@ -55,12 +55,6 @@ export const pushIt = (args) => {
     return pushIt(nextArgs)
 }
 
-export const processInputNode = ({edge, payload, mapping}) => {
-  const resultedge = mapping.nodeIdToedges[edge.target]
-  payload[edge.target] = payload[edge.source]
-  return {edge: resultedge, payload, mapping}
-}
-
 export const processOutputNode = ({edge, payload, mapping}) => {
   const outputNode = mapping.nodeIdToNode[edge.target]
   payload[outputNode.id] = payload[edge.source]
@@ -83,17 +77,17 @@ export const processActionUpperNode = ({edge, payload, mapping}) => {
   return {edge: resultedge, payload, mapping}
 }
 
-export const processActionJoinNode = ({edge, value, payload, mapping}) => {
+export const processActionJoinNode = ({edge, payload, mapping}) => {
 
   const joinNode = mapping.nodeIdToNode[edge.target]
   const outerHandle = edge.targetHandle === "a" ? "b" : "a"
-  payload[`${edge.target}_${edge.targetHandle}`] = value
+  payload[`${edge.target}_${edge.targetHandle}`] = payload[edge.source]
 
   if(payload[`${edge.target}_${outerHandle}`]) {
     const joinedValue = `${payload[`${edge.target}_a`]}${joinNode.data.joiner}${payload[`${edge.target}_b`]}`
-    payload[`${edge.target}_c`] = joinedValue
+    payload[edge.target] = joinedValue
     const resultEdge = mapping.nodeIdToedges[joinNode.id]
-    return {edge: resultEdge, value: joinedValue, payload, mapping}
+    return {edge: resultEdge, payload, mapping}
   } else {
     return {payload, mapping}
   }

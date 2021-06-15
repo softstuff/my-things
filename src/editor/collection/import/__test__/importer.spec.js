@@ -30,13 +30,14 @@ describe("Verify buildInitPayload", () => {
   });
 });
 
-describe("processChunk", () => {
+describe("process", () => {
 
   const mapping = {
 
     inputSelectorToInputNode: {
       firstName: "in_0",
-      lastName: "in_1"
+      lastName: "in_1",
+      age: "in_2"
     },
     nodeIdToNode: {
       in_0: {
@@ -49,77 +50,107 @@ describe("processChunk", () => {
         type: "input",
         data: { label: "lastName" },
       },
+      in_2: {
+        id: "in_2",
+        type: "input",
+        data: { label: "33" },
+      },
       out_0: {
         id: "out_0",
         type: "argument",
-        data: { name: "firstName" },
+        data: { name: "name" },
       },
       out_1: {
         id: "out_1",
         type: "argument",
-        data: { name: "lastName" },
+        data: { name: "age" },
       },
-      out_2: {
-        id: "out_2",
-        type: "argument",
-        data: { name: "lowerLastName" },
+      a_0: {
+        id: "a_0",
+        type: "lower",
       },
       a_1: {
         id: "a_1",
-        type: "lower",
+        type: "upper",
+      },
+      a_2: {
+        id: "a_2",
+        type: "join",
+        data: { joiner: "_" },
       },
     },
     nodeIdToedges: {
-      in_0: { id: "ein_0_out_0", source: "in_0", target: "out_0" },
-      in_1: { id: "ein_1_out_1", source: "in_1", target: "out_1" },
+      in_0: { id: "ein_0_a_0", source: "in_0", target: "a_0" },
+      in_1: { id: "ein_1_a_1", source: "in_1", target: "a_1" },
+      in_2: { id: "ein_1_out_0", source: "in_2", target: "out_1" },
+      a_0: {
+        id: "edge_a_0_to_a_2",
+        type: "default",
+        source: "a_0",
+        target: "a_2",
+        targetHandle: "a",
+      },
+      a_1: {
+        id: "edge_a_1_to_a_2",
+        type: "default",
+        source: "a_1",
+        target: "a_2",
+        targetHandle: "b",
+      },
+      a_2: {
+        id: "edge_a_2_to_out_1",
+        type: "default",
+        source: "a_2",
+        sourceHandle: "c",
+        target: "out_0",
+        targetHandle: null,
+      },
     },
   };
   describe("process", () => {
     test("Happy path", () => {
-      const input = "Foo;Bar"
       const config = {
         type: "CSV",
         delimiter: ";",
-        columns: ["firstName", "lastName"]
+        columns: ["firstName","lastName","age"]
       }
-      const chunk = processChunk(input, config, mapping);
-      expect(chunk).toEqual({
-        firstName: "Foo", lastName: "Bar",
-        in_0: "Foo", in_1: "Bar",
-        out_0: "Foo", out_1: "Bar"
+      let input = "Foo;Bar;33"
+
+      const result = processChunk(input, config, mapping);
+
+      expect(result).toEqual({
+        firstName: "Foo",
+        lastName: "Bar",
+        age: "33",
+        in_0: "Foo",
+        in_1: "Bar",
+        in_2: "33",
+        a_0: "foo",
+        a_1: "BAR",
+        a_2_a: "foo",
+        a_2_b: "BAR",
+        a_2: "foo_BAR",
+        out_0: "foo_BAR",
+        out_1: "33"
       });
-    });
-  });
-
-  describe("processInputNode", () => {
-    const args = {
-      edge: mapping.nodeIdToedges.in_0,
-      payload: {in_0: "Foo"},
-      mapping,
-    };
-
-    test("Happy path", () => {
-      const result = processInputNode(args);
-      const expected = { edge: undefined, payload:{in_0: "Foo", out_0: "Foo"}, mapping: args.mapping };
-      expect(result).toEqual(expected);
     });
   });
 
   describe("processOutputNode", () => {
     const args = {
-      edge: mapping.nodeIdToedges.in_0,
-      payload: {in_0: "Foo"},
+      edge: mapping.nodeIdToedges.in_2, 
+      payload: {in_2: "Foo"},
       mapping,
     };
 
     test("validate output", () => {
       const result = processOutputNode(args);
-      expect(result).toEqual({in_0: "Foo", out_0: "Foo"});
+      expect(result).toEqual({in_2: "Foo", out_1: "Foo"});
     });
 
     test("validate output id", () => {
       const result = processOutputIdNode(args);
-      expect(result).toEqual({in_0: "Foo", out_0: "Foo"});
+      expect(result).toEqual({in_2: "Foo", out_1: "Foo"});
     });
   });
 
@@ -248,13 +279,12 @@ describe("processChunk", () => {
     test("Validate in_0 to action A, handler with B is not set, expect pipeline stop", () => {
       const args = {
         edge: mapping.nodeIdToedges.in_0_a,
-        value: "Foo",
-        payload: {},
+        payload: {in_0: "Foo"},
         mapping,
       };
       const result = processActionJoinNode(args);
       const expected = {
-        payload: { action_0_a: "Foo" },
+        payload: {in_0: "Foo", action_0_a: "Foo" },
         mapping,
       };
       expect(result).toEqual(expected);
@@ -264,18 +294,17 @@ describe("processChunk", () => {
     test("Validate in_1 to action B, with A is set, expect joined result", () => {
       const args = {
         edge: mapping.nodeIdToedges.in_1_b,
-        value: "Bar",
-        payload: { action_0_a: "Foo" },
+        payload: { in_1: "Bar", action_0_a: "Foo" },
         mapping,
       };
       const result = processActionJoinNode(args);
       const expected = {
         edge: mapping.nodeIdToedges.action_0,
-        value: "Foo_Bar",
         payload: {
+          in_1: "Bar",
           action_0_a: "Foo",
           action_0_b: "Bar",
-          action_0_c: "Foo_Bar",
+          action_0: "Foo_Bar",
         },
         mapping,
       };
