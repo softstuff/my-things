@@ -8,7 +8,7 @@ const ArgumentKeyNode = ({data}) => {
   return (
     <div>
       <Handle type="target" position={Position.Left} isValidConnection={onlySingleEdge}  />
-      <div>{data.name}*(key)</div>
+      <div>{data.label}*(key)</div>
     </div>
   );
 }

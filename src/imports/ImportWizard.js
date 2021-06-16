@@ -9,7 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import {FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField} from '@material-ui/core';
 import Ajv from "ajv"
-import MapData from './MapData';
+import MapData from './mapper/MapData';
 import {ImportConfigContext, useImportConfig} from './useImportConfig';
 import {useSchema} from '../schema/useSchema';
 

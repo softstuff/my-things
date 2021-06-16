@@ -18,7 +18,7 @@ import CardHeader from "@material-ui/core/CardHeader";
 import { Autocomplete} from "@material-ui/lab";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import MapData from "../../../../imports/MapData";
+import MapData from "../../../../imports/mapper/MapData";
 import { WhatPanel } from "./WhatPanel";
 import { useWizzard, WizzardProvider } from "./useWizzard";
 import { HowPanel } from "./HowPanel";

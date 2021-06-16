@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import MapData from "../../../../imports/MapData";
+import MapData from "../../../../imports/mapper/MapData";
 import { useWizzard } from "./useWizzard";
 
 export const WherePanel = () => {
@@ -22,6 +22,7 @@ export const WherePanel = () => {
     const [outputs, setOutputs] = useState([]);
     const [actions, setActions] = useState([]);
     const [edges, setEdges] = useState([]);
+    const [initElements, setInitElements] = useState([]);
     const [lastElements, setLastElements] = useState([]);
     const [rfInstance, setRfInstance] = useState(null);
     const {state, dispatch} = useWizzard()
@@ -53,13 +54,13 @@ export const WherePanel = () => {
       return () => clearInterval(handle);
     }, [rfInstance, lastElements]);
 
-    // useEffect(() => {
-    //   console.log("rfInstance is updated to ", rfInstance)
-    //   if (rfInstance) {
-    //     const elements = rfInstance?.toObject()
-    //     dispatch({type: "SET_MAPPING", mapping: elements, isValid: elements !== null})
-    //   }
-    // }, [rfInstance]);
+    useEffect(() => {
+      console.log("rfInstance is updated to ", rfInstance)
+      // if (rfInstance) {
+      //   const elements = rfInstance?.toObject()
+      //   dispatch({type: "SET_MAPPING", mapping: elements, isValid: elements !== null})
+      // }
+    }, [rfInstance]);
 
 
     useEffect(()=>{
@@ -71,11 +72,21 @@ export const WherePanel = () => {
         setRfInstance({...state.mapping})
       } else if(state.type === "CSV") {
         console.log("Setup default CSV mapping")
-        setInputs(state.config.columns.map( (column, index) => ({id: `in_${index}`, name: column})))
-        setOutputs(state.config.columns.map( (column, index) => ({id: `out_${index}`, name: column, required: false})))
-        setActions([]);
-        setEdges(state.config.columns.map( (column, index) => ({source: `in_${index}`, target: `out_${index}`})))
+        const elle = [
+          ...state.config.columns.map( (column, index) => ({id: `in_${index}`, type: "input", data: { label: column}, sourcePosition: "right", position: { x: 0, y: index * 80 + 20 }})),
+          ...state.config.columns.map( (column, index) => ({id: `out_${index}`, data: { label: column}, type: "argument", targetPosition: "left", position: { x: 500, y: index * 60 + 20 }})),
+          ...state.config.columns.map( (column, index) => ({id: `e_in_${index}_to_out_${index}`, source: `in_${index}`, target: `out_${index}`, type: 'custom'}))
+        ]
+        console.log("elle", elle)
+        setInitElements( elle)
       }
+      // } else if(state.type === "CSV") {
+      //   console.log("Setup default CSV mapping")
+      //   setInputs(state.config.columns.map( (column, index) => ({id: `in_${index}`, name: column})))
+      //   setOutputs(state.config.columns.map( (column, index) => ({id: `out_${index}`, name: column, required: false})))
+      //   setActions([]);
+      //   setEdges(state.config.columns.map( (column, index) => ({source: `in_${index}`, target: `out_${index}`, type: 'custom'})))
+      // }
     }, [state, rfInstance])
 
     // useEffect(()=>{
@@ -159,10 +170,11 @@ export const WherePanel = () => {
     return (
       <>
         <MapData
-          inputs={inputs}
-          outputs={outputs}
-          actions={actions}
-          edges={edges}
+          // inputs={inputs}
+          // outputs={outputs}
+          // actions={actions}
+          // edges={edges}
+          initElements={initElements}
           setRfInstance={setRfInstance}
           
         />

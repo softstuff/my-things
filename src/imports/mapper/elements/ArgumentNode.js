@@ -39,10 +39,10 @@ const ArgumentNode = ({data}) => {
   return (
     <>
     <Box display='flex' flexDirection="row" ref={boxEl}>
-      <Handle type="target" position={Position.Left} isValidConnection={onlySingleEdge}  />
-      <Typography className={classes.typography}>
-        Attribute: {data.name} {data.required === 'yes' ? '*':''}
-      </Typography>
+      <Handle type="target" position={Position.Left}  isValidConnection={onlySingleEdge}  />
+      {/* <Typography className={classes.typography}> */}
+        Attribute: {data.label} {data.required === 'yes' ? '*':''}
+      {/* </Typography> */}
       {/* <Box flexGrow={1}>{data.name}{data.required === 'yes' ? '*':''}</Box> */}
       {/* <Box>
         <InfoIcon onClick={handleClick} fontSize="small" color="primary" />
