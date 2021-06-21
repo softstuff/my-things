@@ -1,8 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { EdgeText, getBezierPath, getMarkerEnd, getEdgeCenter  } from 'react-flow-renderer';
+import { usePayload } from '../usePayload';
 
 export default function CustomEdge({
   id,
+  source,
+  target,
   sourceX,
   sourceY,
   targetX,
@@ -14,27 +17,38 @@ export default function CustomEdge({
   arrowHeadType= "arrowclosed",
   markerEndId,
 }) {
+  const [label, setLabel] = useState()
   const edgePath = getBezierPath({ sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition });
   const markerEnd = getMarkerEnd(arrowHeadType, markerEndId);
+  const content = usePayload()
 
   useEffect(()=>{
     console.log("arrowHeadType", arrowHeadType)
   },[arrowHeadType])
-  // const [centerX, centerY, offsetX, offsetY] = getEdgeCenter({ sourceX, sourceY, targetX, targetY })
+  const [centerX, centerY, offsetX, offsetY] = getEdgeCenter({ sourceX, sourceY, targetX, targetY })
 
+  useEffect(()=>{
+    console.log("Edge ",source, target)
+    if(content?.payload){
+
+      console.log("Value for ", id, "is", content.payload[source])
+      setLabel(content.payload[source])
+    }
+  },[content, source, target])
+  
   return (
     <>
       <path id={id} style={style} className="react-flow__edge-path" d={edgePath} markerEnd={markerEnd} />
-      {/* <EdgeText
+      {label && (<EdgeText
         x={centerX}
         y={centerY}
-        label="a label"
+        label={label}
         labelStyle={{ fill: 'white' }}
         labelShowBg
         labelBgStyle={{ fill: 'red' }}
         labelBgPadding={[4, 4]}
         labelBgBorderRadius={4}
-        />; */}
+        />)}
     </>
   );
 }

@@ -77,6 +77,7 @@ export default ({
   }, [initElements])
 
   const onConnect = (params) => {
+    params.type="custom"
     console.log("addEdge ", params);
     setElements((els) => addEdge(params, els));
   };
@@ -184,6 +185,7 @@ export default ({
             onEdgeUpdate={onEdgeUpdate}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
+            deleteKeyCode={"Delete"}
           >
             <Background variant="lines" gap={12} size={1} />
             <Controls  showInteractive={!locked} />
@@ -196,3 +198,7 @@ export default ({
     </div>
   );
 };
+
+const MapFlow = ({}) => {
+  
+}

@@ -1,11 +1,11 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
-import Popover from '@material-ui/core/Popover';
-import Typography from '@material-ui/core/Typography';
-import InfoIcon from '@material-ui/icons/Info';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogActions from '@material-ui/core/DialogActions';
 import {Handle, Position} from 'react-flow-renderer';
 import {useEdge} from './useEdge';
-import {Box} from '@material-ui/core';
+import {Box, Button, TextField} from '@material-ui/core';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -18,56 +18,60 @@ const useStyles = makeStyles((theme) => ({
 
 
 const ArgumentNode = ({data}) => {
+  const [open, setOpen] = useState(false);
   const {onlySingleEdge} = useEdge()
+  const [label, setLabel] = useState(data.label);
   const classes = useStyles();
-  const boxEl = useRef()
-  const [anchorEl, setAnchorEl] = React.useState(null);
 
-  const handleClick = (event) => {
-    // setAnchorEl(event.currentTarget);
-    setAnchorEl(boxEl.current);
+  const handleClickOpen = () => {
+    setOpen(true);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
+  const handleClose = (value) => {
+    setOpen(false);
   };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
-
 
   return (
     <>
-    <Box display='flex' flexDirection="row" ref={boxEl}>
+    <Box display='flex' flexDirection="row" onClick={handleClickOpen}>
       <Handle type="target" position={Position.Left}  isValidConnection={onlySingleEdge}  />
       {/* <Typography className={classes.typography}> */}
-        Attribute: {data.label} {data.required === 'yes' ? '*':''}
+        Attribute: {label} {data.required === 'yes' ? '*':''}
       {/* </Typography> */}
       {/* <Box flexGrow={1}>{data.name}{data.required === 'yes' ? '*':''}</Box> */}
       {/* <Box>
         <InfoIcon onClick={handleClick} fontSize="small" color="primary" />
       </Box> */}
     </Box>
-    {/* <Popover 
-      id={id}
-      open={open}
-      anchorEl={anchorEl}
-      onClose={handleClose}
-      anchorOrigin={{
-        vertical: 'bottom',
-        horizontal: 'center',
-      }}
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'center',
-      }}
-    >
- <Typography className={classes.typography}>
-   Attribute
- </Typography>
-</Popover> */}
+    <SimpleDialog label={label} open={open} onClose={handleClose} />
+
     </>
   );
 }
+
+function SimpleDialog({ onClose, label, onNameChange, open }) {
+  const classes = useStyles();
+
+  const handleClose = () => {
+    onClose(label);
+  };
+
+  return (
+    <Dialog onClose={handleClose} aria-labelledby="simple-dialog-title" open={open}>
+      <DialogTitle id="simple-dialog-title">Attribute</DialogTitle>
+      <TextField label="Name" value={label} />
+      <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleClose} color="primary">
+            Save
+          </Button>
+        </DialogActions>
+    </Dialog>
+  );
+}
+
+
 
 export default ArgumentNode
