@@ -7,7 +7,6 @@ import ReactFlow, {
   ReactFlowProvider,
   removeElements,
   updateEdge,
-  useStoreState,
 } from "react-flow-renderer";
 import InputNode from "./elements/InputNode";
 import JoinActionNode from "./elements/JoinActionNode";
@@ -15,10 +14,10 @@ import ToLowerCaseActionNode from "./elements/ToLowerCaseActionNode";
 import ToUpperCaseActionNode from "./elements/ToUpperCaseActionNode";
 import Sidebar from "./Sidebar";
 import "./react-flow-overrides.scss";
-import ArgumentNode from "./elements/ArgumentNode";
-import ArgumentKeyNode from "./elements/ArgumentKeyNode";
-import { useDebounce } from "../../utils/useDebounce";
+import AttributeNode from "./elements/AttributeNode";
 import CustomEdge from "./elements/CustomEdge";
+import { MapperProvider, useMapper } from "./useMapper";
+import CollectionKeyNode from "./elements/CollectionKeyNode";
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -42,61 +41,45 @@ const useStyles = makeStyles(() => ({
 
 const nodeTypes = {
   input: InputNode,
-  argumentKey: ArgumentKeyNode,
-  argument: ArgumentNode,
+  collectionKey: CollectionKeyNode,
+  attribute: AttributeNode,
   join: JoinActionNode,
   lower: ToLowerCaseActionNode,
   upper: ToUpperCaseActionNode,
 };
-const unremmovableNodeTypes = ["input", "argumentKey", "argument"];
 
 const edgeTypes = {
   custom: CustomEdge,
 };
 
-let id = 4;
-const getId = () => `dndnode_${id++}`;
+export default ({ initElements, locked = false, inputs, payload }) => {
+  
+  return (
+    <MapperProvider initElements={initElements} locked={locked} inputs={inputs} payload={payload}>
+      <MapFlow />
+    </MapperProvider>
+  );
+};
 
-export default ({
-  // inputs,
-  // outputs,
-  // actions,
-  // edges,
-  initElements,
-  setRfInstance,
-  locked = false
-}) => {
+const MapFlow = ({}) => {
+
   const classes = useStyles();
+  const {elements, setElements, reactFlowInstance, setReactFlowInstance, locked, generateId} = useMapper()
 
   const reactFlowWrapper = useRef(null);
-  const [reactFlowInstance, setReactFlowInstance] = useState(null);
-  const [elements, setElements] = useState(initElements);
-
-  useEffect(()=>{
-    setElements(initElements)
-  }, [initElements])
-
+  
   const onConnect = (params) => {
     params.type="custom"
     console.log("addEdge ", params);
     setElements((els) => addEdge(params, els));
   };
   const onElementsRemove = (elementsToRemove) => {
-    if (
-      elementsToRemove.some((element) =>
-        unremmovableNodeTypes.includes(element.type)
-      ) == false
-    ) {
       console.log("onElementsRemove", elementsToRemove);
       setElements((els) => removeElements(elementsToRemove, els));
-    } else {
-      console.log("onElementsRemove, can not be removed", elementsToRemove);
-    }
   };
   const onLoad = (_reactFlowInstance) => {
     console.log("onLoad set flow instance to ", _reactFlowInstance)
     setReactFlowInstance(_reactFlowInstance);
-    setRfInstance(_reactFlowInstance);
   };
   const onDragOver = (event) => {
     event.preventDefault();
@@ -113,7 +96,7 @@ export default ({
       y: event.clientY - reactFlowBounds.top,
     });
     const newNode = {
-      id: getId(),
+      id: generateId(),
       type: node.type,
       position,
       data: { ...node.data },
@@ -125,49 +108,6 @@ export default ({
     console.log("onEdgeUpdate", oldEdge, newConnection);
     setElements((els) => updateEdge(oldEdge, newConnection, els));
   };
-
-  // useEffect(() => {
-  //   if( inputElements.length > 0 || outputElements.length > 0  || edgesElement.length > 0  || actionsElement.length > 0 ) {
-     
-  //     console.log("Init elements", inputs, outputs, edges, actions);
-  //     const inputElements = inputs.map((node, index) => ({
-  //       id: node.id,
-  //       type: node.type || "input",
-  //       data: { label: node.name },
-  //       position: node.position || { x: 0, y: index * 80 + 20 },
-  //       sourcePosition: "right",
-  //     }));
-
-  //     const outputElements = outputs.map((node, index) => ({
-  //       id: node.id,
-  //       type: node.key ? "argumentKey" : "argument",
-  //       data: { ...node },
-  //       position: node.position || { x: 500, y: index * 60 + 20 },
-  //       targetPosition: "left",
-  //     }));
-
-  //     const edgesElement = edges.map((edge) => ({
-  //       id: `e${edge.source}_${edge.target}`,
-  //       ...edge,
-  //     }));
-
-  //     const actionsElement = actions.map((actions) => ({
-  //       ...actions,
-  //     }));
-
-    
-
-  //    const newElements = [
-  //       ...inputElements,
-  //       ...outputElements,
-  //       ...edgesElement,
-  //       ...actionsElement,
-  //     ]
-  //     console.log(
-  //       "Set elements to ",newElements );
-  //     setElements(newElements);
-  //   }
-  // }, [inputs, outputs, actions, edges]);
 
   return (
     <div className={classes.container}>
@@ -197,8 +137,4 @@ export default ({
       </ReactFlowProvider>
     </div>
   );
-};
-
-const MapFlow = ({}) => {
-  
 }

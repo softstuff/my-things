@@ -75,7 +75,8 @@ export const TestPanel = () => {
             <MapData
               initElements={initElements}
               setRfInstance={setRfInstance} 
-              locked={true}        
+              locked={true}
+              payload={payload}
             />
         </PayloadContext.Provider>
         </div> 

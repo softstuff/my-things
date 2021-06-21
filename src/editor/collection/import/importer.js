@@ -95,7 +95,7 @@ export const processActionJoinNode = ({edge, payload, register}) => {
   payload[`${edge.target}_${edge.targetHandle}`] = payload[edge.source]
 
   if(payload[`${edge.target}_${outerHandle}`]) {
-    const joinedValue = `${payload[`${edge.target}_a`]}${joinNode.data.joiner}${payload[`${edge.target}_b`]}`
+    const joinedValue = `${payload[`${edge.target}_a`]}${joinNode.data.separator}${payload[`${edge.target}_b`]}`
     payload[edge.target] = joinedValue
     const resultEdge = register.nodeIdToedges[joinNode.id]
     return {edge: resultEdge, payload, register}

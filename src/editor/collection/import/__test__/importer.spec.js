@@ -129,7 +129,7 @@ describe("process", () => {
       a_2: {
         id: "a_2",
         type: "join",
-        data: { joiner: "_" },
+        data: { separator: "_" },
       },
     },
     nodeIdToedges: {
@@ -295,7 +295,7 @@ describe("process", () => {
         action_0: {
           id: "action_0",
           type: "join",
-          data: { joiner: "_" },
+          data: { separator: "_" },
         },
         out_0: {
           id: "out_0",
