@@ -13,7 +13,7 @@ export const buildRegistry = (mapping) => {
       return map
     }, {})
     ,
-    nodeIdToedges: mapping.elements.filter(isEdge).reduce((map, current)=>{
+    nodeIdToEdges: mapping.elements.filter(isEdge).reduce((map, current)=>{
       map[current.source] = current
       return map
     }, {})
@@ -28,8 +28,8 @@ export const processChunk = (input, type, config, register) => {
       .forEach(inputSelector => {
         const inputNodeId = register.inputSelectorToInputNode[inputSelector]
         payload[inputNodeId] = payload[inputSelector]
-        const firstEdge = register.nodeIdToedges[inputNodeId]
-        pushIt({edge: firstEdge, payload, register})
+        const edges = register.nodeIdToEdges[inputNodeId]
+        pushIt({edges, payload, register})
       })
     return payload
   }
@@ -46,46 +46,47 @@ export const buildInitPayload = (input, type, config) => {
   }
   throw new Error("Unsupported import type", config.type)
 }
-export const pushIt = (args) => {
-    if (!args.edge) return args
+export const pushIt = ({edges, payload, register}) => {
 
-    const nextNode = args.register.nodeIdToNode[args.edge.target]
+  edges?.forEach(edge => {
+      const node = register.nodeIdToNode[edge.target]
     
-    let nextArgs = null
-    if (nextNode.type === "lower") {
-      nextArgs = processActionLowerNode(args)
-    } else if (nextNode.type === "upper") {
-      nextArgs = processActionUpperNode(args)
-    } else if (nextNode.type === "join") {
-      nextArgs = processActionJoinNode(args)
-    } else if (nextNode.type === "argumentKey") {
-      nextArgs = processOutputIdNode(args)
-    } else if (nextNode.type === "argument") {
-      nextArgs = processOutputNode(args)
-    }
-    return pushIt(nextArgs)
+      const nodeArgs = {edge, payload, register}
+      if (node.type === "lower") {
+        processActionLowerNode(nodeArgs)
+      } else if (node.type === "upper") {
+        processActionUpperNode(nodeArgs)
+      } else if (node.type === "join") {
+        processActionJoinNode(nodeArgs)
+      } else if (node.type === "key") {
+        processOutputIdNode(nodeArgs)
+      } else if (node.type === "attribute") {
+        processOutputNode(nodeArgs)
+      }
+      const nextEdges = register.nodeIdToEdges[node.id]
+      if (nextEdges) {
+        pushIt({edges: nextEdges, payload, register})
+      }
+
+    });
+
+    
 }
 
 export const processOutputNode = ({edge, payload, register}) => {
-  const outputNode = register.nodeIdToNode[edge.target]
-  payload[outputNode.id] = payload[edge.source]
-  return payload
+  payload[edge.target] = payload[edge.source]
 }
 
-export const processOutputIdNode = (args) => {
-  return processOutputNode(args)
+export const processOutputIdNode = ({edge, payload, register}) => {
+  payload[edge.target] = payload[edge.source]
 }
 
 export const processActionLowerNode = ({edge, payload, register}) => {
-  const resultedge = register.nodeIdToedges[edge.target]
   payload[edge.target] = payload[edge.source].toString().toLowerCase()
-  return {edge: resultedge, payload, register}
 }
 
 export const processActionUpperNode = ({edge, payload, register}) => {
-  const resultedge = register.nodeIdToedges[edge.target]
   payload[edge.target] = payload[edge.source].toString().toUpperCase()
-  return {edge: resultedge, payload, register}
 }
 
 export const processActionJoinNode = ({edge, payload, register}) => {
@@ -97,10 +98,6 @@ export const processActionJoinNode = ({edge, payload, register}) => {
   if(payload[`${edge.target}_${outerHandle}`]) {
     const joinedValue = `${payload[`${edge.target}_a`]}${joinNode.data.separator}${payload[`${edge.target}_b`]}`
     payload[edge.target] = joinedValue
-    const resultEdge = register.nodeIdToedges[joinNode.id]
-    return {edge: resultEdge, payload, register}
-  } else {
-    return {payload, register}
-  }
+  } 
   
 }

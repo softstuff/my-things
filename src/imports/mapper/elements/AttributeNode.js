@@ -10,6 +10,7 @@ import { useMapper } from '../useMapper';
 import {Controller, useForm, useFormContext} from 'react-hook-form';
 
 import { NodeSettings, NodeSettingsDialog } from './NodeSettingsDialog';
+import _ from 'lodash'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -32,10 +33,12 @@ const useStyles = makeStyles((theme) => ({
 const AttributeNode = (props) => {
   const {onlySingleEdge} = useEdge()
   const classes = useStyles();
+  const [error, setError] = useState()
   
 
   useEffect(()=>{
     console.log("ArgumentNode props change", props)
+    setError( _.isEmpty(props.data.label) ? "Name is not set" : null)
   }, [props])
 
   return (
@@ -49,6 +52,7 @@ const AttributeNode = (props) => {
         <Typography>
           {props.data.label} {props.data.required === 'yes' ? '*':''}
         </Typography>
+        {error && (<Typography color="error">{error}</Typography>)}
       </Box>
     </>
   );
