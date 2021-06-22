@@ -14,7 +14,10 @@ export const buildRegistry = (mapping) => {
     }, {})
     ,
     nodeIdToEdges: mapping.elements.filter(isEdge).reduce((map, current)=>{
-      map[current.source] = current
+      if(!map[current.source]) {
+        map[current.source] = []
+      } 
+      map[current.source].push(current)
       return map
     }, {})
   }
@@ -22,7 +25,6 @@ export const buildRegistry = (mapping) => {
 
 export const processChunk = (input, type, config, register) => {
     let payload = buildInitPayload(input, type, config)
-    console.log("process ", payload)
 
     Object.keys(register.inputSelectorToInputNode)
       .forEach(inputSelector => {

@@ -66,7 +66,7 @@ export const NodeSettingsDialog = ({ title, open, onCancel, onSave, children}) =
 export const NodeSettings = ({nodeId, title, children}) =>  {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
-    const {elements, setElements} = useMapper()
+    const {elements, setElements, locked} = useMapper()
     
     const handleOpenSettings = () => {
         setOpen(true);
@@ -93,9 +93,10 @@ export const NodeSettings = ({nodeId, title, children}) =>  {
         <>
             <div className={classes.header}>
                 <Typography variant="subtitle2" >{title}</Typography>
+                {!locked && (
                 <div className={classes.settingsItem}>
                     <SettingsIcon onClick={handleOpenSettings} fontSize="small" color="primary" />
-                </div>
+                </div>)}
             </div>
             <NodeSettingsDialog nodeId={nodeId} title={title} open={open} onCancel={handleClose} onSave={handleSave} >
                 {children}

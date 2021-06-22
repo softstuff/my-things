@@ -1,16 +1,12 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogActions from '@material-ui/core/DialogActions';
 import {Handle, Position} from 'react-flow-renderer';
 import {useEdge} from './useEdge';
-import {Box, Button, DialogContent, TextField, Typography} from '@material-ui/core';
+import {Box, TextField, Typography} from '@material-ui/core';
+import {Controller, useFormContext} from 'react-hook-form';
+import { NodeSettings } from './NodeSettingsDialog';
+import isEmpty from 'lodash/isEmpty'
 import { useMapper } from '../useMapper';
-import {Controller, useForm, useFormContext} from 'react-hook-form';
-
-import { NodeSettings, NodeSettingsDialog } from './NodeSettingsDialog';
-import _ from 'lodash'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -34,12 +30,27 @@ const AttributeNode = (props) => {
   const {onlySingleEdge} = useEdge()
   const classes = useStyles();
   const [error, setError] = useState()
+  const {elements, setElements} = useMapper()
   
 
   useEffect(()=>{
     console.log("ArgumentNode props change", props)
-    setError( _.isEmpty(props.data.label) ? "Name is not set" : null)
-  }, [props])
+    const isValid = !isEmpty(props.data.label)
+    setError( isValid ? null : "Name is not set")
+
+    if (elements && isValid !== props.data.isValid) {
+      console.log("Update element to isValid",isValid)
+      setElements(
+          elements.map(el=> {
+          if (el.id === props.id) {
+              el.data = {...el.data, isValid}
+          }
+          return el
+          })
+      )
+    }
+
+  }, [props.data])
 
   return (
     <>

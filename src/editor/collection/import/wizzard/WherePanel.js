@@ -20,44 +20,18 @@ export const WherePanel = () => {
   const MapFields = () => {
     const [inputs, setInputs] = useState([]);
     const [initElements, setInitElements] = useState([]);
-    const [lastElements, setLastElements] = useState([]);
-    const [rfInstance, setRfInstance] = useState(null);
     const {state, dispatch} = useWizzard()
   
-    
-    useEffect(() => {
-      const handle = setInterval(() => {
-        if(!rfInstance) {
-          console.log()
-          return
-        }
-       const elements = {...rfInstance?.toObject()}
-       delete elements.position
-       delete elements.zoom
-       if (JSON.stringify(elements) !== JSON.stringify(lastElements)){
-        console.log("Element changed", lastElements === elements, lastElements == elements, JSON.stringify(elements) === JSON.stringify(lastElements))
-        setLastElements(elements)
-        dispatch({type: "SET_MAPPING", mapping: elements, isValid: elements !== null})
-       }
-      }, 1000);
-  
-      return () => clearInterval(handle);
-    }, [rfInstance, lastElements]);
-
-    useEffect(() => {
-      console.log("rfInstance is updated to ", rfInstance)
-    }, [rfInstance]);
-
+    const getInputs = () => {
+      if(state.type === "CSV") return state.config.columns
+    }
 
     useEffect(()=>{
-      setInputs(state.config.columns)
-
-      console.log("State changed, state:", state, "rfInstance", rfInstance)
-      if(rfInstance) {
-        console.log("Ignore reload")
-      } else if (state.mapping) {
+      setInputs(getInputs())
+      console.log("State changed, state:", state)
+      if (state.mapping?.elements?.length > 0) {
         console.log("Update mapping", state.mapping)
-        setRfInstance({...state.mapping})
+        setInitElements( [...state.mapping.elements])
       } else if(state.type === "CSV") {
         console.log("Setup default CSV mapping")
         const elle = [
@@ -67,10 +41,16 @@ export const WherePanel = () => {
         ]
         console.log("elle", elle)
         setInitElements( elle)
-        
       }
-    }, [state, rfInstance])
+    }, [])
 
+    
+    const onElementsUpdate = elements => {
+      const inputs = getInputs()
+      console.log("Elements has updated", elements)
+      const isValid = !elements.some(el => el.data?.isValid === false)
+      dispatch({type: "SET_MAPPING", mapping: {elements, inputs}, isValid})
+    }
   
     // const guessConnections = (inputNodes, argumentNodes) => {
     //   let connections = inputNodes
@@ -92,7 +72,7 @@ export const WherePanel = () => {
         <MapData
           inputs={inputs}
           initElements={initElements}
-          setRfInstance={setRfInstance}          
+          onElementsUpdate={onElementsUpdate} 
         />
       </>
     );

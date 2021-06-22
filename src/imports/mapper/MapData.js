@@ -52,21 +52,26 @@ const edgeTypes = {
   custom: CustomEdge,
 };
 
-export default ({ initElements, locked = false, inputs, payload }) => {
+export default ({ initElements, locked = false, inputs, payload, onElementsUpdate }) => {
   
   return (
     <MapperProvider initElements={initElements} locked={locked} inputs={inputs} payload={payload}>
-      <MapFlow />
+      <MapFlow onElementsUpdate={onElementsUpdate} />
     </MapperProvider>
   );
 };
 
-const MapFlow = ({}) => {
+const MapFlow = ({onElementsUpdate}) => {
 
   const classes = useStyles();
   const {elements, setElements, reactFlowInstance, setReactFlowInstance, locked, generateId} = useMapper()
-
   const reactFlowWrapper = useRef(null);
+
+  useEffect(()=>{
+    if (onElementsUpdate) {
+      onElementsUpdate([...elements])
+    }
+  },[elements])
   
   const onConnect = (params) => {
     params.type="custom"
@@ -122,7 +127,7 @@ const MapFlow = ({}) => {
             onLoad={onLoad}
             onDrop={onDrop}
             onDragOver={onDragOver}
-            onEdgeUpdate={onEdgeUpdate}
+            onEdgeUpdate={locked ? undefined : onEdgeUpdate }
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             deleteKeyCode={"Delete"}

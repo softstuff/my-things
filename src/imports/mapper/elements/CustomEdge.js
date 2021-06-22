@@ -21,17 +21,10 @@ export default function CustomEdge({
   const edgePath = getBezierPath({ sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition });
   const markerEnd = getMarkerEnd(arrowHeadType, markerEndId);
   const content = usePayload()
-
-  useEffect(()=>{
-    console.log("arrowHeadType", arrowHeadType)
-  },[arrowHeadType])
   const [centerX, centerY, offsetX, offsetY] = getEdgeCenter({ sourceX, sourceY, targetX, targetY })
 
   useEffect(()=>{
-    console.log("Edge ",source, target)
     if(content?.payload){
-
-      console.log("Value for ", id, "is", content.payload[source])
       setLabel(content.payload[source])
     }
   },[content, source, target])

@@ -76,8 +76,8 @@ describe("Verify buildRegistry", () => {
             }
           },
           nodeIdToEdges: {
-            in_0: {id: "ein_0_out_0", source: "in_0", target: "out_0"},
-            in_1: {id: "ein_1_out_1", source: "in_1", target: "out_1"},
+            in_0: [{id: "ein_0_out_0", source: "in_0", target: "out_0"}],
+            in_1: [{id: "ein_1_out_1", source: "in_1", target: "out_1"}],
           }
         }
       )

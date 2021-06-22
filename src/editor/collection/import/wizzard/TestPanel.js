@@ -1,3 +1,4 @@
+import { Button, Typography } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import MapData from "../../../../imports/mapper/MapData";
 import { PayloadContext } from "../../../../imports/mapper/usePayload";
@@ -19,62 +20,77 @@ export const TestPanel = () => {
 
   const CsvTest = () => {
     const {state, dispatch} = useWizzard()
-    const [input, setInput] = useState(`${state.config.columns.join(state.config.delimiter)}\nKalle;Anka`)
-    const [rfInstance, setRfInstance] = useState(null);
-    const [initElements, setInitElements] = useState([]);
+    const [source, setSource] = useState(`${state.config.columns.join(state.config.delimiter)}\nKalle;Anka`)
     const [payload, setPayload] = useState();
-    const [result, setResult] = useState();
+    const [chunks, setChunks] = useState([]);
+    const [register, setRegister] = useState()
+    const [rows, setRows] = useState([])
 
     useEffect(()=>{
-      console.log("update state", state)
-      setInitElements( state.mapping.elements )
-    }, [state])
+      setRegister(buildRegistry(state.mapping))
+    }, [state.mapping])
+    
+    useEffect(()=>{
+      const _rows = source.split("\n")
+      if(_rows.length > 0 && _rows[0].startsWith(state.mapping.inputs[0])){
+        _rows.shift()
+      }
+      setRows(_rows.slice(0, 20))
+    }, [source])
+    
 
-    const handleInputChange = (e) => {
-      setInput(e.target.value)
+    const handleSourceChange = (e) => {
+      e.preventDefault()
+      setSource(e.target.value)
     }
+
     const doTest = () => {
 
-      console.log("doTest clicked")
-      const rows = input.split("\n")
-      const register = buildRegistry(state.mapping)
-
-      const _payload = processChunk(rows[1], state.type, state.config, register)
-      console.log("Got payload",_payload)
-      setPayload(_payload)
-      const _result = Object.keys(_payload).filter(name => name.startsWith("out_")).map(key=>{
-        return {attribute: register.nodeIdToNode[key].data.label, value: _payload[key]}
+      console.log("doTest clicked", rows)
+      const _chunks = rows.map(source => {
+        const _payload = processChunk(source, state.type, state.config, register)
+        console.log("Got payload",_payload)
+        
+        const attributes = Object.keys(_payload)
+            .filter(name => name.startsWith("out_"))
+            .map(key=>(
+              {name: register.nodeIdToNode[key].data.label, value: _payload[key]}
+            ))
+        return {source, attributes, payload: _payload}   
       })
-      console.log("Got result",_result)
-      setResult(_result)
+      setChunks(_chunks)
     }
+
 
     return (
       <>
         <h2>Test CSV</h2>
 
         <div>
-
-          <textarea cols={120} rows={10} value={input} onChange={handleInputChange} />
+          <textarea cols={120} rows={10} value={source} onChange={handleSourceChange} />
         </div>
         <div>
           <button onClick={doTest}>Test</button>
         </div>
-        {result && (
+
         <div>
-          <ul>
-            { result.map(item => (
-              <li key={item.attribute}>
-                {item.attribute}: {item.value}
+          Result
+          <ol>
+            {chunks.map((chunk, index) => (
+              <li key={index}>
+                <a onClick={()=>setPayload(chunk.payload)} >{chunk.source}</a>
+                {chunk.attributes.map(attribute => (
+                  <div>{attribute.name}: {attribute.value}</div>
+                ))}
               </li>
             ))}
-          </ul>
-        </div>)}
+          </ol>
+        </div>
+        
         <div>
           <PayloadContext.Provider value={{payload}}>
             <MapData
-              initElements={initElements}
-              setRfInstance={setRfInstance} 
+              initElements={state.mapping.elements}
               locked={true}
               payload={payload}
             />

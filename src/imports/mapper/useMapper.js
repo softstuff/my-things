@@ -31,7 +31,7 @@ export const MapperProvider = (props) => {
   }, [props.payload])
 
   useEffect(()=>{
-    const unmapped = props.inputs.filter(input => !elements.some(el => el.type === 'input' && el.data.label === input))
+    const unmapped = props.inputs?.filter(input => !elements.some(el => el.type === 'input' && el.data.label === input))
     console.log("unmapped", unmapped, "of", inputs, "elements", elements)
     setUnmappedInputs(unmapped)
     setInputs(props.inputs)
