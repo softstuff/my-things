@@ -28,6 +28,7 @@ export const TestPanel = () => {
 
     useEffect(()=>{
       setRegister(buildRegistry(state.mapping))
+      dispatch({type: "TESTED", isValid: true})
     }, [state.mapping])
     
     useEffect(()=>{

@@ -1,30 +1,20 @@
 import {
   Box,
   Button,
-  CardContent,
-  Checkbox,
-  Chip,
-  Grid,
   makeStyles,
   Step,
   StepLabel,
   Stepper,
-  Tab,
-  Tabs,
-  TextField,
 } from "@material-ui/core";
-import Card from "@material-ui/core/Card";
-import CardHeader from "@material-ui/core/CardHeader";
-import { Autocomplete} from "@material-ui/lab";
-import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import MapData from "../../../../imports/mapper/MapData";
 import { WhatPanel } from "./WhatPanel";
 import { useWizzard, WizzardProvider } from "./useWizzard";
 import { HowPanel } from "./HowPanel";
 import { WherePanel } from "./WherePanel";
 import { TestPanel } from "./TestPanel";
 import { ConfirmPanel } from "./ConfirmPanel";
+import {useSnackbar} from 'notistack';
+import { useStorage } from '../../../../firebase/useStorage'
+import { useEditor } from "../../../useEditor";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -71,9 +61,14 @@ const ImportCreator = ({ onAbort }) => {
 const ImportWizard = ({onAbort}) => {
   const classes = useStyles();
   const {state, dispatch} = useWizzard()
+  const {addCollectionImport} = useStorage()
+  const {enqueueSnackbar} = useSnackbar()
+  
 
   const handleSaveConfig = () => {
-    alert("Done");
+    addCollectionImport(state)
+    console.log('Saved import', state)
+    enqueueSnackbar("Saved import", { variant: 'info'})
   };
 
   return (
@@ -140,7 +135,7 @@ const ImportWizard = ({onAbort}) => {
           onClick={handleSaveConfig}
           className={classes.button}
         >
-          Next
+          Save
         </Button>
       )}
       <p>

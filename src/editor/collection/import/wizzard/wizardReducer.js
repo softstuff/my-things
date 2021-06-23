@@ -52,5 +52,25 @@ export function wizardReducer(state, action) {
           mapping: action.mapping,
         };
       }
+      case "TESTED": {
+        return  {
+          ...state,
+          step: {
+            ...state.step,
+            [`done_${state.step.active}`]: action.isValid
+          },
+        };
+      }
+      case "CONFIRMED": {
+        return  {
+          ...state,
+          step: {
+            ...state.step,
+            [`done_${state.step.active}`]: action.isValid
+          },
+          name: action.name || '',
+          collectionId: action.collectionId
+        };
+      }
     }
   }

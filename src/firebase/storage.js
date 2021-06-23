@@ -225,6 +225,12 @@ export const removeWorkspace = async (tenantId, wid) => {
 //     )
 // }
 
+export const addCollectionImport = async (tenantId, wid, {collectionId, name, type, config, mapping}) => {
+    await firestore.doc(`tenants/${tenantId}/workspaces/${wid}`).update({
+        imports: firebase.firestore.FieldValue.arrayUnion({collectionId, name, type, config, mapping})
+    })
+}
+
 export const subscribeOnSchema = async (tenantId, wid, onLoaded, onError) => {
 
     const path = getWorkspacePath(tenantId, wid)

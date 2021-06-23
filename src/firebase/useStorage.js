@@ -1,7 +1,7 @@
 import {useCallback} from "react"
 import {useUser} from "../components/user/useUser"
 import {useWorkspace} from "../components/workspace/useWorkspace"
-import {deleteWorkspaceField, saveSchema, subscribeOnSchema, usageOf} from "./storage"
+import {addCollectionImport, deleteWorkspaceField, saveSchema, subscribeOnSchema, usageOf} from "./storage"
 
 
 export const useStorage = () => {
@@ -12,11 +12,13 @@ export const useStorage = () => {
     const saveSchemaCallback = useCallback( (schema) => saveSchema(tenantId, wid, schema), [tenantId, wid])
     const usageOfCallback = useCallback( (pointer) => usageOf(tenantId, wid, pointer), [tenantId, wid])
     const deleteWorkspaceFieldCallback = useCallback( (field) => deleteWorkspaceField(tenantId, wid, field), [tenantId, wid])
+    const addCollectionImportCallback = useCallback( (field) => addCollectionImport(tenantId, wid, field), [tenantId, wid])
 
     return {
         loadSchema,
         saveSchema: saveSchemaCallback,
         usageOf: usageOfCallback,
-        deleteWorkspaceField: deleteWorkspaceFieldCallback
+        deleteWorkspaceField: deleteWorkspaceFieldCallback,
+        addCollectionImport: addCollectionImportCallback
     }
 }

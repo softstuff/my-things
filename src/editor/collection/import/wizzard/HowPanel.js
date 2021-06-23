@@ -70,23 +70,6 @@ const CsvConfig = () => {
         )}
       />
 
-      <Controller
-        name={"hasHeader"}
-        control={control}
-        defaultValue={state.config?.hasHeader || true}  
-        render={({ field }) => (
-          <FormControlLabel
-            control={
-              <Checkbox    
-                {...field}
-                checked={field.value}
-                color="primary"
-              />
-            }
-            label="File have a header row"
-          />
-        )}
-      />
     </form>
   );
 };
