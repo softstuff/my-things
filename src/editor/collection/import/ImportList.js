@@ -1,4 +1,4 @@
-import {List, ListItem, ListItemIcon, ListItemText, makeStyles } from "@material-ui/core"
+import {List, ListItem, ListItemIcon, ListItemText, makeStyles, Button } from "@material-ui/core"
 import DeleteIcon from '@material-ui/icons/Delete';
 
 import { useEffect, useState } from "react";
@@ -12,27 +12,15 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-const ImportList = ({onSelect}) => {
+const ImportList = ({onSelect, onUse}) => {
     const classes = useStyles()
     const {workspace} = useWorkspace()
     const {collectionId, editing} = useEditor()
     const {deleteWorkspaceField} = useStorage()
-    const [names, setNames] = useState([])
-    const [imports, setImports] = useState()
+    const [imports, setImports] = useState([])
 
     useEffect(()=>{
-        if (!workspace || !collectionId){
-            return
-        }
-        const imp = (workspace.imports || {})[collectionId]
-        if( imp ) {
-            const names = Object.keys(imp)
-            setNames(names)
-            setImports(imp)
-        } else {
-            setNames([])
-            setImports()          
-        }
+        setImports(workspace.imports.filter(imp => imp.collectionId === collectionId))
     }, [workspace, collectionId])
 
     const deleteImport = async (name) => {
@@ -41,26 +29,36 @@ const ImportList = ({onSelect}) => {
         console.log("Deleted")
     }
 
+    const openImporter = config => {
+        onUse(config)
+    }
+
     return (
         <>            
-            {names.length === 0 && (<p>No imports has been created, yet..</p>)}
+            {imports.length === 0 && (<p>No imports has been created, yet..</p>)}
 
             <List>
-            {names.map((name, index) => (
-                <ListItem key={index} onClick={()=>onSelect(name)}>
-                    <ListItemText className={classes.nameItem} >name: {name}</ListItemText>
-                    <ListItemText primary={imports[name].type} className={classes.typeItem} />
-                    <ListItemText primary={imports[name].lastRun} className={classes.typeItem} />
-                    <ListItemText primary={imports[name].lastStatus} className={classes.typeItem} />
+            {imports.map((imp, index) => (
+                <ListItem key={index} >
+                    <ListItemText className={classes.nameItem} >name: {imp.name}</ListItemText>
+                    <ListItemText primary={imp.type} className={classes.typeItem} />
+                    <ListItemText primary={imp.lastRun} className={classes.typeItem} />
+                    <ListItemText primary={imp.lastStatus} className={classes.typeItem} />
+                    <ListItemText className={classes.typeItem} >
+                        <Button variant="contained" color="primary" onClick={()=>onSelect(imp)}>View</Button>
+                    </ListItemText>
+                    <ListItemText className={classes.typeItem} >
+                        <Button variant="contained" color="primary" onClick={()=>openImporter(imp)}>Use</Button>
+                    </ListItemText>
+
                     {editing && (
-                    <ListItemIcon onClick={()=>deleteImport(name)}>
+                    <ListItemIcon onClick={()=>deleteImport(imp)}>
                         <DeleteIcon />
                     </ListItemIcon>
                     )}
                 </ListItem>
             ))}
             </List>
-            abc
         </>)
 }
 

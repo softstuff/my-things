@@ -133,7 +133,7 @@ const MapFlow = ({onElementsUpdate}) => {
             deleteKeyCode={"Delete"}
           >
             <Background variant="lines" gap={12} size={1} />
-            <Controls  showInteractive={!locked} />
+            <Controls  showInteractive={!locked}  />
           </ReactFlow>
         </div>
         {!locked && (<div className={classes.sidebar}>
