@@ -3,15 +3,16 @@ import { makeStyles } from "@material-ui/core"
 const useStyles = makeStyles(() => ({
     
 }))
-const ConfigEditor = ({config, onAbort}) => {
+const ConfigEditor = ({importer, onAbort}) => {
 
     const classes = useStyles()
 
     return (
         <>
             <a onClick={onAbort}>Back to list</a>
-            <p>Import {config.name || '(unnamed)'} - {config.type}</p>
+            <p>Import {importer.config.name || '(unnamed)'} - {importer.config.type}</p>
 
+            <p>ID:{importer.id}</p>
         </>
     )
 }

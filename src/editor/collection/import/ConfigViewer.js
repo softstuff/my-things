@@ -1,28 +1,33 @@
 import { makeStyles } from "@material-ui/core"
+import { useWorkspace } from "../../../components/workspace/useWorkspace"
 import MapData from "../../../imports/mapper/MapData"
 
 const useStyles = makeStyles(() => ({
     
 }))
-const ConfigViewer = ({config:{name, type, config, mapping}, onAbort}) => {
-
-    const classes = useStyles()
-
+const ConfigViewer = ({importer:{config}, onAbort}) => {
     return (
         <>
             <a onClick={onAbort}>Back to list</a>
-            <p>Import: {name || '(unnamed)'} - {type}</p>
-            <ul>
-                <li><strong>Expected headers</strong> {config.columns.join(" ")}</li>
-                <li><strong>Expected delimiter</strong> {config.delimiter}</li>
-            </ul>
+            <p>Import: {config.name || '(unnamed)'} - {config.type}</p>
+           {config.type === "CSV" && (<CsvViewer config={config} />)} 
             
 
             <MapData
-              initElements={mapping.elements}
+              initElements={config.mapping.elements}
               locked={true}
             />
         </>
+    )
+}
+
+const CsvViewer = ({config}) => {
+
+    return (
+        <ul>
+            <li><strong>Expected headers</strong> {config.config.columns.join(" ")}</li>
+            <li><strong>Expected delimiter</strong> {config.config.delimiter}</li>
+        </ul>
     )
 }
 

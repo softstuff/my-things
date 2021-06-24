@@ -6,12 +6,12 @@ const WizzardContext = createContext()
 
 const initialState = {
     step: {
-      active: 1,
-      canBack: true,
+      active: 0,
+      canBack: false,
       hasNext: true,
     },
-    type: 'CSV',
-    config: {}
+    // type: 'CSV',
+    // config: {}
   };
 
 export function WizzardProvider({children}) {

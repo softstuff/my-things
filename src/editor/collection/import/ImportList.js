@@ -20,17 +20,20 @@ const ImportList = ({onSelect, onUse}) => {
     const [imports, setImports] = useState([])
 
     useEffect(()=>{
-        setImports(workspace.imports.filter(imp => imp.collectionId === collectionId))
+        setImports(Object.keys(workspace.imports)
+                        .filter(id => workspace.imports[id].collectionId === collectionId)
+                        .map(id => ({ id, config: workspace.imports[id] }))
+                        || [])
     }, [workspace, collectionId])
 
     const deleteImport = async (name) => {
-        console.log("Delete import named ", name)
-        await deleteWorkspaceField(`imports.${collectionId}.${name}`)
-        console.log("Deleted")
+        // console.log("Delete import named ", name)
+        // await deleteWorkspaceField(`imports.${collectionId}.${name}`)
+        // console.log("Deleted")
     }
 
-    const openImporter = config => {
-        onUse(config)
+    const openImporter = importer => {
+        onUse(importer)
     }
 
     return (
@@ -38,21 +41,21 @@ const ImportList = ({onSelect, onUse}) => {
             {imports.length === 0 && (<p>No imports has been created, yet..</p>)}
 
             <List>
-            {imports.map((imp, index) => (
-                <ListItem key={index} >
-                    <ListItemText className={classes.nameItem} >name: {imp.name}</ListItemText>
-                    <ListItemText primary={imp.type} className={classes.typeItem} />
-                    <ListItemText primary={imp.lastRun} className={classes.typeItem} />
-                    <ListItemText primary={imp.lastStatus} className={classes.typeItem} />
+            {imports.map( importer => (
+                <ListItem key={importer.id} >
+                    <ListItemText className={classes.nameItem} >{importer.config.name}</ListItemText>
+                    <ListItemText primary={importer.config.type} className={classes.typeItem} />
+                    <ListItemText primary={importer.config.lastRun || 'never'} className={classes.typeItem} />
+                    <ListItemText primary={importer.config.lastStatus || '-'} className={classes.typeItem} />
                     <ListItemText className={classes.typeItem} >
-                        <Button variant="contained" color="primary" onClick={()=>onSelect(imp)}>View</Button>
+                        <Button variant="contained" color="primary" onClick={()=>onSelect(importer)}>View</Button>
                     </ListItemText>
                     <ListItemText className={classes.typeItem} >
-                        <Button variant="contained" color="primary" onClick={()=>openImporter(imp)}>Use</Button>
+                        <Button variant="contained" color="primary" onClick={()=>openImporter(importer)}>Use</Button>
                     </ListItemText>
 
                     {editing && (
-                    <ListItemIcon onClick={()=>deleteImport(imp)}>
+                    <ListItemIcon onClick={()=>deleteImport(importer.id)}>
                         <DeleteIcon />
                     </ListItemIcon>
                     )}

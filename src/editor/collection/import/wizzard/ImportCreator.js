@@ -14,7 +14,6 @@ import { TestPanel } from "./TestPanel";
 import { ConfirmPanel } from "./ConfirmPanel";
 import {useSnackbar} from 'notistack';
 import { useStorage } from '../../../../firebase/useStorage'
-import { useEditor } from "../../../useEditor";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,26 +48,29 @@ function a11yProps(index) {
 }
 
 
-const ImportCreator = ({ onAbort }) => {
+const ImportCreator = ({ onAbort, onCreated }) => {
 
   return (
     <WizzardProvider>
-      <ImportWizard onAbort={onAbort} />
+      <ImportWizard onAbort={onAbort} onCreated={onCreated} />
     </WizzardProvider>
   )
 }
 
-const ImportWizard = ({onAbort}) => {
+const ImportWizard = ({onAbort, onCreated}) => {
   const classes = useStyles();
   const {state, dispatch} = useWizzard()
   const {addCollectionImport} = useStorage()
   const {enqueueSnackbar} = useSnackbar()
   
 
-  const handleSaveConfig = () => {
-    addCollectionImport(state)
-    console.log('Saved import', state)
+  const handleSaveConfig = async () => {
+    const configId = await addCollectionImport(state)
+    const importer = {id: configId, config: state}
+    console.log('Saved import', importer)
     enqueueSnackbar("Saved import", { variant: 'info'})
+
+    onCreated(importer)
   };
 
   return (
@@ -138,10 +140,6 @@ const ImportWizard = ({onAbort}) => {
           Save
         </Button>
       )}
-      <p>
-      state:
-        <textarea cols="100" rows="100" value={JSON.stringify(state, null, 2)} />
-      </p>
     </>
   );
 };

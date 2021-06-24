@@ -25,22 +25,30 @@ const ImportView = () => {
     const [creating, setCreating] = useState()
     const [inUse, setInUse] = useState()
 
-    const openImporter = config => {
-        setInUse(config)
+    const openImporter = importer => {
+        setInUse(true)
+        setSelected(importer)
     }
+
+    const handleOnCreated = importer => {
+        setCreating(false)
+        openImporter(importer)
+    }
+
     if (creating) {
-        return (<ImportCreator onAbort={()=>setCreating(false)} />)
+        return (<ImportCreator onAbort={()=>setCreating(false)} onCreated={handleOnCreated} />)
+    }
+    if (inUse) {
+        return (<FileImporter importer={selected} onAbort={()=>setSelected()}/>)
     }
     if (selected) {
         if(editing) {
-            return (<ConfigEditor config={selected} onAbort={()=>setSelected()}/>)
+            return (<ConfigEditor importer={selected} onAbort={()=>setSelected()}/>)
         } else {
-            return (<ConfigViewer config={selected} onAbort={()=>setSelected()}/>)
+            return (<ConfigViewer importer={selected} onAbort={()=>setSelected()}/>)
         }
     }
-    if (inUse) {
-        return (<FileImporter config={inUse} onAbort={()=>setSelected()}/>)
-    }
+    
 
     return (
         <>

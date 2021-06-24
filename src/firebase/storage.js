@@ -1,6 +1,7 @@
 //@flow
 import {firestore} from "./config"
 import firebase from 'firebase/app'
+import { nanoid } from "nanoid"
 
 const metaDocumentName = "_meta_"
 
@@ -75,9 +76,11 @@ export const createThing = async (tenantId, wid, collectionId, documentId, thing
 
     console.log('createThing', path, documentId, thing)
     if (documentId) {
-        return await firestore.collection(path).doc(documentId).set(thing)
+        const result = await firestore.collection(path).doc(documentId).set(thing)
+        return result.id
     } else {
-        return await firestore.collection(path).add(thing)
+        const result = await firestore.collection(path).add(thing)
+        return result.id
     }
 }
 
@@ -225,10 +228,13 @@ export const removeWorkspace = async (tenantId, wid) => {
 //     )
 // }
 
-export const addCollectionImport = async (tenantId, wid, {collectionId, name, type, config, mapping}) => {
+export const addCollectionImport = async (tenantId, wid, importConfig) => {
+    const configId = nanoid(4)
+    const pointer = `imports.${configId}`
     await firestore.doc(`tenants/${tenantId}/workspaces/${wid}`).update({
-        imports: firebase.firestore.FieldValue.arrayUnion({collectionId, name, type, config, mapping})
+        [pointer]: importConfig
     })
+    return configId
 }
 
 export const subscribeOnSchema = async (tenantId, wid, onLoaded, onError) => {
