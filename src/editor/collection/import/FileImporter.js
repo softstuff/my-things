@@ -54,14 +54,14 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
 
         // e.target.result
         const fileContent = reader.result;
-        console.log(fileContent);
-        enqueueSnackbar(fileContent)
+        // console.log(fileContent);
+        // enqueueSnackbar(fileContent)
         const register = buildRegistry(config.mapping)
 
         consumeCsv(id, config, collectionId, fileContent, register, setProgress, setResult, addObject)
         
       };
-      reader.readAsText(file)
+      reader.readAsText(file, config.config.encoding || "UTF-8")
     });
   }, []);
 
