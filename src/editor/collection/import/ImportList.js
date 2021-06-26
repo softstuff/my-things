@@ -20,7 +20,7 @@ const ImportList = ({onSelect, onUse}) => {
     const [imports, setImports] = useState([])
 
     useEffect(()=>{
-        setImports(Object.keys(workspace.imports)
+        setImports(Object.keys(workspace.imports || [])
                         .filter(id => workspace.imports[id].collectionId === collectionId)
                         .map(id => ({ id, config: workspace.imports[id] }))
                         || [])
