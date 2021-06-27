@@ -26,8 +26,8 @@ const ImportView = () => {
     const [inUse, setInUse] = useState()
 
     const openImporter = importer => {
-        setInUse(true)
         setSelected(importer)
+        setInUse(true)
     }
 
     const handleOnCreated = importer => {

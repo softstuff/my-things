@@ -1,4 +1,4 @@
-import { Button, makeStyles, TextField } from "@material-ui/core";
+import { Box, Button, makeStyles, TextField } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useEditor } from "../../../useEditor";
@@ -16,8 +16,6 @@ export const ConfirmPanel = () => {
     const classes = useStyles()
     return (
       <>
-        <h2>Confirm</h2>
-
         <div className={classes.content}>
         {state.type === "CSV" && (<CsvConfirm />)}
         </div>
@@ -40,19 +38,25 @@ export const ConfirmPanel = () => {
 
     return (
       <>
-        <div>Creating A CSV import</div>
-        <ul>
-          <li><strong>Expected headers</strong> {state.config.columns.join(" ")}</li>
-          <li><strong>Expected delimiter</strong> {state.config.delimiter}</li>
-        </ul>
-
         <p>You can name this import if you like: </p>
-        
+          
         <TextField 
           label="Name"
           value={name}
           onChange={handleNameChange}
           />
+
+        <Box m={5} />
+
+        <p>Creating A CSV import</p>
+        <ul>
+          <li><strong>Expects {state.config.columns.length} columns:</strong> {state.config.columns.join(", ")}</li>
+          <li><strong>Expected separator</strong> {state.config.separator}</li>
+          <li><strong>Expected file encoding</strong> {state.config.encoding}</li>
+          <li><strong>Expected file extentions</strong> {state.config.extentions.join(", ")}</li>
+        </ul>
+
+        
       </>
     )
   }

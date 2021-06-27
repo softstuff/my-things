@@ -44,7 +44,6 @@ export function HowPanel() {
   const { state } = useWizzard();
   return (
     <>
-      <h2>How</h2>
       {state.type === "CSV" && <CsvConfig />}
     </>
   );
@@ -61,6 +60,7 @@ const CsvConfig = () => {
         separator: ";",
         columns: ["id", "first name", "last name"],
         encoding: "UTF-8",
+        extentions: [".csv", ".txt"]
       };
       dispatch({ type: "SET_CONFIG", values, isValid: true });
     }
@@ -76,14 +76,6 @@ const CsvConfig = () => {
     const guessColumns =
       headerRow.split(guessSeparator).filter((col) => !isEmpty(col)) || [];
 
-    console.log(
-      "guessSeparator",
-      guessSeparator,
-      "guessColumns",
-      guessColumns.length,
-      "columns",
-      columns.length
-    );
     if (guessColumns.length > columns.length) {
       const isValid = columns.length > 0;
       const values = {

@@ -26,7 +26,7 @@ const CsvViewer = ({config}) => {
     return (
         <ul>
             <li><strong>Expected headers</strong> {config.config.columns.join(" ")}</li>
-            <li><strong>Expected delimiter</strong> {config.config.delimiter}</li>
+            <li><strong>Expected separator</strong> {config.config.separator}</li>
         </ul>
     )
 }

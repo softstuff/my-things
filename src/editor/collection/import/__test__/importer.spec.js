@@ -15,7 +15,7 @@ describe("Verify buildInitPayload", () => {
     test("Happy path", () => {
       const type = "CSV"
       const config = {
-        delimiter: ";",
+        separator: ";",
         columns: ["firstName", "lastName", "age"],
       };
       const input = "Foo;Bar;42";
@@ -146,7 +146,7 @@ describe("process", () => {
     test("Happy path", () => {
       const type = "CSV"
       const config = {
-        delimiter: ";",
+        separator: ";",
         columns: ["firstName","lastName","age"]
       }
       let input = "Foo;Bar;33"

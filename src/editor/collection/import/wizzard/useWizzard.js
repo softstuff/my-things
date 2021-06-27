@@ -10,7 +10,7 @@ const initialState = {
       canBack: false,
       hasNext: true,
     },
-    // type: 'CSV',
+    type: 'CSV',
     // config: {}
   };
 

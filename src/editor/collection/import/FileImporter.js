@@ -61,7 +61,7 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
         consumeCsv(id, config, collectionId, fileContent, register, setProgress, setResult, addObject)
         
       };
-      reader.readAsText(file, config.config.encoding || "UTF-8")
+      reader.readAsText(file, config.config.encoding)
     });
   }, []);
 
@@ -71,7 +71,7 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
     isDragActive,
     isDragAccept,
     isDragReject
-  } = useDropzone({onDrop, maxFiles:1, accept: '.csv'});
+  } = useDropzone({onDrop, maxFiles:1, accept: config.extentions});
 
   const style = useMemo(() => ({
     ...baseStyle,
@@ -119,7 +119,7 @@ const CsvType = ({config}) => {
         <strong>Expected headers</strong> {config.config.columns.join(" ")}
       </li>
       <li>
-        <strong>Expected delimiter</strong> {config.config.delimiter}
+        <strong>Expected separator</strong> {config.config.separator}
       </li>
   </ul>
   )

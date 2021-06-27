@@ -5,6 +5,7 @@ import {
   Step,
   StepLabel,
   Stepper,
+  Typography
 } from "@material-ui/core";
 import { WhatPanel } from "./WhatPanel";
 import { useWizzard, WizzardProvider } from "./useWizzard";
@@ -16,37 +17,21 @@ import {useSnackbar} from 'notistack';
 import { useStorage } from '../../../../firebase/useStorage'
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    minWidth: 275,
+  container: {
+    maxWidth: "70rem",    
+    margin: "auto",
+  },
+  step: {
+    minHeight: "50vh",
+  },
+  stepNavigation: {
+    display: "flex",
+    justifyContent: "space-between"
   },
   button: {
     marginRight: theme.spacing(1),
   },
 }));
-
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`scrollable-auto-tabpanel-${index}`}
-      aria-labelledby={`scrollable-auto-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box p={3}>{children}</Box>}
-    </div>
-  );
-}
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-}
-
 
 const ImportCreator = ({ onAbort, onCreated }) => {
 
@@ -56,6 +41,14 @@ const ImportCreator = ({ onAbort, onCreated }) => {
     </WizzardProvider>
   )
 }
+
+const steps = [
+  {title:"What", subtitle: "Select what type of data you like to import"},
+ {title: "How", subtitle: "Explain how your data is structured"},
+ {title: "Where", subtitle: "Map where you like the imported data to end up in the collection"},
+ {title: "Test", subtitle: "Give some of the expected import data a test run with this import configuration"},
+ {title: "Confirm", subtitle: "" },
+ {title: "Import", subtitle: ""}]
 
 const ImportWizard = ({onAbort, onCreated}) => {
   const classes = useStyles();
@@ -73,30 +66,25 @@ const ImportWizard = ({onAbort, onCreated}) => {
     onCreated(importer)
   };
 
+  
+
   return (
-    <>
+    <div className={classes.container}>
       <a readOnly={true} onClick={onAbort}>Back to list</a>
       <p>Import Creator</p>
       <Stepper activeStep={state.step.active}>
-        <Step>
-          <StepLabel>What</StepLabel>
+        {steps.map(step => (
+          <Step key={step.title}>
+          <StepLabel>{step.title}</StepLabel>
         </Step>
-        <Step>
-          <StepLabel>How</StepLabel>
-        </Step>
-        <Step>
-          <StepLabel>Where</StepLabel>
-        </Step>
-        <Step>
-          <StepLabel>Test</StepLabel>
-        </Step>
-        <Step>
-          <StepLabel>Confirm</StepLabel>
-        </Step>
-        <Step>
-          <StepLabel>Import</StepLabel>
-        </Step>
+        ))}
       </Stepper>
+      <StepNavigation {...steps[state.step.active]} onSave={handleSaveConfig}/>
+
+      <Typography variant="h3" >{steps[state.step.active].title}</Typography>
+      <Typography variant="subtitle1" >{steps[state.step.active].subtitle}</Typography>
+
+      <div className={classes.step}>
       {state.step.active === 0 && (
         <WhatPanel/>
       )}
@@ -112,36 +100,54 @@ const ImportWizard = ({onAbort, onCreated}) => {
       {state.step.active === 4 && (
         <ConfirmPanel />
       )}
-      <Button
-        disabled={!state.step.canBack}
-        onClick={() => dispatch({ type: "BACK" })}
-        className={classes.button}
-      >
-        Back
-      </Button>
-      {state.step.hasNext && (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => dispatch({ type: "NEXT" })}
-          className={classes.button}
-          disabled={!state.step[`done_${state.step.active}`]}
-        >
-          Next
-        </Button>
-      )}
-      {!state.step.hasNext && (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSaveConfig}
-          className={classes.button}
-        >
-          Save
-        </Button>
-      )}
-    </>
+      </div>
+      <StepNavigation onSave={handleSaveConfig}/>
+    </div>
   );
 };
+
+const StepNavigation = ({onSave}) => {
+  const classes = useStyles();
+  const {state, dispatch} = useWizzard()
+
+  return (
+    <div className={classes.stepNavigation}>
+      <div>
+        <Button
+          variant="outlined"
+          // color="primary"
+          disabled={!state.step.canBack}
+          onClick={() => dispatch({ type: "BACK" })}
+          className={classes.button}
+        > Back
+        </Button>
+      </div>
+        
+      <div>
+        {state.step.hasNext && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => dispatch({ type: "NEXT" })}
+            className={classes.button}
+            disabled={!state.step[`done_${state.step.active}`]}
+          >
+            Next
+          </Button>
+        )}
+        {!state.step.hasNext && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={onSave}
+            className={classes.button}
+          >
+            Save
+          </Button>
+        )}
+      </div>
+    </div>
+    )
+}
 
 export default ImportCreator;

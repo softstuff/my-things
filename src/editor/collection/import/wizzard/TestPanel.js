@@ -20,7 +20,7 @@ export const TestPanel = () => {
 
   const CsvTest = () => {
     const {state, dispatch} = useWizzard()
-    const [source, setSource] = useState(`${state.config.columns.join(state.config.delimiter)}\nKalle;Anka`)
+    const [source, setSource] = useState(`${state.config.columns.join(state.config.separator)}\n${["kalle","Kalle","Anka"].join(state.config.separator)}`)
     const [payload, setPayload] = useState();
     const [chunks, setChunks] = useState([]);
     const [register, setRegister] = useState()
@@ -65,8 +65,6 @@ export const TestPanel = () => {
 
     return (
       <>
-        <h2>Test CSV</h2>
-
         <div>
           <textarea cols={120} rows={10} value={source} onChange={handleSourceChange} />
         </div>
@@ -75,17 +73,18 @@ export const TestPanel = () => {
         </div>
 
         <div>
-          Result
-          <ol>
+          Result:
+          <ul>
             {chunks.map((chunk, index) => (
               <li key={index}>
-                <a onClick={()=>setPayload(chunk.payload)} >{chunk.source}</a>
-                {chunk.attributes.map(attribute => (
-                  <div>{attribute.name}: {attribute.value}</div>
+                row {index +1} {chunk.source} <Button onClick={()=>setPayload(chunk.payload)} >Show mapping</Button>
+                <div>Object attribute:</div>
+                {chunk.attributes.map((attribute, i) => (
+                  <div key={i}> - {attribute.name} = {attribute.value}</div>
                 ))}
               </li>
             ))}
-          </ol>
+          </ul>
         </div>
         
         <div>

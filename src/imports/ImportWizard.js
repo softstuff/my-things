@@ -157,7 +157,7 @@ const DataStructure = ({onValidation, myStep}) => {
         {guess && (<>
           <p>Guess is: {guess.text}</p>
           <p>Content is: {guess.valid ? 'valid' : 'not valid'}</p>
-          {guess.delimiter && <p>delimiter is {guess.delimiter}</p>}
+          {guess.separator && <p>separator is {guess.separator}</p>}
           {guess.error && <p>Error: {guess.error}</p>}
         </>)}
 
@@ -190,9 +190,9 @@ const guessStructure = (sample) => {
       }
 
     } else if (firstRow.match(/[,|;|/t]/)) { 
-      guess.delimiter = firstRow.match(/[,|;|/t]/)[0]
-      guess.columns = firstRow.split(guess.delimiter)
-      guess.text = `My guess is that this is a CSV file with delimiter ${guess.delimiter} with ${guess.columns.length} columns`
+      guess.separator = firstRow.match(/[,|;|/t]/)[0]
+      guess.columns = firstRow.split(guess.separator)
+      guess.text = `My guess is that this is a CSV file with separator ${guess.separator} with ${guess.columns.length} columns`
       guess.valid = true
       guess.csv = true
       

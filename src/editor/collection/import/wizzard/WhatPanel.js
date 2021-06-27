@@ -1,43 +1,65 @@
-import { Card, CardContent, Checkbox, Grid, Typography, withStyles } from "@material-ui/core";
+import { Card, CardContent, Checkbox, Radio, FormControlLabel, makeStyles, Typography, withStyles, RadioGroup } from "@material-ui/core";
 import { green } from "@material-ui/core/colors";
+import { useEffect } from "react";
 import { useWizzard } from "./useWizzard";
 
-export function WhatPanel() {
+const useStyles = makeStyles(() => ({
+  types: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    minHeight: "40vh",
+  }
+}))
 
+export function WhatPanel() {
+  const classes = useStyles()
+  const {state, dispatch} = useWizzard()
+
+  useEffect(()=>{
+    dispatch({type: "SET_TYPE", value: state.type, isValid: state.type !== null})
+  },[])
+
+  const handleChangeType = event => {
+    console.log("handleChangeType ", event.target.name, event.target.value, event.target.checked)
+    const newType = event.target.value
+    dispatch({type: "SET_TYPE", value: newType, isValid: state.type !== null})
+  }
   return (
     <>
-      <h2>What</h2>
-      <Grid container direction="row" justify="center" alignItems="center">
-        <TypeCard type={"CSV"} />
-      </Grid>
+      <div>
+        <RadioGroup className={classes.types} aria-label="type" name="type" value={state.type} onChange={handleChangeType}>
+          <TypeCard type={"CSV"} />
+          <TypeCard type={"JSON"} disabled={true} />
+          <TypeCard type={"XML"} disabled={true} />
+          <TypeCard type={"YAML"} disabled={true} />
+        </RadioGroup>
+      </div>
     </>
   );
 }
 
-const TypeCard = ({type}) => {
-  const {state, dispatch} = useWizzard()
-  const handleClick = () => {
-    const isValid = type !== null
-    dispatch({type: "SET_TYPE", value: type, isValid})
-  }
+const TypeCard = ({type, disabled}) => {
+  
   return (
-    <Card variant="outlined" onClick={handleClick}>
+    <Card variant="outlined">
     <CardContent>
-      <Typography variant="h5" component="h2">
-        CSV
-      </Typography>
-      <GreenCheckbox
-        checked={state.type === type}
-      ></GreenCheckbox>
+      
+      <FormControlLabel 
+       label={
+          <Typography variant="h5" component="h2">
+            {type}
+          </Typography>
+        }
+        labelPlacement="top"  
+        value={type}
+        disabled={disabled}
+        control={
+          <Radio
+            color="primary"
+        />}
+      />
     </CardContent>
     </Card>)
 }
-const GreenCheckbox = withStyles({
-  root: {
-    color: green[400],
-    '&$checked': {
-      color: green[600],
-    },
-  },
-  checked: {},
-})((props) => <Checkbox color="default" {...props} />);

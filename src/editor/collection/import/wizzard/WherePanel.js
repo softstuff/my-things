@@ -8,11 +8,8 @@ export const WherePanel = () => {
     
     return (
       <>
-        <h2>Where</h2>
-
         <MapFields />
-
-      </>
+       </>
     );
   }
 

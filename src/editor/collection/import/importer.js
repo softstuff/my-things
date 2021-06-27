@@ -40,7 +40,7 @@ export const processChunk = (input, type, config, register) => {
 export const buildInitPayload = (input, type, config) => {
 
   if (type === "CSV") {
-      const values = input.split(config.delimiter)
+      const values = input.split(config.separator)
       return values.reduce((map, value, index) => {
           map[config.columns[index]] = value;
           return map;

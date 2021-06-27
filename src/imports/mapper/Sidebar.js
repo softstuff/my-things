@@ -35,10 +35,10 @@ export default () => {
 
       <p>
         Import input:
-        {unmappedInputs.map(input => (
-          <div className={classes.node} onDragStart={(event) => onDragStart(event, { type:'input', data: {label: input}})} draggable>
-          {input}
-        </div>
+        {unmappedInputs.map((input,index) => (
+          <div key={index} className={classes.node} onDragStart={(event) => onDragStart(event, { type:'input', data: {label: input}})} draggable>
+            {input}
+          </div>
         ))}
         {unmappedInputs.length == 0 && (<div>All inputs is mapped</div>)}
       </p>
