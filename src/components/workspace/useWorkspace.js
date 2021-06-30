@@ -31,7 +31,7 @@ export const WorkspaceProvider = (props) => {
     const [schema] = useState()
     const [wid, setWid] = useState()
     const [widList, setWidList] = useState([])
-    const { tenantId } = useUser()
+    const { tenantId, uid } = useUser()
     const classes = useStyles()
 
 
@@ -76,7 +76,7 @@ export const WorkspaceProvider = (props) => {
     }, [tenantId, wid])
 
     return (
-        <WorkspaceContext.Provider value={{wid, workspace, setWid, widList, schema, tenantId}} >
+        <WorkspaceContext.Provider value={{wid, workspace, setWid, widList, schema, tenantId, uid}} >
              { (()=>{
                     if(loading){
                         return (<div className={classes.centerScreen}><CircularProgress/></div>)

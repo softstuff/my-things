@@ -1,5 +1,7 @@
 import firebase from 'firebase/app'
 import 'firebase/firestore'
+import 'firebase/storage'
+import 'firebase/database'
 import "firebase/auth";
 
 const enabledEmulator = () => process.env.REACT_APP_USE_FIREBASE_EMULATOR
@@ -16,6 +18,8 @@ firebase.initializeApp( {
 
 export const auth = firebase.auth()
 export const firestore = firebase.firestore()
+export const storage = firebase.storage()
+export const database = firebase.database()
 
 console.log(firebase.app().options)
 
@@ -23,6 +27,8 @@ if (enabledEmulator()) {
     console.log("USING EMULATOR SETTINGS")
     auth.useEmulator('http://localhost:9099/');
     firestore.useEmulator('localhost', 8080);
+    storage.useEmulator('localhost', 9199)
+    database.useEmulator('localhost', 9000)
     //firebase.hosting().useEmulator('localhost' , 5000);
     //firebase.functions().useEmulator('localhost', 5001);
 }
