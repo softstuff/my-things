@@ -2,11 +2,11 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     match /imports/{tenantId}/{wid}/{id}/{filename} {
-      allow write: if request.resource.metadata.uid == request.auth.uid 
-      //allow list, delete: if false
+      allow  update, create: if request.resource.metadata.uid == request.auth.uid 
+      allow list, get, delete: if false
 
       //allow get, create, update: if request.resource.metadata.uid == request.auth.uid 
-      //allow list, delete: if false
+      // allow list, delete: if false
     }
 
     // && tenantId == request.resource.metadata.tenantId
