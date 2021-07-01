@@ -32,4 +32,4 @@ emulator-snapshot/
 tmp/*
 .idea/
 
-.my-things*.json
+my-things*.json
