@@ -60,7 +60,7 @@ export const pushIt = ({edges, payload, register}) => {
         processActionUpperNode(nodeArgs)
       } else if (node.type === "join") {
         processActionJoinNode(nodeArgs)
-      } else if (node.type === "key") {
+      } else if (node.type === "collectionKey") {
         processOutputIdNode(nodeArgs)
       } else if (node.type === "attribute") {
         processOutputNode(nodeArgs)

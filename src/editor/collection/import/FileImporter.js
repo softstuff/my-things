@@ -82,7 +82,7 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
 
       const metadata = {
 
-        customMetadata: { tenantId, wid, uid, id}
+        customMetadata: { tenantId, wid, uid, iid: id}
       }
       console.log("Send metadata", metadata)
       var uploadTask = importRef.child(`${tenantId}/${wid}/${id}/${file.name}`).put(file, metadata)
