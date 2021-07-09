@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import MapData from "../../../../imports/mapper/MapData";
 import { useWizzard } from "./useWizzard";
 
@@ -39,15 +39,19 @@ export const WherePanel = () => {
         console.log("elle", elle)
         setInitElements( elle)
       }
-    }, [state, state.config.columns])
+    }, [])
 
     
-    const onElementsUpdate = elements => {
-      const inputs = getInputs()
-      console.log("Elements has updated", elements)
+    const onElementsUpdate = useCallback( elements => {
+      const inputs = state.config.columns
       const isValid = !elements.some(el => el.data?.isValid === false)
-      dispatch({type: "SET_MAPPING", mapping: {elements, inputs}, isValid})
+      const hasChanged = JSON.stringify(state.mapping) === JSON.stringify({elements, inputs})
+      console.log("Elements has updated", "hasChanged", hasChanged, "isValid", isValid)
+      // if (hasChanged) {
+        dispatch({type: "SET_MAPPING", mapping: {elements, inputs}, isValid})
+      // }
     }
+    , [state.config.columns])
   
     // const guessConnections = (inputNodes, argumentNodes) => {
     //   let connections = inputNodes

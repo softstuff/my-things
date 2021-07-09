@@ -31,7 +31,7 @@ const AttributeNode = (props) => {
       )
     }
 
-  }, [elements, props, props.data, setElements])
+  }, [props.data])
 
   return (
     <>

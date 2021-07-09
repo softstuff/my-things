@@ -159,17 +159,16 @@ exports.imports = functions
       const files = statRef.child("files")
       var i = 0
       var fileStatRef = files.child(encodeKey(fileName))
-      var uniqueFileNameInStats = (await fileStatRef.get()).exists()
-      while (++i < 1000 && uniqueFileNameInStats) {
+      /*eslint-disable-next-line no-await-in-loop*/
+      while (++i < 1000 && (await fileStatRef.get()).exists()) {
         fileStatRef = files.child(`${encodeKey(fileName)}_${i}`)
-        /*eslint-disable-next-line no-await-in-loop*/
-        uniqueFileNameInStats = (await fileStatRef.get()).exists()
       }
       await fileStatRef.set({
         startedAt: admin.database.ServerValue.TIMESTAMP,
         imported: 0
       })
 
+      console.log("AAA")
       const maxBatchSize = 500;
       let importedFromFile = 0;
       const started = Number(new Date())
@@ -190,18 +189,18 @@ exports.imports = functions
           .pipe(new Transform({
             objectMode: true,
             transform(data, encoding, next) {
-
+              console.log("BB")
               const { result } = processChunk(data, registry)
 
               batch.set(colRef.doc(result.key), result.attributes)
               importedFromFile++
-
+              console.log("CC")
               const time = Number(new Date()) - started
-
+              console.log("DD")
               if (++batchSize >= maxBatchSize) {
 
                 logger.debug("Do batch commit")
-                return Promise.all([
+                Promise.all([
                   statRef.update({ "imported": admin.database.ServerValue.increment(batchSize) }),
                   fileStatRef.update({
                     "imported": admin.database.ServerValue.increment(batchSize),
@@ -214,25 +213,30 @@ exports.imports = functions
                       batchSize = 0;
 
                       logger.debug("Batch commit is done, pipe call, ", result.writeTime)
-                      return
+                      console.log("Next A")
+                      return result
                     })
                     .catch(error => {
+                      console.log("Error A", error)
                       next(error, data)
                     })
                 ])
                   .then(() => {
+                    console.log("Next B")
                     return next(null, data)
                   })
                   .catch(error => {
-                    next(error, data)
+                    console.log("Error B", error)
+                    return next(error)
                   })
                   
               } else {
-                return next(null, data)
+                console.log("Next C")
+                next(null, data)
               }
             },
             final(next) {
-
+              console.log("final")
               if (batchSize > 0) {
                 logger.debug("pipe final, batchSize", batchSize, " wait for final batch commit")
                 Promise.all([
@@ -247,6 +251,7 @@ exports.imports = functions
                       return
                     })
                     .catch(error => {
+                      console.log("Next Error E", error)
                       next(error)
                     })
                 ])
@@ -255,6 +260,7 @@ exports.imports = functions
                   return next()
                 })
                 .catch(error => {
+                  console.log("Next Error E", error)
                   next(error)
                 })
 
@@ -284,13 +290,14 @@ exports.imports = functions
             logger.debug("end of stream")
 
           })
-          .on('data', (chunk) => { })
+          .on('data', (chunk) => { console.log("Data")})
           .on('close', () => {
             logger.debug("data stream is closed")
             resolve(file)
           })
       })
 
+      logger.debug("Await import to complete")
       await parsePromise
       logger.debug("Import is done")
       
