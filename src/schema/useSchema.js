@@ -12,20 +12,21 @@ export const useSchema = () => {
 
     const translateToSubCollectionFor = pointer => pointer === '' ? `${pointer}/properties` : `${pointer}/items/properties`
 
-    const defaultRoot = () => {
-        console.log("Create default schema")
-        return {
-            $schema: "http://json-schema.org/draft-07/schema#",
-            $id: `${window.location.protocol}//${window.location.host}/api/schema/${wid}.json`,
-            title: `Workspace ${wid}`,
-            type: 'object',
-            properties: {}
-        }
-    }
+    
 
     const addNewCollection = useCallback( (pointer, key, description) => {
         console.log("addNewCollection", pointer, key, description, schema)
 
+        const defaultRoot = () => {
+            console.log("Create default schema")
+            return {
+                $schema: "http://json-schema.org/draft-07/schema#",
+                $id: `${window.location.protocol}//${window.location.host}/api/schema/${wid}.json`,
+                title: `Workspace ${wid}`,
+                type: 'object',
+                properties: {}
+            }
+        }
 
         let schemaToSave = Object.assign({}, schema || defaultRoot())
         const subPointer = translateToSubCollectionFor(pointer)
@@ -47,7 +48,7 @@ export const useSchema = () => {
 
         saveSchema(tenantId, wid, schemaToSave)
         return `${subPointer}/${key}`
-    },[])
+    },[schema, tenantId, wid])
 
     const deleteCollection = useCallback( (pointer) => {
         console.log("deleteCollection", pointer)
@@ -58,7 +59,7 @@ export const useSchema = () => {
         console.log("- schemaToSave", schemaToSave)
 
         saveSchema(tenantId, wid, schemaToSave)
-    },[])
+    },[schema, tenantId, wid])
 
     const saveProperty = useCallback( (pointer, properties) => {
         console.log("init saveProperty", pointer, properties)
@@ -68,8 +69,18 @@ export const useSchema = () => {
         console.log('saveProperty', schemaToSave)
         saveSchema(tenantId, wid, schemaToSave)
         return schemaToSave
-    },[])
+    },[schema, tenantId, wid])
 
+
+    const cleanEmptyValues = useCallback( obj => {
+        for (var propName in obj) {
+          if (obj[propName] === null || obj[propName] === undefined || obj[propName] === '') {
+            delete obj[propName];
+          }
+        }
+        return obj
+      },[])
+      
     const addProperty = useCallback( (parentPointer, key, required, data) => {
         console.log("init addProperty", parentPointer, key, 'required:',required, data)
         const propertyPointer = `${parentPointer}/items/properties/${key}`
@@ -85,7 +96,7 @@ export const useSchema = () => {
                 requiredKeys.push(key)
             }
         } else {
-            requiredKeys = requiredKeys.filter(item => item != key)
+            requiredKeys = requiredKeys.filter(item => item !== key)
             console.log("Cleared ", key, " from ", requiredKeys)
         }
         jp.set(schemaToSave, requeredPointer, requiredKeys)
@@ -93,7 +104,7 @@ export const useSchema = () => {
         console.log('saveProperty', schemaToSave)
         saveSchema(tenantId, wid, schemaToSave)
         return schemaToSave
-    },[])
+    },[cleanEmptyValues, schema, tenantId, wid])
 
     const deleteProperty = useCallback( (parentPointer, key) => {
         console.log("init deleteProperty", parentPointer, key)
@@ -104,31 +115,23 @@ export const useSchema = () => {
 
         if (jp.has(schemaToSave, requeredPointer)) {
             let requiredKeys = jp.get(schemaToSave, requeredPointer)
-            requiredKeys = requiredKeys.filter(item => item != key)
+            requiredKeys = requiredKeys.filter(item => item !== key)
             jp.set(schemaToSave, requeredPointer, requiredKeys)
         }
 
         console.log('saveProperty', schemaToSave)
         saveSchema(tenantId, wid, schemaToSave)
         return schemaToSave
-    },[])
+    },[schema, tenantId, wid])
 
-    const cleanEmptyValues = useCallback( obj => {
-        for (var propName in obj) {
-          if (obj[propName] === null || obj[propName] === undefined || obj[propName] === '') {
-            delete obj[propName];
-          }
-        }
-        return obj
-      },[])
 
     const save = useCallback( schema => {
         saveSchema(tenantId, wid, schema)
-    },[])
+    },[tenantId, wid])
 
     const getPropertyFor = useCallback( pointer => {
         return  jp.get(schema, pointer)
-    },[])
+    },[schema])
 
     const collectionIdFor = useCallback( pointer =>  {
         return pointer.substring(pointer.lastIndexOf('/')+1)

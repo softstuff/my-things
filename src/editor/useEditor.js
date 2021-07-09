@@ -47,7 +47,7 @@ export const EditorProvider = (props) => {
         return ()=>{
             mounted = false
         }
-    }, [documentId])
+    }, [tenantId, collectionId, wid, documentId])
 
     return (
         <EditorContext.Provider value={{

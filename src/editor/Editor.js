@@ -1,11 +1,10 @@
 import React, {useState} from 'react'
-import {addNewCollection, deleteCollection} from '../firebase/storage'
+import {deleteCollection} from '../firebase/storage'
 import {FormControlLabel, Grid, makeStyles, Paper, Switch} from '@material-ui/core'
 import ThingsBreadcrumbs from '../components/ThingsBreadcrumbs';
 import {useSession} from '../firebase/UserProvider';
 import CollectionList from './collection/CollectiontList';
 import DocumentView from './document/DocumentView';
-import {useSnackbar} from 'notistack';
 import CollectionView from './collection/CollectionView';
 import {useWorkspace} from '../components/workspace/useWorkspace';
 import {useEditor} from './useEditor';
@@ -52,10 +51,8 @@ const useStyles = makeStyles((theme) => ({
 function Editor() {
 
     const classes = useStyles()
-    const {enqueueSnackbar} = useSnackbar()
     const {
         editing, setEditing,
-        collectionList,
         collectionId, setCollectionId,
         documentId, setDocumentId,
         createDocument, setCreateDocument

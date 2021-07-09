@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   makeStyles,
   Step,
@@ -52,7 +51,7 @@ const steps = [
 
 const ImportWizard = ({onAbort, onCreated}) => {
   const classes = useStyles();
-  const {state, dispatch} = useWizzard()
+  const {state} = useWizzard()
   const {addCollectionImport} = useStorage()
   const {enqueueSnackbar} = useSnackbar()
   
@@ -70,7 +69,7 @@ const ImportWizard = ({onAbort, onCreated}) => {
 
   return (
     <div className={classes.container}>
-      <a readOnly={true} onClick={onAbort}>Back to list</a>
+      <Button readOnly={true} onClick={onAbort}>Back to list</Button>
       <p>Import Creator</p>
       <Stepper activeStep={state.step.active}>
         {steps.map(step => (

@@ -58,7 +58,7 @@ const DocumentList = () => {
                 enqueueSnackbar(`Failed to documents for ${collectionId}`, { variant: 'error' })
             }
         )
-    }, [tenantId, wid, collectionId])
+    }, [tenantId, wid, collectionId, enqueueSnackbar])
 
     
     const handleClick = ({id, doc}) => {

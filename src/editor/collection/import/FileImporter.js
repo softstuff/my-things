@@ -1,14 +1,9 @@
-import { makeStyles } from "@material-ui/core";
 import { useDropzone } from "react-dropzone";
-import { useSnackbar } from "notistack";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { database, storage } from "../../../firebase/config";
 import firebase from 'firebase/app'
-import { useStorage } from "../../../firebase/useStorage";
-import { useEditor } from "../../useEditor";
 import { useWorkspace } from "../../../components/workspace/useWorkspace";
-
-const useStyles = makeStyles(() => ({}));
+import { Button } from "@material-ui/core";
 
 
 const baseStyle = {
@@ -40,13 +35,9 @@ const rejectStyle = {
 };
 
 export const FileImporter = ({ importer: {id, config}, onAbort}) => {
-  const classes = useStyles();
-  const {enqueueSnackbar} = useSnackbar()
-  const {addObject} = useStorage()
-  const [progress, setProgress] = useState()  
   const [result, setResult] = useState()  
   const {tenantId, wid, uid} = useWorkspace()
-  const [batchId] = useState(+new Date())
+  const [batchId] = useState(Number(new Date()))
   const importBatchRef = useRef()
 
 
@@ -63,7 +54,7 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
       })
     }
 
-  },[batchId])
+  },[tenantId,wid, id, batchId])
 
   const onDrop = useCallback((acceptedFiles, fileRejections, event) => {
     console.log(`onDrop  ${acceptedFiles.length} acceptedFiles, ${fileRejections.length} fileRejections` )
@@ -81,19 +72,11 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
       
       var uploadTask = importRef.child(`${tenantId}/${wid}/${id}/${file.name}`).put(file, metadata)
 
-      uploadTask.on('state_changed',  (snapshot) => {
+      uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,  (snapshot) => {
         // Observe state change events such as progress, pause, and resume
         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('Upload is ' + progress + '% done');
-        switch (snapshot.state) {
-          case firebase.storage.TaskState.PAUSED: // or 'paused'
-            console.log('Upload is paused');
-            break;
-          case firebase.storage.TaskState.RUNNING: // or 'running'
-            console.log('Upload is running');
-            break;
-        }
+        var _progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Upload is ' + _progress + '% done, State:', snapshot.state)
       }, 
       (error) => {
         // Handle unsuccessful uploads
@@ -109,7 +92,7 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
         console.log('Uploaded a blob or file!');
       });
     });
-  }, []);
+  }, [batchId, id, tenantId, uid, wid]);
 
   const {
     getRootProps,
@@ -141,7 +124,7 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
 
   return (
     <>
-      <a onClick={onAbort}>Back to list</a>
+      <Button onClick={onAbort}>Back to list</Button>
       <p>
         Use importer: {config.name || "(unnamed)"} - {config.type}
       </p>
@@ -158,8 +141,6 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
         </div>
       </div>
 
-
-      <p>progress: {progress}</p>
 
       {result && (
         <div>

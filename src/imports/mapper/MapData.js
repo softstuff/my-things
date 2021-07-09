@@ -1,5 +1,5 @@
 import { makeStyles } from "@material-ui/core";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import ReactFlow, {
   addEdge,
   Background,
@@ -52,7 +52,7 @@ const edgeTypes = {
   custom: CustomEdge,
 };
 
-export default ({ initElements, locked = false, inputs, payload, onElementsUpdate }) => {
+const MapData =({ initElements, locked = false, inputs, payload, onElementsUpdate }) => {
   
   return (
     <MapperProvider initElements={initElements} locked={locked} inputs={inputs} payload={payload}>
@@ -71,7 +71,7 @@ const MapFlow = ({onElementsUpdate}) => {
     if (onElementsUpdate) {
       onElementsUpdate([...elements])
     }
-  },[elements])
+  },[elements, onElementsUpdate])
   
   const onConnect = (params) => {
     params.type="custom"
@@ -143,3 +143,5 @@ const MapFlow = ({onElementsUpdate}) => {
     </div>
   );
 }
+
+export default MapData

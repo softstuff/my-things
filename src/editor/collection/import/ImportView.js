@@ -2,7 +2,6 @@ import React, { useState } from "react"
 import { Fab, makeStyles } from "@material-ui/core"
 import AddIcon from '@material-ui/icons/Add';
 import ImportCreator from "./wizzard/ImportCreator"
-import ImportEditor from "./ConfigEditor"
 import ImportList from "./ImportList"
 import { useEditor } from "../../useEditor";
 import ConfigEditor from "./ConfigEditor";

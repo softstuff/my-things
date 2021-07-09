@@ -72,5 +72,6 @@ export function wizardReducer(state, action) {
           collectionId: action.collectionId
         };
       }
+      default: throw new Error("Unsupported action type" + action.type)
     }
   }

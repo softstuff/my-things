@@ -7,7 +7,7 @@ import StepContent from '@material-ui/core/StepContent';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import {FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField} from '@material-ui/core';
+import {FormControl,  FormLabel, RadioGroup, TextField} from '@material-ui/core';
 import Ajv from "ajv"
 import MapData from './mapper/MapData';
 import {ImportConfigContext, useImportConfig} from './useImportConfig';
@@ -47,7 +47,7 @@ function getStepContent(step, onValidation) {
   }
 }
 
-export default function  ImportWizard({}) {
+export default function  ImportWizard() {
   const classes = useStyles();
   const [activeStep, setActiveStep] = useState(0);
   const [isStepValid, setIsStepValid] = useState(0);
@@ -139,13 +139,13 @@ const DataStructure = ({onValidation, myStep}) => {
       setConfig(updatedConfig)
       console.log("Saved data structure", updatedConfig)
     }
-  },[activeStep])
+  },[activeStep, myStep, guess, config, data, setConfig])
 
   useEffect(()=>{
     const _guess = guessStructure(devDataSample)
     setGuess( _guess )
     onValidation(_guess.valid)
-  },[])
+  },[onValidation])
   
 
   return (
@@ -213,13 +213,13 @@ function validateJsonSchema(json) {
 
 const getFirstLine = (sample) => {
   // skipp comments by // or # , with or without whitespaces before
-  const first = sample.split("\n").find( row => row.trimStart().match(/^(?![#|\/]).*$/g))
+  const first = sample.split("\n").find( row => row.trimStart().match(/^(?![#|/]).*$/g))
   return first
 }
 
 
 const SetCollection = ({onValidation, myStep}) => {
-  const { schema, getPointerFor, collectionIdFor} = useSchema()
+  const { getPointerFor, collectionIdFor} = useSchema()
   const [selected, setSelected] = useState("")
   const {config, setConfig, activeStep} = useImportConfig()
 
@@ -234,7 +234,7 @@ const SetCollection = ({onValidation, myStep}) => {
       setConfig(updatedConfig)
       console.log("Saved collection path", updatedConfig, config)
     }
-  },[activeStep, getPointerFor])
+  },[activeStep, collectionIdFor, config, getPointerFor, myStep, onValidation, selected, setConfig])
 
   const handleChange = (event) => {
     setSelected(event.target.value);
@@ -251,21 +251,21 @@ const SetCollection = ({onValidation, myStep}) => {
   //   </ul>)
   // }
 
-const renderSchema = (level, path, collection) => {
-  const collectionPath = `${path}/${collection}`
-  return (
-    <li key={collectionPath}>
-     <FormControlLabel value={collectionPath} control={<Radio color="primary"/>} label={collection} />
-      {level[collection]?.items?.properties && (
-        <ul key={'sub'+collection}>
-         {Reflect.ownKeys(level[collection]?.items.properties).map(child => {    
-            if (level[collection]?.items?.properties[child]?.items) {   
-              return renderSchema(level[collection]?.items?.properties[child].items, collectionPath, child)}
-         })}
-          </ul>)
-      }
-    </li>)
-}
+// const renderSchema = (level, path, collection) => {
+//   const collectionPath = `${path}/${collection}`
+//   return (
+//     <li key={collectionPath}>
+//      <FormControlLabel value={collectionPath} control={<Radio color="primary"/>} label={collection} />
+//       {level[collection]?.items?.properties && (
+//         <ul key={'sub'+collection}>
+//          {Reflect.ownKeys(level[collection]?.items.properties).map(child => {    
+//             if (level[collection]?.items?.properties[child]?.items) {   
+//               return renderSchema(level[collection]?.items?.properties[child].items, collectionPath, child)}
+//          })}
+//           </ul>)
+//       }
+//     </li>)
+// }
 
 // const renderedSchema = renderSchemaRoot(schema, "", "", "")
 
@@ -285,10 +285,10 @@ const MapFields = ({onValidation, myStep}) => {
 
   const [inputs, setInputs] = useState([])
   const [outputs, setOutputs] = useState([])
-  const [actions, setActions] = useState([])
+  const [actions] = useState([])
   const [edges, setEdges] = useState([])
   const [rfInstance, setRfInstance] = useState(null);
-  const { schema, getPropertyFor } = useSchema()
+  const { getPropertyFor } = useSchema()
   const {config, setConfig, activeStep} = useImportConfig()
 
   useEffect(()=>{
@@ -298,7 +298,7 @@ const MapFields = ({onValidation, myStep}) => {
       setConfig(updatedConfig)
       console.log("Saved data mapping", updatedConfig)
     }
-  },[activeStep])
+  },[activeStep, config, myStep, rfInstance, setConfig])
 
   useEffect(()=>{
     console.log('get property for pointer ', config.pointer, "From config ", config)
@@ -338,7 +338,7 @@ const MapFields = ({onValidation, myStep}) => {
       
       onValidation(true)
     }
-  },[onValidation])
+  },[config, getPropertyFor, onValidation])
 
   const guessConnections = (inputNodes, argumentNodes) => {
     let connections = inputNodes.map( inputNode => {
@@ -354,7 +354,7 @@ const MapFields = ({onValidation, myStep}) => {
   }
 
   return <>
-    {myStep == activeStep && 
+    {myStep === activeStep && 
       <MapData
           inputs={inputs}
           outputs={outputs}

@@ -1,4 +1,4 @@
-import { Button, Typography } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import MapData from "../../../../imports/mapper/MapData";
 import { PayloadContext } from "../../../../imports/mapper/usePayload";
@@ -29,7 +29,7 @@ export const TestPanel = () => {
     useEffect(()=>{
       setRegister(buildRegistry(state.mapping))
       dispatch({type: "TESTED", isValid: true})
-    }, [state.mapping])
+    }, [state.mapping, dispatch])
     
     useEffect(()=>{
       const _rows = source.split("\n")
@@ -37,7 +37,7 @@ export const TestPanel = () => {
         _rows.shift()
       }
       setRows(_rows.slice(0, 20))
-    }, [source])
+    }, [source, state.mapping.inputs])
     
 
     const handleSourceChange = (e) => {

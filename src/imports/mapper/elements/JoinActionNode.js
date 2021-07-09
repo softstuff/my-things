@@ -1,5 +1,5 @@
 import {TextField} from '@material-ui/core';
-import React, {useState} from 'react';
+import React from 'react';
 import {Handle, Position} from 'react-flow-renderer';
 import { Controller, useFormContext } from 'react-hook-form';
 import { NodeSettings } from './NodeSettingsDialog';

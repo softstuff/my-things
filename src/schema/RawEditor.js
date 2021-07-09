@@ -14,7 +14,7 @@ const useRawEditorStyles = makeStyles({
     },
 });
 
-const RawEditor = ({  }) => {
+const RawEditor = () => {
     const classes = useRawEditorStyles();
     const { register, handleSubmit, setValue } = useForm()
     const { enqueueSnackbar } = useSnackbar();

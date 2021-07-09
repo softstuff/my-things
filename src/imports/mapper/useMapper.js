@@ -35,7 +35,7 @@ export const MapperProvider = (props) => {
     console.log("unmapped", unmapped, "of", inputs, "elements", elements)
     setUnmappedInputs(unmapped)
     setInputs(props.inputs)
-  }, [props.inputs, elements])
+  }, [props.inputs, elements, inputs])
 
   return (
     <MapperContext.Provider  value={{
@@ -43,7 +43,6 @@ export const MapperProvider = (props) => {
         payload, setPayload,
         locked, setLocked,
         unmappedInputs,
-        payload, setPayload,
         reactFlowInstance, setReactFlowInstance, 
         generateId}}>
       {props.children}

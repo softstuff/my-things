@@ -24,7 +24,7 @@ export const WherePanel = () => {
     }
 
     useEffect(()=>{
-      setInputs(getInputs())
+      setInputs(state.config.columns)
       console.log("State changed, state:", state)
       if (state.mapping?.elements?.length > 0) {
         console.log("Update mapping", state.mapping)
@@ -39,7 +39,7 @@ export const WherePanel = () => {
         console.log("elle", elle)
         setInitElements( elle)
       }
-    }, [])
+    }, [state, state.config.columns])
 
     
     const onElementsUpdate = elements => {

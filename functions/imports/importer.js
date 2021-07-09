@@ -128,8 +128,10 @@ exports.imports = functions
   .object()
   .onFinalize(async (object, context) => {
 
+    const file = admin.storage().bucket(object.bucket).file(object.name)
+
     try {
-      const { tenantId, wid, iid, batchId = +new Date() } = object.metadata
+      const { tenantId, wid, iid, batchId = Number(new Date()) } = object.metadata
       const workspaceDocPath = `/tenants/${tenantId}/workspaces/${wid}`
 
       const workspaceSnap = await firestore.doc(workspaceDocPath).get()
@@ -137,7 +139,7 @@ exports.imports = functions
 
       const registry = buildRegistry(importConfig.mapping)
 
-      const file = admin.storage().bucket(object.bucket).file(object.name)
+      
       const fileName = file.name.split("/")[4]
       logger.info("Uploaded filename", fileName, "tenantId", tenantId, "workspace", wid, "import config id", iid, "batchId", batchId)
 
@@ -157,9 +159,11 @@ exports.imports = functions
       const files = statRef.child("files")
       var i = 0
       var fileStatRef = files.child(encodeKey(fileName))
-
-      while (++i < 1000 && (await fileStatRef.get()).exists()) {
+      var uniqueFileNameInStats = (await fileStatRef.get()).exists()
+      while (++i < 1000 && uniqueFileNameInStats) {
         fileStatRef = files.child(`${encodeKey(fileName)}_${i}`)
+        /*eslint-disable-next-line no-await-in-loop*/
+        uniqueFileNameInStats = (await fileStatRef.get()).exists()
       }
       await fileStatRef.set({
         startedAt: admin.database.ServerValue.TIMESTAMP,
@@ -168,7 +172,7 @@ exports.imports = functions
 
       const maxBatchSize = 500;
       let importedFromFile = 0;
-      const started = +new Date()
+      const started = Number(new Date())
       let batchSize = 0;
       let batch = firestore.batch();
       const collection = "Person"
@@ -192,12 +196,12 @@ exports.imports = functions
               batch.set(colRef.doc(result.key), result.attributes)
               importedFromFile++
 
-              const time = +new Date() - started
+              const time = Number(new Date()) - started
 
               if (++batchSize >= maxBatchSize) {
 
                 logger.debug("Do batch commit")
-                Promise.all([
+                return Promise.all([
                   statRef.update({ "imported": admin.database.ServerValue.increment(batchSize) }),
                   fileStatRef.update({
                     "imported": admin.database.ServerValue.increment(batchSize),
@@ -210,13 +214,21 @@ exports.imports = functions
                       batchSize = 0;
 
                       logger.debug("Batch commit is done, pipe call, ", result.writeTime)
+                      return
+                    })
+                    .catch(error => {
+                      next(error, data)
                     })
                 ])
                   .then(() => {
-                    next(null, data)
+                    return next(null, data)
                   })
+                  .catch(error => {
+                    next(error, data)
+                  })
+                  
               } else {
-                next(null, data)
+                return next(null, data)
               }
             },
             final(next) {
@@ -232,10 +244,18 @@ exports.imports = functions
                   batch.commit()
                     .then(() => {
                       logger.debug("Batch commit is done, pipe is done")
+                      return
                     })
-                ]).then(() => {
+                    .catch(error => {
+                      next(error)
+                    })
+                ])
+                .then(() => {
                   logger.debug("final next")
-                  next()
+                  return next()
+                })
+                .catch(error => {
+                  next(error)
                 })
 
 
@@ -243,12 +263,14 @@ exports.imports = functions
                 logger.debug("Pipe is done")
                 fileStatRef.update({
                   "endedAt": admin.database.ServerValue.TIMESTAMP
-                }
-                )
-                  .then(() => {
-                    logger.debug("final next")
-                    next()
-                  })
+                })
+                .then(() => {
+                  logger.debug("final next")
+                  return next()
+                })
+                .catch(error => {
+                  next(error)
+                })
               }
             },
           }
@@ -269,14 +291,15 @@ exports.imports = functions
           })
       })
 
-      return parsePromise
-        .then(file => {
-          logger.debug("Deleting file after proccess")
-          return file.delete({ ignoreNotFound: true })
-        })
-        .then(() => logger.debug("Exit"))
-        .catch(error => logger.debug("Error", error))
+      await parsePromise
+      logger.debug("Import is done")
+      
     } catch (e) {
       logger.error("Error", e)
+      
+    } finally {
+      await file.delete({ ignoreNotFound: true })
+      logger.debug("Uploade file was deleted successful - Exit")
     }
+
   })

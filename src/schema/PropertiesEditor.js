@@ -76,14 +76,14 @@ const PropertiesEditor = ({ pointer, subSchema }) => {
                 enqueueSnackbar("Failed to load usage info")
             })
 
-    }, [pointer, collectionIdFor, enqueueSnackbar])
+    }, [pointer, collectionIdFor, enqueueSnackbar, usageOf])
 
     return (
         <>
             <Typography variant='h2'>{title}</Typography>
             <Typography variant='body1'>{info}</Typography>
             <Typography variant='h3'>Attributes:</Typography>
-            {(!properties || properties.length == 0) && (<p>No arguments is added yet</p>)}
+            {(!properties || properties.length === 0) && (<p>No arguments is added yet</p>)}
 
             {properties && properties
                 .filter(prop => prop.type !== 'array')
@@ -358,16 +358,16 @@ const AddPropertyDialog = ({ title, pointer, property, open, setOpen }) => {
 
     const methods = useForm();
     const { handleSubmit, reset } = methods
-    const { } = useDataConverter()
+    // const { } = useDataConverter()
     const { addProperty, deleteProperty } = useSchema()
     const confirm = useConfirm();
-    const isNew = property == undefined
+    const isNew = property === undefined
 
 
     const handleAdd = property => {
         console.log("Add ", property, pointer)
         const { key, isRequired } = property
-        const required = isRequired == 'yupp'
+        const required = isRequired === 'yupp'
         delete property.key
         delete property.isRequired
 

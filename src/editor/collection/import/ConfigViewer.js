@@ -1,14 +1,10 @@
-import { makeStyles } from "@material-ui/core"
-import { useWorkspace } from "../../../components/workspace/useWorkspace"
+import { Button } from "@material-ui/core"
 import MapData from "../../../imports/mapper/MapData"
 
-const useStyles = makeStyles(() => ({
-    
-}))
 const ConfigViewer = ({importer:{config}, onAbort}) => {
     return (
         <>
-            <a onClick={onAbort}>Back to list</a>
+            <Button onClick={onAbort}>Back to list</Button>
             <p>Import: {config.name || '(unnamed)'} - {config.type}</p>
            {config.type === "CSV" && (<CsvViewer config={config} />)} 
             

@@ -1,7 +1,7 @@
-import { Button, Dialog, DialogContent, DialogTitle, DialogActions, makeStyles, TextField, Typography } from "@material-ui/core";
+import { Button, Dialog, DialogContent, DialogTitle, DialogActions, makeStyles, Typography } from "@material-ui/core";
 import SettingsIcon from '@material-ui/icons/Settings';
 import { useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { useMapper } from "../useMapper";
 
 
@@ -22,7 +22,6 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 export const NodeSettingsDialog = ({ title, open, onCancel, onSave, children}) => {
-    const classes = useStyles();
     const methods = useForm()
   
     const handleSave = (data) => {

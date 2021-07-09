@@ -72,10 +72,10 @@ const SchemaView = () => {
         console.log('got prop ', selectedPointer, propertie)
         setSubSchema(propertie)
 
-    }, [schema, selectedPointer])
+    }, [getPropertyFor, schema, selectedPointer])
 
     const handleAddSubClick = (pointer) => {
-        console.log('Do add sub  ', pointer)
+        console.log('Do add sub  ', pointer, createCollection)
         setSelectedPointer(pointer)
         setCreateCollection(true)
         setShowDetail('new collection')
@@ -266,7 +266,7 @@ const TreePanel = ({currentSelected, onAddSub, onDelete, onSelect}) => {
         }
 
         setSelected([currentSelected])
-    }, [currentSelected])
+    }, [currentSelected, expanded])
 
     console.log('expanded', expanded)
     console.log('selected', selected)
@@ -274,7 +274,7 @@ const TreePanel = ({currentSelected, onAddSub, onDelete, onSelect}) => {
 
     const renderTree = (schema, parentPointer) => 
         schemaPropsToList(schema)
-        .filter(prop=>prop.type == 'array')
+        .filter(prop=>prop.type === 'array')
         .map(prop => {
             const pointer = `${parentPointer}properties/${prop.key}`
             //  onClick={()=>onEdit(prop.key, pointer)}
@@ -288,7 +288,8 @@ const TreePanel = ({currentSelected, onAddSub, onDelete, onSelect}) => {
         const tree = renderTree(schema, '/')
         setSchemaTreeNodes(tree)
         console.log("print tree from schema", schema)
-    },[schema])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[ schema])
 
     return (
         <TreeView
@@ -312,15 +313,15 @@ function StyledTreeItem(props) {
     const classes = useTreeItemStyles();
     const { labelText, labelIcon: LabelIcon, labelInfo, color, bgColor, onAddSub, onDelete, onSelect, ...other } = props;
 
-    const handleAddClick = e => {
-        onAddSub(other.nodeId)
-        e.stopPropagation()
-    }
+    // const handleAddClick = e => {
+    //     onAddSub(other.nodeId)
+    //     e.stopPropagation()
+    // }
 
-    const handleDeleteClick = e => {
-        onDelete(labelText, other.nodeId)
-        e.stopPropagation()
-    }
+    // const handleDeleteClick = e => {
+    //     onDelete(labelText, other.nodeId)
+    //     e.stopPropagation()
+    // }
 
     const handleItemClick = e => {
         onSelect(labelText, other.nodeId)

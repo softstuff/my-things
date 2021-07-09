@@ -1,5 +1,5 @@
-import { Card, CardContent, Checkbox, Radio, FormControlLabel, makeStyles, Typography, withStyles, RadioGroup } from "@material-ui/core";
-import { green } from "@material-ui/core/colors";
+import { Card, CardContent, Radio, FormControlLabel, makeStyles, Typography, RadioGroup } from "@material-ui/core";
+
 import { useEffect } from "react";
 import { useWizzard } from "./useWizzard";
 
@@ -19,7 +19,7 @@ export function WhatPanel() {
 
   useEffect(()=>{
     dispatch({type: "SET_TYPE", value: state.type, isValid: state.type !== null})
-  },[])
+  },[state.type, dispatch])
 
   const handleChangeType = event => {
     console.log("handleChangeType ", event.target.name, event.target.value, event.target.checked)

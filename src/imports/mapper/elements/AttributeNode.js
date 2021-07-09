@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {makeStyles} from '@material-ui/core/styles';
 import {Handle, Position} from 'react-flow-renderer';
 import {useEdge} from './useEdge';
 import {Box, TextField, Typography} from '@material-ui/core';
@@ -9,26 +8,8 @@ import isEmpty from 'lodash/isEmpty'
 import { useMapper } from '../useMapper';
 
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    border: '1px solid',
-    padding: theme.spacing(1),
-    backgroundColor: theme.palette.background.paper,
-  },
-  header: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: "space-between"
-  },
-  settingsItem: {
-    flexGrow: 0
-  }
-}));
-
-
 const AttributeNode = (props) => {
   const {onlySingleEdge} = useEdge()
-  const classes = useStyles();
   const [error, setError] = useState()
   const {elements, setElements} = useMapper()
   
@@ -50,7 +31,7 @@ const AttributeNode = (props) => {
       )
     }
 
-  }, [props.data])
+  }, [elements, props, props.data, setElements])
 
   return (
     <>

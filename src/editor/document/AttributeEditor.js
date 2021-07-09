@@ -257,7 +257,7 @@ const AttributeEditor = (props) => {
         append(fieldArray)
       }
   
-    }, [fieldName, defaultValue]);
+    }, [fieldName, defaultValue, append]);
   
     const addNew = (e) => {
       append("")
@@ -303,7 +303,7 @@ const AttributeEditor = (props) => {
     useEffect(()=>{
       setValue(renderField.name, null)
       console.log("NullEditor renderField", renderField.value)
-    },[renderField])
+    },[renderField, setValue])
 
     return null
   }
@@ -320,7 +320,7 @@ const AttributeEditor = (props) => {
     },[type])
 
     useEffect(()=>{
-      console.log("ArrayItem type", type, value)
+      console.log("ArrayItem value", value)
       if(value) {
         setType(whatType(value))
       }

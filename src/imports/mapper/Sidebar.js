@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-export default () => {
+const Sidebar = () => {
 
   const classes = useStyles()
 
@@ -40,7 +40,7 @@ export default () => {
             {input}
           </div>
         ))}
-        {unmappedInputs.length == 0 && (<div>All inputs is mapped</div>)}
+        {unmappedInputs.length === 0 && (<div>All inputs is mapped</div>)}
       </p>
       <p>
         <div className={classes.node} onDragStart={(event) => onDragStart(event, { type:'collectionKey'})} draggable>
@@ -67,3 +67,5 @@ export default () => {
     </aside>
   );
 };
+
+export default Sidebar

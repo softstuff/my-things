@@ -57,6 +57,3 @@ const AddSchemaCollectionForm = ({ forbiddenNames, pointer, onNewCollection }) =
 }
 
 export default AddSchemaCollectionForm
-
-{/* "minItems": 2,
-  "maxItems": 3 */}

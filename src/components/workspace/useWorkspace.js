@@ -61,10 +61,11 @@ export const WorkspaceProvider = (props) => {
         setLoading(true)
         loadWorkspace(tenantId, wid,
             loaded => {
-                setWorkspace(loaded)
-                // setSchema(loaded.schema)
-                setLoading(false)
-                console.log('Loaded workspace', wid, loaded)
+                if(mounted) {
+                    setWorkspace(loaded)
+                    setLoading(false)
+                    console.log('Loaded workspace', wid, loaded)
+                }
             },
             error => {
                 console.log(`Failed to load workspace ${wid}`, error)

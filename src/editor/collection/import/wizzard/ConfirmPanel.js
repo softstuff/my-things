@@ -1,6 +1,5 @@
-import { Box, Button, makeStyles, TextField } from "@material-ui/core";
+import { Box, makeStyles, TextField } from "@material-ui/core";
 import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
 import { useEditor } from "../../../useEditor";
 import { useWizzard } from "./useWizzard";
 
@@ -30,7 +29,7 @@ export const ConfirmPanel = () => {
 
     useEffect(()=>{
       dispatch({type: "CONFIRMED", name, collectionId,  isValid: true})
-    },[name])
+    },[collectionId, dispatch, name])
     
     const handleNameChange = e => {
       setName( e.target.value)

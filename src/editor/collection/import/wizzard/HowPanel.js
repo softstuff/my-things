@@ -11,7 +11,7 @@ import {
   TextField,
 } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useWizzard } from "./useWizzard";
 import isEmpty from "lodash/isEmpty";
 
@@ -64,7 +64,7 @@ const CsvConfig = () => {
       };
       dispatch({ type: "SET_CONFIG", values, isValid: true });
     }
-  }, [state.config]);
+  }, [state.config, dispatch]);
 
   const handleChangeHeaderRow = (e) => {
     const headerRow = e.target.value;

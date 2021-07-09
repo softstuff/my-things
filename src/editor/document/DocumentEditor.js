@@ -186,10 +186,10 @@ const EditDialog = ({
   })
 
   useEffect(() => {
-    console.log("open EditDialog with ", open, field, value, type, pointer)
+    console.log("open EditDialog with ", field, value, type, pointer)
     methods.reset()
     console.log("Done")
-  }, [field, value, type, pointer])
+  }, [field, value, type, pointer, methods])
 
   const handleClose = () => {
     console.log("Close edit, isDirty", methods.formState.isDirty)
@@ -318,7 +318,7 @@ const ArrayListItem = ({selected, pointer, field, type, value, onEdit, onDelete,
 }
 
 export const whatType = (value) => {
-  if (value == null || value == undefined) {
+  if (value == null || value === undefined) {
     return "null"
   } else if (Array.isArray(value)) {
     return "array"

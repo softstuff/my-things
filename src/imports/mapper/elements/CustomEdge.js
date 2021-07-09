@@ -21,7 +21,7 @@ export default function CustomEdge({
   const edgePath = getBezierPath({ sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition });
   const markerEnd = getMarkerEnd(arrowHeadType, markerEndId);
   const content = usePayload()
-  const [centerX, centerY, offsetX, offsetY] = getEdgeCenter({ sourceX, sourceY, targetX, targetY })
+  const [centerX, centerY] = getEdgeCenter({ sourceX, sourceY, targetX, targetY })
 
   useEffect(()=>{
     if(content?.payload){
@@ -45,9 +45,3 @@ export default function CustomEdge({
     </>
   );
 }
-
-{/* <text>
-        <textPath href={`#${id}`} style={{ fontSize: '12px' }} startOffset="50%" textAnchor="middle">
-          {data.text}
-        </textPath>
-      </text> */}

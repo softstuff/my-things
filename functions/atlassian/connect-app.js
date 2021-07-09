@@ -158,16 +158,16 @@ const handleTokenExchange = async (req, res) => {
 
         logger.debug('Create a custom token with claims:', additionalClaims)
         const customToken = await auth.createCustomToken(accountId, additionalClaims)
-        return res.json({
+        res.json({
             customToken: customToken,
         })
     } catch (error) {
         if (error instanceof atlassianConn.AuthError) {
             logger.warn(error)
-            return res.sendStatus(401)
+            res.sendStatus(401)
         } else {
             logger.error(error)
-            return res.sendStatus(500)
+            res.sendStatus(500)
         }
     }
 
