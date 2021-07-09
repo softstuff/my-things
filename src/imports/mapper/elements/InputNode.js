@@ -24,7 +24,8 @@ const InputNode = ({data}) => {
 
   return (
     <div className={classes.node}>
-      <TextField label={data.label} variant="outlined" value={testData} onChange={e=>setTestData(e.target.value)} size="small" margin="dense" />
+      {data.label}
+      {/* <TextField label={data.label} variant="outlined" value={testData} onChange={e=>setTestData(e.target.value)} size="small" margin="dense" /> */}
 
       <Handle type="source" position={Position.Right} isValidConnection={onlySingleEdge}  />
     </div>

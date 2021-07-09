@@ -1,0 +1,9 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /imports/{tenantId}/{allPaths=**} {
+      allow create: if request.resource.metadata.uid == request.auth.uid && tenantId  == request.auth.token.myThings.tenantId && request.auth.token.myThings.admin == true
+      allow list, get, update, delete: if false
+    }
+  }
+}

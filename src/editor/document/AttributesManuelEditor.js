@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
 
 const AttributesManualEditor = ({onSaveThing}) => {
     const classes = useStyles();
-    const {documentId, document, createDocument} = useEditor()
+    const { document, createDocument} = useEditor()
     const { register, handleSubmit, control} = useForm()
     const { register: registerAddAttribute, handleSubmit: handleSubmitAddAttribute, reset: resetAddAttribute, formState: { errors}} = useForm()
     const { fields, append, remove } = useFieldArray({

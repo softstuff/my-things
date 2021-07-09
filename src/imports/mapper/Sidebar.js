@@ -1,5 +1,6 @@
 import {makeStyles} from '@material-ui/core';
 import React from 'react';
+import { useMapper } from './useMapper';
 
 const useStyles = makeStyles((theme) => ({
   node: {
@@ -16,7 +17,10 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default () => {
+
   const classes = useStyles()
+
+  const {unmappedInputs} = useMapper()
 
   const onDragStart = (event, node) => {
     const json = JSON.stringify(node)
@@ -24,10 +28,33 @@ export default () => {
     event.dataTransfer.setData('application/reactflow', json);
     event.dataTransfer.effectAllowed = 'move';
   };
+
   return (
     <aside>
-      <div className="description">You can drag these nodes to the pane on the right.</div>
-      <div className={classes.node} onDragStart={(event) => onDragStart(event, { type: 'join', data: {joiner: "-"}})} draggable>
+      
+
+      <p>
+        Import input:
+        {unmappedInputs.map((input,index) => (
+          <div key={index} className={classes.node} onDragStart={(event) => onDragStart(event, { type:'input', data: {label: input}})} draggable>
+            {input}
+          </div>
+        ))}
+        {unmappedInputs.length == 0 && (<div>All inputs is mapped</div>)}
+      </p>
+      <p>
+        <div className={classes.node} onDragStart={(event) => onDragStart(event, { type:'collectionKey'})} draggable>
+          Collection key
+        </div>
+      </p>
+      <p>
+        Result attribute:
+        <div className={classes.node} onDragStart={(event) => onDragStart(event, { type:'attribute', data: {label: ""}})} draggable>
+          Attribute
+        </div>
+      </p>
+      <p> Actions:
+      <div className={classes.node} onDragStart={(event) => onDragStart(event, { type: 'join', data: {separator: "-"}})} draggable>
         Join input
       </div>
       <div className={classes.node} onDragStart={(event) => onDragStart(event,  { type:'upper'})} draggable>
@@ -36,6 +63,7 @@ export default () => {
       <div className={classes.node} onDragStart={(event) => onDragStart(event, { type:'lower'})} draggable>
         To lower case
       </div>
+      </p>
     </aside>
   );
 };

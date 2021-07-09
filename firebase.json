@@ -1,4 +1,7 @@
 {
+  "database": {
+    "rules": "database.rules.json"
+  },
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
@@ -20,12 +23,12 @@
       {
         "source": "/api/**",
         "function": "api"
-      },
-      {
-        "source": "**",
-        "destination": "/index.html"
       }
     ]
+  },
+  "storage": {
+    "rules": "storage.rules",
+    "destination": "/index.html"
   },
   "emulators": {
     "auth": {
@@ -37,8 +40,14 @@
     "firestore": {
       "port": 8080
     },
+    "database": {
+      "port": 9000
+    },
     "hosting": {
       "port": 5000
+    },
+    "storage": {
+      "port": 9199
     },
     "ui": {
       "enabled": true

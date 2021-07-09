@@ -1,6 +1,6 @@
 $actionColor: rgb(68, 48, 73);
-$argumentKeyColor: rgb(109, 116, 49);
-$argumentColor: rgb(44, 100, 39);
+$attributeKeyColor: rgb(109, 116, 49);
+$attributeColor: rgb(44, 100, 39);
 
 // All nodes
 .react-flow__handle {
@@ -16,9 +16,9 @@ $argumentColor: rgb(44, 100, 39);
   right: -8px;
 }
 
-// Output arguments
-.react-flow__node-argument {
-  border: 1px solid $argumentColor;
+// Output attributes
+.react-flow__node-attribute {
+  border: 1px solid $attributeColor;
   padding: 10px;
   border-radius: 3px;
   width: 150px;
@@ -28,21 +28,21 @@ $argumentColor: rgb(44, 100, 39);
   background: #fff;
 }
 
-.react-flow__node-argument .react-flow__handle {
-  background: $argumentColor;
+.react-flow__node-attribute .react-flow__handle {
+  background: $attributeColor;
 }
 
-.react-flow__node-argument.selected,
-.react-flow__node-argument.selected:hover {
-  box-shadow: 0 0 0 0.5px $argumentColor;
+.react-flow__node-attribute.selected,
+.react-flow__node-attribute.selected:hover {
+  box-shadow: 0 0 0 0.5px $attributeColor;
 }
 
-.react-flow__node-argument.selectable:hover {
+.react-flow__node-attribute.selectable:hover {
   box-shadow: 0 1px 4px 1px rgba(black,  0.08);
 }
 
-.react-flow__node-argumentKey {
-  border: 1px solid $argumentKeyColor;
+.react-flow__node-collectionKey {
+  border: 1px solid $attributeKeyColor;
   padding: 10px;
   border-radius: 3px;
   width: 150px;
@@ -52,16 +52,16 @@ $argumentColor: rgb(44, 100, 39);
   background: #fff;
 }
 
-.react-flow__node-argumentKey .react-flow__handle {
-  background: $argumentKeyColor;
+.react-flow__node-collectionKey .react-flow__handle {
+  background: $attributeKeyColor;
 }
 
-.react-flow__node-argumentKey.selected,
-.react-flow__node-argumentKey.selected:hover {
-  box-shadow: 0 0 0 0.5px $argumentKeyColor;
+.react-flow__node-collectionKey.selected,
+.react-flow__node-collectionKey.selected:hover {
+  box-shadow: 0 0 0 0.5px $attributeKeyColor;
 }
 
-.react-flow__node-argumentKey.selectable:hover {
+.react-flow__node-collectionKey.selectable:hover {
   box-shadow: 0 1px 4px 1px rgba(black,  0.08);
 }
 
@@ -72,6 +72,7 @@ $argumentColor: rgb(44, 100, 39);
   border: 1px solid $actionColor;
   padding: 10px;
   background: #fff;
+  min-width: 6rem;
 }
 
 .react-flow__node-join  .react-flow__handle, 

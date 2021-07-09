@@ -9,7 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import {FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField} from '@material-ui/core';
 import Ajv from "ajv"
-import MapData from './MapData';
+import MapData from './mapper/MapData';
 import {ImportConfigContext, useImportConfig} from './useImportConfig';
 import {useSchema} from '../schema/useSchema';
 
@@ -157,7 +157,7 @@ const DataStructure = ({onValidation, myStep}) => {
         {guess && (<>
           <p>Guess is: {guess.text}</p>
           <p>Content is: {guess.valid ? 'valid' : 'not valid'}</p>
-          {guess.delimiter && <p>delimiter is {guess.delimiter}</p>}
+          {guess.separator && <p>separator is {guess.separator}</p>}
           {guess.error && <p>Error: {guess.error}</p>}
         </>)}
 
@@ -190,9 +190,9 @@ const guessStructure = (sample) => {
       }
 
     } else if (firstRow.match(/[,|;|/t]/)) { 
-      guess.delimiter = firstRow.match(/[,|;|/t]/)[0]
-      guess.columns = firstRow.split(guess.delimiter)
-      guess.text = `My guess is that this is a CSV file with delimiter ${guess.delimiter} with ${guess.columns.length} columns`
+      guess.separator = firstRow.match(/[,|;|/t]/)[0]
+      guess.columns = firstRow.split(guess.separator)
+      guess.text = `My guess is that this is a CSV file with separator ${guess.separator} with ${guess.columns.length} columns`
       guess.valid = true
       guess.csv = true
       
@@ -241,15 +241,15 @@ const SetCollection = ({onValidation, myStep}) => {
     onValidation(true)
   };
 
-  const renderSchemaRoot = (schema) => {
-    return (<ul>
-      {Reflect.ownKeys(schema.properties).map(collection => {
-        if(schema.properties[collection]?.items) {
-          return renderSchema(schema.properties, '', collection, `properties/${collection}`)
-        }
-      })}
-    </ul>)
-  }
+  // const renderSchemaRoot = (schema) => {
+  //   return (<ul>
+  //     {Reflect.ownKeys(schema.properties).map(collection => {
+  //       if(schema.properties[collection]?.items) {
+  //         return renderSchema(schema.properties, '', collection, `properties/${collection}`)
+  //       }
+  //     })}
+  //   </ul>)
+  // }
 
 const renderSchema = (level, path, collection) => {
   const collectionPath = `${path}/${collection}`
@@ -267,7 +267,7 @@ const renderSchema = (level, path, collection) => {
     </li>)
 }
 
-const renderedSchema = renderSchemaRoot(schema, "", "", "")
+// const renderedSchema = renderSchemaRoot(schema, "", "", "")
 
   return (<div>
 
@@ -275,7 +275,7 @@ const renderedSchema = renderSchemaRoot(schema, "", "", "")
       <FormControl component="fieldset">
       <FormLabel component="legend">Collection to import</FormLabel>
       <RadioGroup aria-label="collection" name="selectedCollection" value={selected} onChange={handleChange}>
-        {renderedSchema}
+        {/* {renderedSchema} */}
         </RadioGroup>
     </FormControl>
     </div>)

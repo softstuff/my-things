@@ -22,7 +22,7 @@ import DialogActions from "@material-ui/core/DialogActions"
 import DialogContent from "@material-ui/core/DialogContent"
 import DialogTitle from "@material-ui/core/DialogTitle"
 import AttributeEditor from "./AttributeEditor"
-import { ExpandLess, ExpandMore, StarBorder } from "@material-ui/icons"
+import { ExpandLess, ExpandMore } from "@material-ui/icons"
 
 const useStyles = makeStyles((theme) => ({
   attribute: {
@@ -63,10 +63,8 @@ const useStyles = makeStyles((theme) => ({
 }
 }))
 
-export default () => {
-  const classes = useStyles()
-  const { tenantId, wid } = useWorkspace()
-  const { collectionId, documentId, document, setDocument } = useEditor()
+const DocumentEditor = () => {
+  const { document } = useEditor()
 
   useEffect(() => {
     console.log("Edit ", document, Object.getOwnPropertyNames(document))
@@ -78,7 +76,7 @@ export default () => {
 const AttributeViewer = ({ pointer = "" }) => {
   const classes = useStyles()
   const { tenantId, wid } = useWorkspace()
-  const { collectionId, documentId, document, setDocument } = useEditor()
+  const { collectionId, documentId, document } = useEditor()
   const [fields, setFields] = useState([])
   const [openEdit, setOpenEdit] = useState(false)
   const [editAttribute, setEditAttribute] = useState(false)
@@ -342,3 +340,5 @@ const DisplayType = ({type}) => {
 
   return `oops ${JSON.stringify(type)}`
 }
+
+export default DocumentEditor

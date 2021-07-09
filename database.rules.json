@@ -1,0 +1,9 @@
+{
+  /* Visit https://firebase.google.com/docs/database/security to learn more about security rules. */
+  "rules": {
+    "$tenantId": {
+      ".read": "auth.uid != null && $tenantId  === auth.token.myThings.tenantId && auth.token.myThings.admin == true",
+      ".write": false
+    }
+  }
+}

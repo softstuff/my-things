@@ -1,8 +1,8 @@
 import {useSnackbar} from 'notistack';
-import React, {useCallback, useEffect, useState} from 'react'
-import {useWorkspace} from '../components/workspace/useWorkspace';
-import {useUser} from '../components/user/useUser'
-import {listDocuments} from '../firebase/storage';
+import React, { useEffect, useState} from 'react'
+import {useWorkspace} from '../../components/workspace/useWorkspace';
+import {useUser} from '../../components/user/useUser'
+import {listDocuments} from '../../firebase/storage';
 import {makeStyles} from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -11,7 +11,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import {useEditor} from './useEditor';
+import {useEditor} from '../useEditor';
 
 const useStyles = makeStyles({
     table: {

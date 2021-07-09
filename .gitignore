@@ -31,3 +31,5 @@ emulator-snapshot/
 
 tmp/*
 .idea/
+
+my-things*.json

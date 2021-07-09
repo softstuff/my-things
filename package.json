@@ -15,11 +15,13 @@
     "flow-bin": "^0.141.0",
     "json-pointer": "^0.6.1",
     "material-ui-confirm": "^2.1.2",
+    "nanoid": "^3.1.23",
     "node-sass": "4.14.1",
     "notistack": "^1.0.3",
     "query-string": "^6.13.7",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-dropzone": "^11.3.2",
     "react-flow-renderer": "^9.1.0",
     "react-hook-form": "^7.6.10",
     "react-router-dom": "^5.2.0",
@@ -36,7 +38,7 @@
     "deploy:hosting": "firebase deploy --only hosting",
     "deploy": "firebase deploy",
     "emulator": "firebase emulators:start --import emulator-snapshot --export-on-exit emulator-snapshot",
-    "emulator:debgger": "firebase emulators:start --import emulator-snapshot --export-on-exit emulator-snapshot --inspect-functions 9229",
+    "emulator:debugger": "firebase emulators:start --import emulator-snapshot --export-on-exit emulator-snapshot --inspect-functions 9229",
     "emulator:fresh": "firebase emulators:start --export-on-exit emulator-snapshot"
   },
   "eslintConfig": {

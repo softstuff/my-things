@@ -1,7 +1,5 @@
 import {Box, Card, CardHeader, Fab, makeStyles} from '@material-ui/core';
 import React, {useState} from 'react'
-import {useEditor} from './useEditor';
-import {useWorkspace} from '../components/workspace/useWorkspace';
 import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -10,8 +8,10 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import {addNewCollection} from '../firebase/storage'
 import {useForm} from 'react-hook-form';
+import {useEditor} from '../useEditor';
+import {useWorkspace} from '../../components/workspace/useWorkspace';
+import { addNewCollection } from '../../firebase/storage';
 
 const useStyles = makeStyles((theme) => ({
     card: {

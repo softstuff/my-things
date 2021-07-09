@@ -2,11 +2,13 @@ const functions = require('firebase-functions');
 // The Firebase Admin SDK to access Cloud Firestore.
 const admin = require('firebase-admin');
 
-
-admin.initializeApp({ projectId: "my-things-60357" });
+admin.initializeApp();
+// admin.initializeApp({ projectId: "my-things-60357" });
 
 const firestore = admin.firestore()
 const auth = admin.auth()
+const storage = admin.storage()
+const database = admin.database()
 const logger = functions.logger
 
 //logger.debug(functions.config())
@@ -52,6 +54,8 @@ module.exports = {
     admin,
     firestore,
     auth,
+    storage,
+    database,
     logger,
     checkIfAuthenticated
 }

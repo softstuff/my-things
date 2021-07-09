@@ -87,3 +87,23 @@ In IAM admin > service account menu select {project}@appspot.gserviceaccount.com
 Permissions > Grant access
 New member > {project}@appspot.gserviceaccount.com
 Add another role > Service Accounts > Service Account Token Creator
+
+
+
+#TODO
+Bra ställe att hitta React komponenter
+OpenBase
+https://openbase.com/categories/js/best-react-drag-and-drop-libraries?orderBy=RECOMMENDED&
+
+data grid komponent: 
+    http://uikernel.io/
+    https://bvaughn.github.io/react-virtualized/#/components/Grid
+
+diagram o dashbord
+    GoodData. https://gdui-examples.herokuapp.com/time-over-time-comparison
+
+spinners https://www.davidhu.io/react-spinners/
+
+on boarding: intro.js https://github.com/usablica/intro.js
+
+https://openbase.com/categories/js/best-react-onboarding-tour-libraries?orderBy=RECOMMENDED&minStarRating=1&minWeeklyDownloads=10000&

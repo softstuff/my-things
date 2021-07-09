@@ -1,14 +1,13 @@
 import React, { useState } from 'react'
-import {AppBar, Box, Fab, Grid, makeStyles, Paper, Tab, Tabs, Typography, useTheme} from '@material-ui/core'
+import {AppBar, Box, Fab, makeStyles, Tab, Tabs, useTheme} from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add';
-import {useSnackbar} from 'notistack';
-import DocumentList from '../editor/DocumentList';
-import {useEditor} from './useEditor';
+import DocumentList from './DocumentList';
+import {useEditor} from '../useEditor';
 import CollectionInfo from "./CollectionInfo";
-import AddDocumentDialog from './document/AddDocumentDialog';
-import { createThing } from '../firebase/storage';
-import { useSession } from '../firebase/UserProvider';
-import { useWorkspace } from '../components/workspace/useWorkspace';
+import AddDocumentDialog from '../document/AddDocumentDialog';
+import { createThing } from '../../firebase/storage';
+import { useWorkspace } from '../../components/workspace/useWorkspace';
+import ImportView from './import/ImportView';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -43,12 +42,11 @@ const useStyles = makeStyles((theme) => ({
 const CollectionView = () => {
     const classes = useStyles();
     const theme = useTheme();
-    const {enqueueSnackbar} = useSnackbar();
     const {tenantId, wid} = useWorkspace()
-    const {collectionId} = useEditor()
+    const {collectionId, editing} = useEditor()
     const [showAddNewDocumentDialog, setShowAddNewDocumentDialog] = useState(false)
 
-    const [tab, setTab] = React.useState(0);
+    const [tab, setTab] = useState(2);
 
     // useEffect(() => {
 
@@ -123,9 +121,10 @@ const CollectionView = () => {
                 <TabPanel value={tab} index={0} dir={theme.direction}>
                     <DocumentList/>
 
+                    {editing && (
                     <Fab color="primary" aria-label="add" className={classes.fab} onClick={handleOpenAddDocumentDialog}>
                         <AddIcon/>
-                    </Fab>
+                    </Fab>)}
                     
                     <AddDocumentDialog
                         open={showAddNewDocumentDialog}
@@ -147,19 +146,17 @@ const CollectionView = () => {
                                 editing={editing} /> */}
                 {/* </TabPanel> */}
                 <TabPanel value={tab} index={2} dir={theme.direction}>
-                    Import
-                    <Fab color="primary" aria-label="add" className={classes.fab}>
-                        <AddIcon/>
-                    </Fab>
+                    <ImportView />
                 </TabPanel>
                 <TabPanel value={tab} index={3} dir={theme.direction}>
                     Export
                 </TabPanel>
                 <TabPanel value={tab} index={4} dir={theme.direction}>
                     Automation
+                    {editing && (
                     <Fab color="primary" aria-label="add" className={classes.fab}>
                         <AddIcon/>
-                    </Fab>
+                    </Fab>)}
                 </TabPanel>
             </div>
 

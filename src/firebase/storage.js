@@ -1,11 +1,9 @@
 //@flow
 import {firestore} from "./config"
 import firebase from 'firebase/app'
+import { nanoid } from "nanoid"
 
 const metaDocumentName = "_meta_"
-
-const metaTag = "meta"
-
 
 export const subscribeDocument = (tenantId, wid, collectionId, documentId, onLoaded, onError) => {
     const path = `${getWorkspacePath(tenantId, wid)}/${collectionId}/${documentId}`
@@ -78,9 +76,11 @@ export const createThing = async (tenantId, wid, collectionId, documentId, thing
 
     console.log('createThing', path, documentId, thing)
     if (documentId) {
-        return await firestore.collection(path).doc(documentId).set(thing)
+        const result = await firestore.collection(path).doc(documentId).set(thing)
+        return result.id
     } else {
-        return await firestore.collection(path).add(thing)
+        const result = await firestore.collection(path).add(thing)
+        return result.id
     }
 }
 
@@ -186,6 +186,23 @@ export const updateWorkspace = async (tenantId, wid, description) => {
     console.log('updateWorkspace ', wid)
 }
 
+export const deleteWorkspaceField = (tenantId, wid, field) => {
+    const path = `${getWorkspacePath(tenantId, wid)}`
+    
+    console.log('deleteWorkspaceField', path, field)
+    const docRef = firestore.doc(path)
+    return docRef.update({
+            [field]: firebase.firestore.FieldValue.delete()
+        })
+        .then(() => {
+            console.log("Document successfully updated!");
+        })
+        .catch((error) => {
+            // The document probably doesn't exist.
+            console.error("Error updating document: ", error);
+        })
+}
+
 export const removeWorkspace = async (tenantId, wid) => {
     
     const ref = await firestore.doc(`tenants/${tenantId}/workspaces/${wid}`)
@@ -210,6 +227,15 @@ export const removeWorkspace = async (tenantId, wid) => {
 //         }, error => onError(error)
 //     )
 // }
+
+export const addCollectionImport = async (tenantId, wid, importConfig) => {
+    const configId = nanoid(4)
+    const pointer = `imports.${configId}`
+    await firestore.doc(`tenants/${tenantId}/workspaces/${wid}`).update({
+        [pointer]: importConfig
+    })
+    return configId
+}
 
 export const subscribeOnSchema = async (tenantId, wid, onLoaded, onError) => {
 

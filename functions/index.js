@@ -27,9 +27,11 @@ const app = express()
 
 exports.api = functions.https.onRequest(app)
 
-exports.onCreateLevel1 = metaController.onCreateLevel1
-exports.onUpdateLevel1 = metaController.onUpdateLevel1
-exports.onDeleteLevel1 = metaController.onDeleteLevel1
+exports.imports = require('./imports/importer')
+
+// exports.onCreateLevel1 = metaController.onCreateLevel1
+// exports.onUpdateLevel1 = metaController.onUpdateLevel1
+// exports.onDeleteLevel1 = metaController.onDeleteLevel1
 
 // exports.onCreateLevel2 = metaController.onCreateLevel2
 // exports.onUpdateLevel2 = metaController.onUpdateLevel2
