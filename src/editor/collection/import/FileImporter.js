@@ -1,10 +1,9 @@
 import { makeStyles } from "@material-ui/core";
 import { useDropzone } from "react-dropzone";
 import { useSnackbar } from "notistack";
-import { useCallback, useMemo, useState } from "react";
-import { buildRegistry, processChunk } from "./importer";
-import firebase from "firebase/app";
-import { storage } from "../../../firebase/config";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { database, storage } from "../../../firebase/config";
+import firebase from 'firebase/app'
 import { useStorage } from "../../../firebase/useStorage";
 import { useEditor } from "../../useEditor";
 import { useWorkspace } from "../../../components/workspace/useWorkspace";
@@ -47,44 +46,39 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
   const [progress, setProgress] = useState()  
   const [result, setResult] = useState()  
   const {tenantId, wid, uid} = useWorkspace()
-  const {collectionId} = useEditor()
+  const [batchId] = useState(+new Date())
+  const importBatchRef = useRef()
 
-  // const onDrop = useCallback((acceptedFiles) => {
-  //   acceptedFiles.forEach((file) => {
-  //     const reader = new FileReader();
 
-  //     reader.onabort = () => enqueueSnackbar("file reading was aborted");
-  //     reader.onerror = () => enqueueSnackbar("file reading has failed");
-  //     reader.onload = async (e) => {
+  useEffect(()=>{
+    console.log("batchId changed to ", batchId)
+    if(batchId){
+      console.log("Connect to ", `${tenantId}/${wid}/imports/${id}/${batchId}`)
+      const impRef = database.ref(`${tenantId}/${wid}/imports/${id}/${batchId}`)
+      importBatchRef.current = impRef
+      impRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        console.log("value changed ", data)
+        setResult(data)
+      })
+    }
 
-  //       // // e.target.result
-  //       const fileContent = reader.result;
-  //       // // console.log(fileContent);
-  //       // // enqueueSnackbar(fileContent)
-  //       const register = buildRegistry(config.mapping)
-
-  //       consumeCsv(id, config, collectionId, fileContent, register, setProgress, setResult, addObject)
-        
-  //     };
-  //     reader.readAsText(file, config.config.encoding)
-  //   });
-  // }, []);
+  },[batchId])
 
   const onDrop = useCallback((acceptedFiles, fileRejections, event) => {
     console.log(`onDrop  ${acceptedFiles.length} acceptedFiles, ${fileRejections.length} fileRejections` )
-    // Create a root reference
+  
   var storageRef = storage.ref();
-
-  // Create a reference to 'mountains.jpg'
   var importRef = storageRef.child("imports");
 
     acceptedFiles.forEach((file) => {
 
       const metadata = {
 
-        customMetadata: { tenantId, wid, uid, iid: id}
+        customMetadata: { tenantId, wid, uid, iid: id, batchId}
       }
       console.log("Send metadata", metadata)
+      
       var uploadTask = importRef.child(`${tenantId}/${wid}/${id}/${file.name}`).put(file, metadata)
 
       uploadTask.on('state_changed',  (snapshot) => {
@@ -108,11 +102,6 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
       () => {
         // Handle successful uploads on complete
         console.log('Uploaded a blob or file!!!');
-
-        // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-        // uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-        //   console.log('File available at', downloadURL);
-        // });
       })
       
 
@@ -128,7 +117,7 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
     isDragActive,
     isDragAccept,
     isDragReject
-  } = useDropzone({onDrop, maxFiles:1, accept: config.extentions});
+  } = useDropzone({onDrop, accept: config.extentions});
 
   const style = useMemo(() => ({
     ...baseStyle,
@@ -141,6 +130,15 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
     isDragAccept
   ]);
 
+  const decodeKey = key => {
+    return key.replace("_dot_", ".")
+  }
+
+  const asDate = firebaseTimestamp => {
+    console.log("As date", firebaseTimestamp)
+    return new Date(firebaseTimestamp).toISOString()
+  }
+
   return (
     <>
       <a onClick={onAbort}>Back to list</a>
@@ -148,11 +146,7 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
         Use importer: {config.name || "(unnamed)"} - {config.type}
       </p>
       {config.type === "CSV" && (<CsvType config={config} />)} 
-      
-      <p>progress: {progress}</p>
-      <p>result: imported: {result?.imported}, failed: {result?.failed}, lines: {result?.lines}</p>
-
-
+          
       <div className="container">
         <div {...getRootProps({style})}>
           <input {...getInputProps()} />
@@ -163,6 +157,35 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
           )}
         </div>
       </div>
+
+
+      <p>progress: {progress}</p>
+
+      {result && (
+        <div>
+          <div>Result</div>
+          <div>Started: {asDate(result?.startedAt)}</div>
+          <div>Imported: {result?.imported}</div>
+          <div>Failed: {result?.failed}</div>
+          {result.files && (<div>
+            Files:
+            <ul>
+              {Object.keys(result.files).map((fileName, index)=>(
+                <li key={index}>
+                  <div><strong>{decodeKey(fileName)}</strong></div>
+                  <div>Started: {asDate(result?.startedAt)}</div>
+                  {result.files[fileName].endedAt ? (<div>EndedAt: {result.files[fileName].endedAt}</div>) : <div>Inprogress</div>}
+                  <div>Imported: {result.files[fileName].imported}</div>
+                  <div>Failed: {result.files[fileName].failed}</div>
+                  
+                  <div>timeMs: {result.files[fileName].timeMs}</div>
+                  <div>ratePerSec: {result.files[fileName].ratePerSec}</div>
+                </li>
+              ))}
+            </ul>
+            </div>)}
+        </div>
+      )}
     </>
   );
 };
@@ -180,44 +203,4 @@ const CsvType = ({config}) => {
       </li>
   </ul>
   )
-}
-
-const consumeCsv = async (id, config, collectionId, fileContent, register, setProgress, setResult, addObject) => {
-
-  var lines = fileContent.split(/[\r\n]+/g); // tolerate both Windows and Unix linebreaks
-  if(lines.length > 0 && lines[0].startsWith(config.config.columns[0])){
-    lines.shift()
-  }
-
-  var imported = 0
-  var failed = 0
-  lines.forEach((line, index) => {
-    try{
-      console.log("Row ", line)
-      const payload = processChunk(line, config.type, config.config, register)
-      console.log("Got payload",payload)
-      
-      const objectId = undefined
-      const attributesToSave = Object.keys(payload)
-        .filter(name => name.startsWith("out_"))
-        .reduce((map, nodeId)=>{
-          const attributeName = register.nodeIdToNode[nodeId].data.label
-          const value = payload[nodeId]
-          map[attributeName] = value
-          return map
-        }, {})
-
-        console.log("attributesToSave", attributesToSave)
-
-        const result = addObject(collectionId, objectId, attributesToSave)
-        console.log("Saved ", result)
-        setProgress(++imported)
-      } catch(error) {
-        failed++
-        console.log("Failed (",failed,") to import row ", index+1, "line:", line, "cause:", error)
-      }
-  }); 
-
-  setResult({imported, failed, lines: lines.length})
-
 }
