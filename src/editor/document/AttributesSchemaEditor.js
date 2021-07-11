@@ -81,6 +81,7 @@ const AttributesSchemaEditor = ({create, doc, onSaveThing, schema}) => {
                 append({name: attribute, value: doc.thing[attribute]})
             })
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [doc, schema, schemaPropsToList, remove, append])
     
     

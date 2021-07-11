@@ -39,6 +39,7 @@ export const WherePanel = () => {
         console.log("elle", elle)
         setInitElements( elle)
       }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     
@@ -51,6 +52,7 @@ export const WherePanel = () => {
         dispatch({type: "SET_MAPPING", mapping: {elements, inputs}, isValid})
       // }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     , [state.config.columns])
   
     // const guessConnections = (inputNodes, argumentNodes) => {

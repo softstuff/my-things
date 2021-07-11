@@ -2,8 +2,9 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const csv = require('csv-parser');
 const { firestore, database } = require('../firebase-service');
-const { Transform, Stream, Writable } = require('stream');
-
+const pipeline = require('stream')
+// const pipeline = require('stream').promises;
+const { Transform, Writable } = require('stream');
 const logger = functions.logger
 
 const isEdge = element => {
@@ -131,7 +132,7 @@ const transformCsvToObject = ({importConfig}) => {
         const { result } = processChunk(data, registry)
         return next(null, result)
       } catch(error) {
-        console.error(error)
+        logger.error(error)
         return next(error, null)
       }
     }
@@ -148,10 +149,9 @@ const storeStream = ({collectionRef, maxBatchSize}) => {
     batchSize = 0;
   }
 
-  return new Transform({
+  return new Writable({
     objectMode: true,
-    async transform(result, encoding, next) {
-      console.log("store stream chunk")
+    async write(result, encoding, next) {
       batch.set(collectionRef.doc(result.key), result.attributes)
       if (++batchSize >= maxBatchSize) {
         try{
@@ -173,11 +173,13 @@ const storeStream = ({collectionRef, maxBatchSize}) => {
           return next(error)
         }
       }
-      console.log("store stream done")
+      logger.debug("Store finished")
       return next()
     }  
   })
 }
+
+
 
 const statStream = ({statRef, fileStatRef}) => {
   let current = 0;
@@ -189,10 +191,8 @@ const statStream = ({statRef, fileStatRef}) => {
     const now = perIteration
     perIteration = 0
     current += now
-
-    const time = Math.round((Number(new Date()) - startTime) / 1000)
-    
-    console.log(`Got ${now} last ${Math.round(rate/1000)} sec, total ${current} for the last ${time} sec`)
+    const time = Number(new Date()) - startTime    
+    logger.debug(`Got ${now} last ${Math.round(rate/1000)} sec, total ${current} for the last ${time/1000} sec`)
     try{
       await Promise.all([
       statRef.update({ "imported": admin.database.ServerValue.increment(now) }),
@@ -211,15 +211,14 @@ const statStream = ({statRef, fileStatRef}) => {
   return new Transform({
     objectMode: true,
     transform(chunk, encoding, next) {
-      console.log("stat stream chunk")
       perIteration++;
       return next(null, chunk)
     },
     async final (next) {
-      console.log("stat stream done")
       clearInterval(timer)
       current += perIteration
-      console.log(`Got total ${current} for during ${ Math.round((Number(new Date()) - startTime) / 1000) } seconds`)
+      const time = ((Number(new Date()) - startTime)/1000).toFixed(2)
+      logger.debug(`Got total ${current} for during ${time} sec`)
 
       try {
         await Promise.all([
@@ -232,6 +231,7 @@ const statStream = ({statRef, fileStatRef}) => {
       } catch(error) {
         logger.warn("Failed to store final stats", error)
       }
+      logger.debug("Stat finished")
       return next()
     }  
   })
@@ -250,8 +250,11 @@ const delayStream = ({delayInMs}) => {
   return new Transform({
     objectMode: true,
     async transform(chunk, encoding, next) {
-      console.log(`delay stream for ${delayInMs} ms`)
-      await delay(delayInMs)
+      
+      if (delayInMs > 0) {
+        logger.debug(`delay stream for ${delayInMs} ms`)
+        await delay(delayInMs)
+      }
       return next(null, chunk)
     }
   })
@@ -259,7 +262,7 @@ const delayStream = ({delayInMs}) => {
 }
 
 exports.imports = functions
-  // .runWith(runtimeOpts)
+  .runWith(runtimeOpts)
   .storage
   .bucket()
   .object()
@@ -273,9 +276,6 @@ exports.imports = functions
 
       const workspaceSnap = await firestore.doc(workspaceDocPath).get()
       const importConfig = workspaceSnap.get(`imports.${iid}`)
-      
-      
-
       
       const fileName = file.name.split("/")[4]
       logger.info("Uploaded filename", fileName, "tenantId", tenantId, "workspace", wid, "import config id", iid, "batchId", batchId)
@@ -305,127 +305,33 @@ exports.imports = functions
         imported: 0
       })
 
-      const maxBatchSize = 500;
-      let importedFromFile = 0;
-      const started = Number(new Date())
-      let batchSize = 0;
-      let batch = firestore.batch();
+      const maxBatchSize = 100;
       const collection = "Person"
       const collectionRef = firestore.collection(`/tenants/${tenantId}/workspaces/${wid}/${collection}`)
       const validation = process.env.NODE_ENV === 'development' ? false : 'crc32c'
-      const dataStream = file.createReadStream({validation})
+      
       const parsePromise = new Promise((resolve, reject) => {
 
-        dataStream
-          
+        file.createReadStream({validation})
           .pipe(csv(optionsOrHeaders = {
             separator: importConfig.config.separator,
             skipComments: true,
           }))
-          .pipe(delayStream({delayInMs: 500}))
+          // .pipe(delayStream({delayInMs: process.env.NODE_ENV === 'development' ? 500 : 0}))
           .pipe(transformCsvToObject({importConfig}))
-          .pipe(storeStream({collectionRef, maxBatchSize}))
           .pipe(statStream({statRef, fileStatRef}))
+          .pipe(storeStream({collectionRef, maxBatchSize}))
           
-          // .pipe(new Transform({
-          //   objectMode: true,
-          //   transform(result, encoding, next) {
-
-          //     batch.set(colRef.doc(result.key), result.attributes)
-          //     importedFromFile++
-          //     const time = Number(new Date()) - started
-          //     if (++batchSize >= maxBatchSize) {
-
-          //       logger.debug("Do batch commit")
-          //       return Promise.all([
-          //         statRef.update({ "imported": admin.database.ServerValue.increment(batchSize) }),
-          //         fileStatRef.update({
-          //           "imported": admin.database.ServerValue.increment(batchSize),
-          //           "timeMs": time,
-          //           "ratePerSec": importedFromFile / (time / 1000)
-          //         }),
-          //         batch.commit()
-          //           .then((result) => {
-          //             batch = admin.firestore().batch();
-          //             batchSize = 0;
-
-          //             logger.debug("Batch commit is done")
-          //             return result
-          //           })
-          //           .catch(error => {
-          //             next(error)
-          //           })
-          //       ])
-          //         .then(() => {
-          //           return next(null, result)
-          //         })
-          //         .catch(error => {
-          //           return next(error)
-          //         })
-                  
-          //     } else {
-          //       return next(null, result)
-          //     }
-          //   },
-          //   final(next) {
-          //     if (batchSize > 0) {
-          //       logger.debug("pipe final, batchSize", batchSize, " wait for final batch commit")
-          //       return Promise.all([
-          //         statRef.update({ "imported": admin.database.ServerValue.increment(batchSize) }),
-          //         fileStatRef.update({
-          //           "imported": admin.database.ServerValue.increment(batchSize),
-          //           "endedAt": admin.database.ServerValue.TIMESTAMP
-          //         }),
-          //         batch.commit()
-          //           .then(() => {
-          //             logger.debug("Batch commit is done, pipe is done")
-          //             return
-          //           })
-          //           .catch(error => {
-          //             console.log("Next Error E", error)
-          //             next(error)
-          //           })
-          //       ])
-          //       .then(() => {
-          //         logger.debug("final next")
-          //         return next()
-          //       })
-          //       .catch(error => {
-          //         console.log("Next Error E", error)
-          //         next(error)
-          //       })
-
-
-          //     } else {
-          //       logger.debug("Pipe is done")
-          //       return fileStatRef.update({
-          //         "endedAt": admin.database.ServerValue.TIMESTAMP
-          //       })
-          //       .then(() => {
-          //         logger.debug("final next")
-          //         return next()
-          //       })
-          //       .catch(error => {
-          //         next(error)
-          //       })
-          //     }
-          //   },
-          // }
-
-          // ))
           .on("error", err => {
             logger.error("import faield", err)
             reject(err)
           })
-          .on('end', () => {
-            logger.debug("end of stream")
-
-          })
-          .on('data', (chunk) => { console.log("Data")})
+          .on('end', () => logger.debug("end of stream"))
           .on('close', () => {
             logger.debug("data stream is closed")
             resolve(file)
           })
+
       })
 
       logger.debug("Await import to complete")
