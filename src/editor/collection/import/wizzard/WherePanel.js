@@ -19,9 +19,9 @@ export const WherePanel = () => {
     const [initElements, setInitElements] = useState([]);
     const {state, dispatch} = useWizzard()
   
-    const getInputs = () => {
-      if(state.type === "CSV") return state.config.columns
-    }
+    // const getInputs = () => {
+    //   if(state.type === "CSV") return state.config.columns
+    // }
 
     useEffect(()=>{
       setInputs(state.config.columns)
