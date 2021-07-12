@@ -3,6 +3,7 @@ set -eu
 
 clear
 
+export NODE_ENV=development
 export USE_FIREBASE_EMULATOR=true
 export FIRESTORE_EMULATOR_HOST=localhost:8080
 export FIREBASE_AUTH_EMULATOR_HOST=localhost:9099

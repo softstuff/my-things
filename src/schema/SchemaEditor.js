@@ -1,5 +1,4 @@
-// @flow
-import React, {useEffect, useState,} from 'react'
+import {useEffect, useState,} from 'react'
 import {
     AppBar,
     Box,
@@ -38,7 +37,7 @@ const SchemaEditor = ({ collectionId, collectionPath, editing, schema }) => {
     const { claims } = useSession()
     const { wid } = useWorkspace()
     const theme = useTheme();
-    const [tab, setTab] = React.useState(0);
+    const [tab, setTab] = useState(0);
 
 
     const handleTabChange = (_, id) => {
@@ -145,7 +144,6 @@ const SchemaViewer = ({ schema }) => {
 const RawEditor = ({ tenantId, wid, collectionPath, schema }) => {
     const classes = useRawEditorStyles();
     const { register, handleSubmit, setValue } = useForm()
-    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
 
@@ -211,8 +209,7 @@ const useFormEditorStyles = makeStyles({
 
 const SchemaFormEditor = ({ tenantId, wid, collectionId, collectionPath, schema }) => {
     const classes = useFormEditorStyles();
-    const { enqueueSnackbar } = useSnackbar();
-    const { formToJsonSchema, schemaPropsToList } = useDataConverter()
+    const { schemaPropsToList } = useDataConverter()
     const { control, register, watch, handleSubmit } = useForm();
     const { fields, append, remove, swap } = useFieldArray({
         control, // control props comes from useForm (optional: if you are using FormContext)

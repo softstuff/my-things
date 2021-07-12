@@ -31,7 +31,8 @@ const AttributeNode = (props) => {
       )
     }
 
-  }, [elements, props, props.data, setElements])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.data])
 
   return (
     <>

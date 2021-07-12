@@ -19,7 +19,7 @@ export function WhatPanel() {
 
   useEffect(()=>{
     dispatch({type: "SET_TYPE", value: state.type, isValid: state.type !== null})
-  },[state.type, dispatch])
+  },[dispatch, state.type])
 
   const handleChangeType = event => {
     console.log("handleChangeType ", event.target.name, event.target.value, event.target.checked)
