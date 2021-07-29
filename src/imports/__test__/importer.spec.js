@@ -329,9 +329,7 @@ describe("process", () => {
 });
 
 describe("process multiple edges", () => {
-  const payload = {
-    firstName: "Foo",
-  };
+
   const register = {
     inputToNode: {
       firstName: "in_0"

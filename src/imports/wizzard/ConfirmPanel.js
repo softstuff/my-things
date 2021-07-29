@@ -1,6 +1,6 @@
 import { Box, makeStyles, TextField } from "@material-ui/core";
 import { useEffect, useState } from "react";
-import { useEditor } from "../../../useEditor";
+import { useEditor } from "../../editor/useEditor";
 import { useWizzard } from "./useWizzard";
 
 

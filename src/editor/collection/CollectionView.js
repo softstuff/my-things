@@ -7,7 +7,7 @@ import CollectionInfo from "./CollectionInfo";
 import AddDocumentDialog from '../document/AddDocumentDialog';
 import { createThing } from '../../firebase/storage';
 import { useWorkspace } from '../../components/workspace/useWorkspace';
-import ImportView from './import/ImportView';
+import ImportView from '../../imports/ImportView';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -146,7 +146,7 @@ const CollectionView = () => {
                                 editing={editing} /> */}
                 {/* </TabPanel> */}
                 <TabPanel value={tab} index={2} dir={theme.direction}>
-                    <ImportView />
+                    <ImportView collectionId={collectionId} editing={editing} />
                 </TabPanel>
                 <TabPanel value={tab} index={3} dir={theme.direction}>
                     Export

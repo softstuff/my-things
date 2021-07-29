@@ -1,8 +1,8 @@
 import { useDropzone } from "react-dropzone";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { database, storage } from "../../../firebase/config";
+import { database, storage } from "../firebase/config";
 import firebase from 'firebase/app'
-import { useWorkspace } from "../../../components/workspace/useWorkspace";
+import { useWorkspace } from "../components/workspace/useWorkspace";
 import { Button } from "@material-ui/core";
 
 
@@ -34,7 +34,7 @@ const rejectStyle = {
   borderColor: '#ff1744'
 };
 
-export const FileImporter = ({ importer: {id, config}, onAbort}) => {
+export const FileImporter = ({ importer, onAbort}) => {
   const [result, setResult] = useState()  
   const {tenantId, wid, uid} = useWorkspace()
   const [batchId] = useState(Number(new Date()))
@@ -44,8 +44,8 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
   useEffect(()=>{
     console.log("batchId changed to ", batchId)
     if(batchId){
-      console.log("Connect to ", `${tenantId}/${wid}/imports/${id}/${batchId}`)
-      const impRef = database.ref(`${tenantId}/${wid}/imports/${id}/${batchId}`)
+      console.log("Connect to ", `${tenantId}/${wid}/imports/${importer.id}/${batchId}`)
+      const impRef = database.ref(`${tenantId}/${wid}/imports/${importer.id}/${batchId}`)
       importBatchRef.current = impRef
       impRef.on('value', (snapshot) => {
         const data = snapshot.val();
@@ -54,23 +54,23 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
       })
     }
 
-  },[tenantId,wid, id, batchId])
+  },[tenantId,wid, importer.id, batchId])
 
   const onDrop = useCallback((acceptedFiles, fileRejections, event) => {
     console.log(`onDrop  ${acceptedFiles.length} acceptedFiles, ${fileRejections.length} fileRejections` )
   
-  var storageRef = storage.ref();
-  var importRef = storageRef.child("imports");
+  let storageRef = storage.ref();
+  let importRef = storageRef.child("imports");
 
     acceptedFiles.forEach((file) => {
 
       const metadata = {
 
-        customMetadata: { tenantId, wid, uid, iid: id, batchId}
+        customMetadata: { tenantId, wid, uid, iid: importer.id, batchId}
       }
       console.log("Send metadata", metadata)
       
-      var uploadTask = importRef.child(`${tenantId}/${wid}/${id}/${file.name}`).put(file, metadata)
+      let uploadTask = importRef.child(`${tenantId}/${wid}/${importer.id}/${file.name}`).put(file, metadata)
 
       uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,  (snapshot) => {
         // Observe state change events such as progress, pause, and resume
@@ -92,7 +92,7 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
         console.log('Uploaded a blob or file!');
       });
     });
-  }, [batchId, id, tenantId, uid, wid]);
+  }, [batchId, importer.id, tenantId, uid, wid]);
 
   const {
     getRootProps,
@@ -100,7 +100,7 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
     isDragActive,
     isDragAccept,
     isDragReject
-  } = useDropzone({onDrop, accept: config.extentions});
+  } = useDropzone({onDrop, accept: importer.config.extentions});
 
   const style = useMemo(() => ({
     ...baseStyle,
@@ -126,9 +126,9 @@ export const FileImporter = ({ importer: {id, config}, onAbort}) => {
     <>
       <Button onClick={onAbort}>Back to list</Button>
       <p>
-        Use importer: {config.name || "(unnamed)"} - {config.type}
+        Use importer: {importer.name || "(unnamed)"} - importer.type}
       </p>
-      {config.type === "CSV" && (<CsvType config={config} />)} 
+      {importer.type === "CSV" && (<CsvType config={importer.config} />)}
           
       <div className="container">
         <div {...getRootProps({style})}>
@@ -177,10 +177,10 @@ const CsvType = ({config}) => {
   return (
     <ul>
       <li>
-        <strong>Expected headers</strong> {config.config.columns.join(" ")}
+        <strong>Expected headers</strong> {config.columns.join(" ")}
       </li>
       <li>
-        <strong>Expected separator</strong> {config.config.separator}
+        <strong>Expected separator</strong> {config.separator}
       </li>
   </ul>
   )

@@ -1,7 +1,7 @@
 import { Button } from "@material-ui/core";
 import { useEffect, useState } from "react";
-import MapData from "../../../../imports/mapper/MapData";
-import { PayloadContext } from "../../../../imports/mapper/usePayload";
+import MapData from "../mapper/MapData";
+import { PayloadContext } from "../mapper/usePayload";
 import { buildRegistry, processChunk } from "../importer";
 import { useWizzard } from "./useWizzard";
 

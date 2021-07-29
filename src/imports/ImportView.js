@@ -3,7 +3,6 @@ import { Fab, makeStyles } from "@material-ui/core"
 import AddIcon from '@material-ui/icons/Add';
 import ImportCreator from "./wizzard/ImportCreator"
 import ImportList from "./ImportList"
-import { useEditor } from "../../useEditor";
 import ConfigEditor from "./ConfigEditor";
 import ConfigViewer from "./ConfigViewer";
 import { FileImporter } from "./FileImporter";
@@ -16,29 +15,32 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-const ImportView = () => {
+const ImportView = ({editing = true}) => {
     const classes = useStyles()
-    const {editing} = useEditor()
     
     const [selected, setSelected] = useState()
-    const [creating, setCreating] = useState()
+    const [create, setCreate] = useState()
+    const [view, setView] = useState()
+    const [edit, setEdit] = useState()
     const [inUse, setInUse] = useState()
 
-    const openImporter = importer => {
-        setSelected(importer)
-        setInUse(true)
-    }
 
     const handleOnCreated = importer => {
-        setCreating(false)
-        openImporter(importer)
+        setCreate(false)
+        setInUse(importer)
     }
 
-    if (creating) {
-        return (<ImportCreator onAbort={()=>setCreating(false)} onCreated={handleOnCreated} />)
+    if (create) {
+        return (<ImportCreator onAbort={()=>setCreate(false)} onCreated={handleOnCreated} />)
     }
     if (inUse) {
-        return (<FileImporter importer={selected} onAbort={()=>setSelected()}/>)
+        return (<FileImporter importer={inUse} onAbort={()=>setInUse()}/>)
+    }
+    if (view) {
+        return (<ConfigViewer importer={view} onAbort={()=>setView()}/>)
+    }
+    if (edit) {
+        return (<ConfigEditor importer={edit} onAbort={()=>setEdit()}/>)
     }
     if (selected) {
         if(editing) {
@@ -51,10 +53,10 @@ const ImportView = () => {
 
     return (
         <>
-            <ImportList onSelect={setSelected} onUse={openImporter} />
+            <ImportList editing={editing} onSelect={setSelected} onEdit={setEdit} onView={setView} onUse={setInUse} />
 
             {editing && (
-            <Fab color="primary" aria-label="add" className={classes.fab} onClick={()=>setCreating(true)}>
+            <Fab color="primary" aria-label="add" className={classes.fab} onClick={()=>setCreate(true)}>
                 <AddIcon/>
             </Fab>
             )}

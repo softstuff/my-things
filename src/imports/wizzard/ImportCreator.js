@@ -13,7 +13,7 @@ import { WherePanel } from "./WherePanel";
 import { TestPanel } from "./TestPanel";
 import { ConfirmPanel } from "./ConfirmPanel";
 import {useSnackbar} from 'notistack';
-import { useStorage } from '../../../../firebase/useStorage'
+import { useStorage } from '../../firebase/useStorage'
 
 const useStyles = makeStyles((theme) => ({
   container: {

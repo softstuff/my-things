@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import MapData from "../../../../imports/mapper/MapData";
+import MapData from "..//mapper/MapData";
 import { useWizzard } from "./useWizzard";
 
 export const WherePanel = () => {
