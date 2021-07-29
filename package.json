@@ -15,6 +15,7 @@
     "flow-bin": "^0.141.0",
     "json-pointer": "^0.6.1",
     "material-ui-confirm": "^2.1.2",
+    "mdi-material-ui": "^6.22.1",
     "nanoid": "^3.1.23",
     "node-sass": "4.14.1",
     "notistack": "^1.0.3",
@@ -26,6 +27,7 @@
     "react-hook-form": "^7.6.10",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
+    "react-table": "^7.7.0",
     "web-vitals": "^0.2.4"
   },
   "scripts": {

@@ -46,7 +46,7 @@ const CollectionView = () => {
     const {collectionId, editing} = useEditor()
     const [showAddNewDocumentDialog, setShowAddNewDocumentDialog] = useState(false)
 
-    const [tab, setTab] = useState(2);
+    const [tab, setTab] = useState(0);
 
     // useEffect(() => {
 

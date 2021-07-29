@@ -1,119 +1,214 @@
-import {useSnackbar} from 'notistack';
-import React, { useEffect, useState} from 'react'
-import {useWorkspace} from '../../components/workspace/useWorkspace';
-import {useUser} from '../../components/user/useUser'
-import {listDocuments} from '../../firebase/storage';
-import {makeStyles} from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import {useEditor} from '../useEditor';
+import { useSnackbar } from 'notistack';
+import React, { useCallback, useEffect, useState } from 'react'
+import { useWorkspace } from '../../components/workspace/useWorkspace';
+import { useUser } from '../../components/user/useUser'
+import { getCollectionQueryRef } from '../../firebase/storage';
+import MaUTable from '@material-ui/core/Table'
+import TableBody from '@material-ui/core/TableBody'
+import TableCell from '@material-ui/core/TableCell'
+import TableHead from '@material-ui/core/TableHead'
+import TableRow from '@material-ui/core/TableRow'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { useTable, usePagination } from 'react-table';
+import { useEditor } from '../useEditor';
+import { Accordion, AccordionSummary, AccordionDetails, Button, Typography, makeStyles} from '@material-ui/core';
+import Filter from './filter/Filter';
 
-const useStyles = makeStyles({
-    table: {
-        minWidth: 650,
-    },
-});
-
+const useStyles = makeStyles((theme) => ({
+  loadMore: {
+      textAlign: 'center',
+      marginTop: theme.spacing(1.5),
+  },
+}));
 
 const DocumentList = () => {
+  const classes = useStyles()
+  const { collectionId } = useEditor()
+  const [documentList, setDocumentList] = useState([])
+  const [headers, setHeaders] = useState([])
+  const [columnNames, setColumnNames] = useState([])
+  const [lastDocument, setLastDocument] = useState()
+  const [searchTerms, setSearchTerms] = useState([])
+  const [queryRef, setQueryRef] = useState()
+  const [onLastPage, setOnLastPage] = useState()
 
-    const { collectionId, setDocumentId, setDocument } = useEditor()
-    const [documentList, setDocumentList] = useState([])
-    const [headers, setHeaders] = useState([])
-    
 
-    const { enqueueSnackbar } = useSnackbar();
-    const { wid } = useWorkspace()
-    const { tenantId } = useUser()
-    const classes = useStyles();
-    
-    useEffect(() => {
-        let mounted = true
-        console.log("List was mounted")
-        console.log(' document list load for collectionId:', collectionId)
-        return listDocuments(tenantId, wid, collectionId,
-            (entitys) => {
-                if(!mounted){
-                    console.log("Load was aborted")
-                    return
-                }
-                console.log("Loaded", entitys)
-                const _headers = [...new Set(entitys.flatMap(entity => Object.keys(entity.doc)))]
-                const _docs = entitys
+  const { enqueueSnackbar } = useSnackbar();
+  const { wid } = useWorkspace()
+  const { tenantId } = useUser()
 
-                console.log("Loaded list documents", _docs, _headers)
-                setDocumentList(_docs)
-                setHeaders(_headers)
-            }, (error) => {
-                console.log(`Failed to load documents for `, collectionId, error)
-                if(!mounted){
-                    console.log("Load was aborted")
-                    return
-                }
-                enqueueSnackbar(`Failed to documents for ${collectionId}`, { variant: 'error' })
-            }
-        )
-    }, [tenantId, wid, collectionId, enqueueSnackbar])
+  const data = React.useMemo(
+    () => documentList,
+    [documentList]
+  )
 
-    
-    const handleClick = ({id, doc}) => {
-        setDocument(doc)
-        setDocumentId(id)
+  const columns = React.useMemo(
+    () => headers,
+    [headers]
+  )
+
+  const tableInstance = useTable(
+    {
+      columns,
+      data,
+      initialState: { pageIndex: 0, pageSize: 100 },
+      manualPagination: true,
+    },
+    usePagination,
+  )
+
+
+  const {
+    getTableProps,
+    headerGroups,
+    rows,
+    prepareRow,
+    state: { pageIndex, pageSize},
+  } = tableInstance
+
+  const loadMore = useCallback( () => {
+    const nextRef = queryRef.startAfter(lastDocument)
+    setQueryRef(nextRef)
+    nextRef.get()
+    .then(snap => {
+      const entitys = snap.docs.map(doc => ({ id:doc.id, item:doc.data()}))
+      const lastDoc = snap.docs.length > 0 ? snap.docs[snap.docs.length -1] : undefined
+      
+      const _columnNames = [...new Set([...columnNames, ...entitys.flatMap(entity => Reflect.ownKeys(entity.item))])].sort()
+      const _headers = _columnNames.map(header => ({ Header: header, accessor: `item.${header}` }))
+      _headers.unshift({ Header: "ID", accessor: "id" })
+
+      setHeaders(_headers)
+      setLastDocument(lastDoc)
+      setOnLastPage( entitys.length < pageSize)
+      if(JSON.stringify(columnNames) !== JSON.stringify(_columnNames)) {
+        setColumnNames(_columnNames)
+      }
+      setDocumentList([...documentList, ...entitys])
+
+    })
+    .catch( error => {
+      console.log(`Failed to load documents for `, collectionId, error)
+      enqueueSnackbar(`Failed to documents for ${collectionId}`, { variant: 'error' })
+    })
+  }, [collectionId, columnNames, documentList, enqueueSnackbar, lastDocument, pageSize, queryRef])
+
+
+  useEffect(() => {
+    let mounted = true
+    if (!mounted) {
+      console.log("Load was aborted")
+      return
     }
 
-    return (
-        <>
-        <TableContainer component={Paper}>
-            <Table className={classes.table} aria-label="simple table">
-                <TableHead>
-                    <TableRow>
-                        <TableCell>ID</TableCell>
-                        {headers.map((field, index) => (
-                            <TableCell key={index}>{field}</TableCell>
-                        ))}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {documentList && documentList.map(entity => (
-                        <TableRow key={entity.id} hover onClick={() => handleClick(entity)} >
-                            <TableCell align="left">
-                                    {entity.id}
-                                </TableCell>
-                            {headers.map(field => (
-                                <TableCell key={`${entity.id}_${field}`} align="left">
-                                    {entity.doc[field]}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
+    const _queryRef = getCollectionQueryRef(tenantId, wid, collectionId, searchTerms, pageSize)
 
-        </>
-    );
-    //
-    // String.prototype.trimEllip = function (length) {
-    //     return this.length > length ? this.substring(0, length) + "..." : this;
-    // }
-    //
-    // return (
-    //     <>
-    //         <p>DocumentList</p>
-    //         <List>
-    //         {documentList.map( document =>
-    //              <ListItem key={document.id} selected={selected === document.id}>
-    //                 <ListItemText primary={Object.values(document).join(",  ").trimEllip(50)} onClick={setSelected} />
-    //             </ListItem>
-    //         )}
-    //         </List>
-    //     </>
-    // )
+    setQueryRef(_queryRef)
+    _queryRef.get()
+    .then(snap => {
+      const entitys = snap.docs.map(doc => ({ id:doc.id, item:doc.data()}))
+      const lastDoc = snap.docs.length > 0 ? snap.docs[snap.docs.length -1] : undefined
+      
+      const _columnNames = [...new Set(entitys.flatMap(entity => Reflect.ownKeys(entity.item)))].sort()
+      const _headers = _columnNames.map(header => ({ Header: header, accessor: `item.${header}` }))
+      _headers.unshift({ Header: "ID", accessor: "id" })
+
+      setHeaders(_headers)
+      setLastDocument(lastDoc)
+      setOnLastPage( entitys.length < pageSize)
+      if(JSON.stringify(columnNames) !== JSON.stringify(_columnNames)) {
+        setColumnNames(_columnNames)
+      }
+      setDocumentList(entitys)
+
+    })
+    .catch( error => {
+      console.log(`Failed to load documents for `, collectionId, error)
+      enqueueSnackbar(`Failed to documents for ${collectionId}`, { variant: 'error' })
+    })
+  }, [tenantId, wid, collectionId, enqueueSnackbar, searchTerms, pageSize, pageIndex, columnNames])
+
+  const handleLoadMore = () => {
+    return loadMore()
+  }
+
+  return (
+    <>
+
+      <div style={{ height: 400, width: '100%' }}>
+
+        <FilterBox propertyNames={columnNames} searchTerms={searchTerms} setSearchTerms={setSearchTerms}/>
+
+        {rows.length === 0 && (<div>Empty result</div>)}
+
+        <MaUTable {...getTableProps()}>
+          <TableHead>
+            {headerGroups.map(headerGroup => (
+              <TableRow {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map(column => (
+                  <TableCell {...column.getHeaderProps()}>
+                    {column.render('Header')}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableHead>
+          <TableBody>
+            {rows.map((row, i) => {
+              prepareRow(row)
+              return (
+                <TableRow {...row.getRowProps()}>
+                  {row.cells.map(cell => {
+                    return (
+                      <TableCell {...cell.getCellProps()}>
+                        {cell.render('Cell')}
+                      </TableCell>
+                    )
+                  })}
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </MaUTable>
+
+
+        {!onLastPage &&(
+          <div className={classes.loadMore}>
+            <Button color="secondary" onClick={handleLoadMore} disabled={onLastPage}>Load more</Button>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+
+const FilterBox = ({ propertyNames, searchTerms, setSearchTerms }) => {
+
+
+  const handleFilterChange = useCallback(term => {
+    setSearchTerms(term)
+  }, [setSearchTerms])
+
+
+  if (!propertyNames || propertyNames.length === 0) {
+    return null
+  }
+
+  return (
+    <Accordion>
+      <AccordionSummary 
+        expandIcon={<ExpandMoreIcon />}
+        aria-controls="filter-content"
+        id="filter-header"
+      >
+        <Typography>Filter</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+          <Filter  propertyNames={propertyNames} onFilterChange={handleFilterChange} />
+      </AccordionDetails>
+    </Accordion>
+  )
 }
 
 

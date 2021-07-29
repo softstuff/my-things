@@ -5,7 +5,7 @@ import {useForm} from 'react-hook-form'
 
 const AddCollection = ( { onAdd, forbiddenNames }) => {
 
-    const { register, handleSubmit, reset, errors} = useForm()
+    const { register, handleSubmit, reset, formState: {errors}} = useForm()
     
     const onSubmit = (data) => {
         try {

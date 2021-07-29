@@ -294,6 +294,26 @@ export const listDocuments = (tenantId, wid, collectionId, onLoaded, onError) =>
 }
 
 
+export const getCollectionQueryRef = (tenantId, wid, collectionId, searchTerms, limit) => {
+
+    const path = `${getWorkspacePath(tenantId, wid)}/${collectionId}`
+
+    let query = firestore.collection(path)
+
+    searchTerms.filters && searchTerms.filters.forEach(term=>{
+        query = query.where(term.property, term.operator, term.value)
+    })
+    if (searchTerms?.orderByProperty) {
+        query = query.orderBy(searchTerms.orderByProperty, searchTerms.orderByDirection)
+    }
+    if (limit) {
+        query = query.limit(limit)
+    }
+    
+    return query
+}
+
+
 export const usageOf = (tenantId, wid, pointer) =>  {
     return []
 }
