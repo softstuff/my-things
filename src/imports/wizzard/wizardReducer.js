@@ -32,6 +32,16 @@ export function wizardReducer(state, action) {
           }
         }
       }
+      case "SET_STRUCTURE": {
+        return {
+          ...state,
+          structure: action.payload,
+          step: {
+              ...state.step,
+              [`done_${state.step.active}`]: action.payload.name !== undefined
+          }
+        }
+      }
       case "SET_CONFIG": {
         return  {
           ...state,

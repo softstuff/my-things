@@ -12,6 +12,7 @@ import InputNode from "./elements/InputNode";
 import JoinActionNode from "./elements/JoinActionNode";
 import ToLowerCaseActionNode from "./elements/ToLowerCaseActionNode";
 import ToUpperCaseActionNode from "./elements/ToUpperCaseActionNode";
+import StructureNode from "./elements/StructureNode";
 import Sidebar from "./Sidebar";
 import "./react-flow-overrides.scss";
 import AttributeNode from "./elements/AttributeNode";
@@ -46,6 +47,7 @@ const nodeTypes = {
   join: JoinActionNode,
   lower: ToLowerCaseActionNode,
   upper: ToUpperCaseActionNode,
+  structure: StructureNode,
 };
 
 const edgeTypes = {

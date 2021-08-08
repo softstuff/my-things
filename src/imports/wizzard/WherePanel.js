@@ -33,8 +33,9 @@ export const WherePanel = () => {
         console.log("Setup default CSV mapping")
         const elle = [
           ...state.config.columns.map( (column, index) => ({id: `in_${index}`, type: "input", data: { label: column}, sourcePosition: "right", position: { x: 0, y: index * 80 + 20 }})),
-          ...state.config.columns.map( (column, index) => ({id: `out_${index}`, data: { label: column}, type: "attribute", targetPosition: "left", position: { x: 500, y: index * 60 + 20 }})),
-          ...state.config.columns.map( (column, index) => ({id: `e_in_${index}_to_out_${index}`, source: `in_${index}`, target: `out_${index}`, type: 'custom'}))
+          ...state.config.columns.map( (column, index) => ({id: `out_${index}`, data: { label: column}, type: "attribute", targetPosition: "left", position: { x: 300, y: index * 60 + 20 }})),
+          ...state.config.columns.map( (column, index) => ({id: `e_in_${index}_to_out_${index}`, source: `in_${index}`, target: `out_${index}`, type: 'custom'})),
+          { id: "structure", type: "structure", data: {label: state.structure.name, properties: state.structure.properties }, position: { x: 600, y: 80 }}
         ]
         console.log("elle", elle)
         setInitElements( elle)

@@ -17,6 +17,31 @@ $attributeColor: rgb(44, 100, 39);
 }
 
 // Output attributes
+
+.react-flow__node-structure {
+  border: 1px solid $attributeColor;
+  padding: 10px;
+  border-radius: 3px;
+  width: 150px;
+  font-size: 12px;
+  color: #222;
+  text-align: center;
+  background: #fff;
+}
+
+.react-flow__node-structure .react-flow__handle {
+  background: $attributeColor;
+}
+
+.react-flow__node-structure.selected,
+.react-flow__node-structure.selected:hover {
+  box-shadow: 0 0 0 0.5px $attributeColor;
+}
+
+.react-flow__node-structure.selectable:hover {
+  box-shadow: 0 1px 4px 1px rgba(black,  0.08);
+}
+
 .react-flow__node-attribute {
   border: 1px solid $attributeColor;
   padding: 10px;

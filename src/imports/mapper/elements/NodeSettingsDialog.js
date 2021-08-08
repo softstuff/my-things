@@ -14,7 +14,8 @@ const useStyles = makeStyles((theme) => ({
     header: {
       display: 'flex',
       flexDirection: 'row',
-      justifyContent: "space-between"
+      justifyContent: "space-between",
+      width: "100%",
     },
     settingsItem: {
       flexGrow: 0

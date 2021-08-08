@@ -9,6 +9,7 @@ import {
 import { WhatPanel } from "./WhatPanel";
 import { useWizzard, WizzardProvider } from "./useWizzard";
 import { HowPanel } from "./HowPanel";
+import { ToPanel } from "./ToPanel";
 import { WherePanel } from "./WherePanel";
 import { TestPanel } from "./TestPanel";
 import { ConfirmPanel } from "./ConfirmPanel";
@@ -44,6 +45,7 @@ const ImportCreator = ({ onAbort, onCreated }) => {
 const steps = [
   {title:"What", subtitle: "Select what type of data you like to import"},
  {title: "How", subtitle: "Explain how your data is structured"},
+ {title: "To", subtitle: "Select or create the storage structured for the imported result"},
  {title: "Where", subtitle: "Map where you like the imported data to end up in the collection"},
  {title: "Test", subtitle: "Give some of the expected import data a test run with this import configuration"},
  {title: "Confirm", subtitle: "" },
@@ -64,8 +66,6 @@ const ImportWizard = ({onAbort, onCreated}) => {
 
     onCreated(importer)
   };
-
-  
 
   return (
     <div className={classes.container}>
@@ -91,12 +91,15 @@ const ImportWizard = ({onAbort, onCreated}) => {
         <HowPanel/>
       )}
       {state.step.active === 2 && (
-        <WherePanel />
+        <ToPanel />
       )}
       {state.step.active === 3 && (
-        <TestPanel />
+        <WherePanel />
       )}
       {state.step.active === 4 && (
+        <TestPanel />
+      )}
+      {state.step.active === 5 && (
         <ConfirmPanel />
       )}
       </div>
