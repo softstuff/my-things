@@ -26,6 +26,8 @@ export function wizardReducer(state, action) {
         return {
           ...state,
           type: action.value,
+          testFile: action.testFile,
+          testLines: action.testLines,
           step: {
               ...state.step,
               [`done_${state.step.active}`]: action.isValid
@@ -50,6 +52,7 @@ export function wizardReducer(state, action) {
             [`done_${state.step.active}`]: action.isValid
           },
           config: action.values,
+          testLines: action.testLines || state.testLines,
         };
       }
       case "SET_MAPPING": {

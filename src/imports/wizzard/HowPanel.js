@@ -14,6 +14,7 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import { useEffect } from "react";
 import { useWizzard } from "./useWizzard";
 import isEmpty from "lodash/isEmpty";
+import LineNavigator from "line-navigator";
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -55,10 +56,11 @@ const CsvConfig = () => {
 
   useEffect(() => {
     if (!state.config) {
+      const headerRow = state.testLines ? state.testLines[0] : "id;first name;last name";
+      const separator = ";"
+      const columns = splitRow(headerRow, separator)
       const values = {
-        headerRow: "id;first name;last name",
-        separator: ";",
-        columns: ["id", "first name", "last name"],
+        headerRow, separator, columns,
         encoding: "UTF-8",
         extentions: [".csv", ".txt"]
       };
@@ -69,8 +71,7 @@ const CsvConfig = () => {
   const handleChangeHeaderRow = (e) => {
     const headerRow = e.target.value;
     const separator = state.config.separator || ";";
-    const columns =
-      headerRow.split(separator).filter((col) => !isEmpty(col)) || [];
+    const columns = splitRow(headerRow, separator)
     const guessSeparators = headerRow.match(/[,|;]/);
     const guessSeparator = guessSeparators ? guessSeparators[0] : ";";
     const guessColumns =
@@ -91,21 +92,33 @@ const CsvConfig = () => {
     }
   };
 
+  const splitRow = (row, separator) =>
+      row.split(separator).filter((col) => !isEmpty(col)) || [];
+
   const handleChangeSeparator = (e) => {
     const headerRow = state.config?.headerRow || "";
     const separator = e.target.value;
-    const columns =
-      headerRow.split(separator).filter((col) => !isEmpty(col)) || [];
+    const columns = splitRow(headerRow, separator)
     const isValid = columns.length > 0;
     const values = { ...state.config, headerRow, separator, columns };
+
     dispatch({ type: "SET_CONFIG", values, isValid });
   };
 
   const handleChangeEncoding = (e, newValue) => {
     const encoding = newValue?.encoding || "UTF-8";
+    let testLines = state.testLines
     console.log("handleChangeEncoding", newValue, encoding)
+    if (state.testFile) {
+      const navigator = new LineNavigator(state.testFile, {encoding});
+
+      navigator.readLines(0, 3, (err, index, lines, isEof, progress) => {
+        testLines = lines
+      })
+    }
+    console.log("File encoding ", encoding, "testLines", testLines);
     const values = { ...state.config, encoding };
-    dispatch({ type: "SET_CONFIG", values, isValid: state.config.columns.length > 0 });
+    dispatch({ type: "SET_CONFIG", values, testLines, isValid: state.config.columns.length > 0 });
   };
 
   if (!state.config) {
@@ -142,7 +155,8 @@ const CsvConfig = () => {
 
         <FormGroup className={classes.encoding}>
           <Autocomplete
-            defaultValue={state.config.encoding}
+            defaultValue={state.config.encoding || "utf8"}
+            value={state.config.encoding || "utf8"}
             onChange={handleChangeEncoding}
             // style={{ maxwidth: 300 }}
             options={selectableEncodings}
@@ -177,6 +191,32 @@ const CsvConfig = () => {
             </Card>
           ))}
         </div>
+
+        {state.testLines && (
+            <div >
+              <p>Values from the test file:</p>
+              {state.testLines
+                  .filter(line => line.trim().length > 0)
+                  .map((line, lineNo) => {
+                const columns = line.split(state.config.separator)
+                const result = columns.map((column, index) => (
+                  <Card key={index} className={classes.column}>
+                    <CardContent>
+                      <div>Column {index + 1}</div>
+                      <div>
+                        <strong>{column}</strong>
+                      </div>
+                    </CardContent>
+                  </Card>))
+                return (
+                    <div key={lineNo} className={classes.columns}>
+                      {result}
+                    </div>)
+
+              }
+            )}
+            </div>
+        )}
       </div>
     </>
   );
