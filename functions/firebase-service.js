@@ -4,6 +4,7 @@ const admin = require('firebase-admin');
 
 admin.initializeApp();
 // admin.initializeApp({ projectId: "my-things-60357" });
+// admin.initializeApp({ projectId: "any-key" });
 
 const firestore = admin.firestore()
 const auth = admin.auth()

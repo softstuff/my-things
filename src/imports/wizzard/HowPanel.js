@@ -5,7 +5,7 @@ import {
   FormControlLabel,
   FormGroup,
   FormLabel,
-  makeStyles,
+  makeStyles, Paper,
   Radio,
   RadioGroup,
   TextField,
@@ -14,6 +14,7 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import { useEffect } from "react";
 import { useWizzard } from "./useWizzard";
 import isEmpty from "lodash/isEmpty";
+import {useForm} from "react-hook-form";
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -24,11 +25,11 @@ const useStyles = makeStyles(() => ({
   },
   columns: {
     display: "flex",
-    marginTop: "2rem",
-    marginBottom: "3rem",
+    flexWrap: "wrap",
+    justifyContent: "space-around",
   },
   column: {
-    marginRight: "1rem",
+    padding: "1rem",
   },
   encoding: {
     marginTop: "2rem",
@@ -44,7 +45,7 @@ export function HowPanel() {
   const { state } = useWizzard();
   return (
     <>
-      {state.type === "CSV" && <CsvConfig />}
+      <CsvConfig />
     </>
   );
 }
@@ -52,84 +53,107 @@ export function HowPanel() {
 const CsvConfig = () => {
   const classes = useStyles();
   const { state, dispatch } = useWizzard();
+  const {register, formState: {errors}} = useForm()
 
   useEffect(() => {
-    if (!state.config) {
-      const values = {
-        headerRow: "id;first name;last name",
-        separator: ";",
-        columns: ["id", "first name", "last name"],
-        encoding: "UTF-8",
-        extentions: [".csv", ".txt"]
+    if (!state.how) {
+      const rows = state.file.sample.split(/\r?\n/)
+      const headerRow = rows[0]
+      const guessSeparators = headerRow.match(/[,|;]/);
+      const separator = guessSeparators ? guessSeparators[0] : ";";
+      const columns = headerRow.split(separator)
+      const values = { 
+        headerRow, separator, columns, type: "CSV", headerOnFirstRow: true
       };
-      dispatch({ type: "SET_CONFIG", values, isValid: true });
+      dispatch({ type: "SET_HOW", values, isValid: isValid(values) });
     }
-  }, [state.config, dispatch]);
+  }, [state.how, dispatch]);
 
-  const handleChangeHeaderRow = (e) => {
-    const headerRow = e.target.value;
-    const separator = state.config.separator || ";";
-    const columns =
-      headerRow.split(separator).filter((col) => !isEmpty(col)) || [];
-    const guessSeparators = headerRow.match(/[,|;]/);
-    const guessSeparator = guessSeparators ? guessSeparators[0] : ";";
-    const guessColumns =
-      headerRow.split(guessSeparator).filter((col) => !isEmpty(col)) || [];
-
-    if (guessColumns.length > columns.length) {
-      const isValid = columns.length > 0;
+  const handleChangeColumnHeaderChanged = (title, index) => {
+    const columns = state.how.columns
+    columns[index] = title
+    const headerRow = columns.join(state.how.separator)
       const values = {
-        headerRow,
-        separator: guessSeparator,
-        columns: guessColumns,
+        ...state.how,
+        columns,
+        headerRow
       };
-      dispatch({ type: "SET_CONFIG", values, isValid });
-    } else {
-      const isValid = columns.length > 0;
-      const values = { ...state.config, headerRow, separator, columns };
-      dispatch({ type: "SET_CONFIG", values, isValid });
-    }
+    dispatch({ type: "SET_HOW", values, isValid: isValid(values) })
   };
 
   const handleChangeSeparator = (e) => {
-    const headerRow = state.config?.headerRow || "";
-    const separator = e.target.value;
+    const headerRow = state.how?.headerRow || ""
+    const separator = e.target.value
     const columns =
-      headerRow.split(separator).filter((col) => !isEmpty(col)) || [];
-    const isValid = columns.length > 0;
-    const values = { ...state.config, headerRow, separator, columns };
-    dispatch({ type: "SET_CONFIG", values, isValid });
-  };
+      headerRow.split(separator).filter((col) => !isEmpty(col)) || []
+    const values = { ...state.how, headerRow, separator, columns }
+    dispatch({ type: "SET_HOW", values, isValid: isValid(values) })
+  }
 
-  const handleChangeEncoding = (e, newValue) => {
-    const encoding = newValue?.encoding || "UTF-8";
-    console.log("handleChangeEncoding", newValue, encoding)
-    const values = { ...state.config, encoding };
-    dispatch({ type: "SET_CONFIG", values, isValid: state.config.columns.length > 0 });
-  };
+  const handleChangeHeaderOnFirstRow = (e) => {
+    const headerOnFirstRow = e.target.value === 'true'
+    if(headerOnFirstRow) {
+      const rows = state.file.sample.split(/\r?\n/)
+      const headerRow = rows[0]
+      const columns = headerRow.split(state.how.separator)
+      const values = {...state.how, headerOnFirstRow, headerRow, columns}
+      dispatch({type: "SET_HOW", values, isValid: isValid(values)})
+    } else {
+      const values = {...state.how, headerOnFirstRow}
+      dispatch({type: "SET_HOW", values, isValid: isValid(values)})
+    }
+  }
 
-  if (!state.config) {
+  const isValid = ({columns}) => {
+    if(!columns || columns.lenght === 0){
+      return false
+    }
+    return true
+  }
+
+  if (!state.how) {
     return <div>Loading default value</div>;
   }
 
   return (
     <>
       <div className={classes.container}>
-        <FormGroup className={classes.headers}>
-          <FormLabel component="legend">Enter header row</FormLabel>
-          <TextField
-            label="headers"
-            value={state.config?.headerRow}
-            onChange={handleChangeHeaderRow}
-          />
-        </FormGroup>
+
+        <FormControl component="fieldset">
+          <FormLabel component="legend">Headers on first row</FormLabel>
+          <RadioGroup
+              aria-label="fHeader on first row"
+              name="headerOnFirstRow"
+              value={state.how.headerOnFirstRow.toString()}
+              onChange={handleChangeHeaderOnFirstRow}
+              row={true}
+          >
+            <FormControlLabel value="true" control={<Radio />} label="Yes" />
+            <FormControlLabel value="false" control={<Radio />} label="No" />
+          </RadioGroup>
+        </FormControl>
+
+        {!state.how.headerOnFirstRow && (
+            <div>
+            {state.how?.columns?.map((column, index) => (
+                <FormGroup key={index} className={classes.headers}>
+                  <FormLabel component="legend">Title for column {index+1}</FormLabel>
+                  <TextField
+                      label="headers"
+                      value={column}
+                      onChange={(e) => handleChangeColumnHeaderChanged(e.target.value, index)}
+                  />
+                </FormGroup>
+              ))}
+            </div>
+        )}
 
         <FormControl component="fieldset">
           <FormLabel component="legend">Separator</FormLabel>
           <RadioGroup
             aria-label="separator"
             name="separator"
-            value={state.config?.separator}
+            value={state.how?.separator}
             onChange={handleChangeSeparator}
             row
           >
@@ -140,41 +164,16 @@ const CsvConfig = () => {
           </RadioGroup>
         </FormControl>
 
-        <FormGroup className={classes.encoding}>
-          <Autocomplete
-            defaultValue={state.config.encoding}
-            onChange={handleChangeEncoding}
-            // style={{ maxwidth: 300 }}
-            options={selectableEncodings}
-            getOptionLabel={(option) => option.encoding || option}
-            getOptionSelected={(option, value)=> option.encoding === value?.encoding || value}
-            renderOption={(option) => (
-              <>
-                <span>{option.encoding}</span>
-                {option.used && (<span>- {option.used}</span>)}
-              </>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Expected file encoding"
-                variant="outlined"
-                helperText="If special characters gets imported incorrect this setting might save the day."
-              />
-            )}
-          />
-        </FormGroup>
+        <hr/>
 
         <div className={classes.columns}>
-          {state.config?.columns?.map((column, index) => (
-            <Card key={index} className={classes.column}>
-              <CardContent>
+          {state.how?.columns?.map((column, index) => (
+            <Paper key={index} className={classes.column} variant={"outlined"}>
                 <div>Column {index + 1}</div>
                 <div>
                   <strong>{column}</strong>
                 </div>
-              </CardContent>
-            </Card>
+            </Paper>
           ))}
         </div>
       </div>

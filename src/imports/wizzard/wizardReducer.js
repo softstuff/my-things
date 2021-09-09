@@ -22,6 +22,16 @@ export function wizardReducer(state, action) {
             hasNext: state.step.active + 1 < 4,
           },
         };
+      case "SET_FILE": {
+        return {
+          ...state,
+          file: action.payload,
+          step: {
+              ...state.step,
+              [`done_${state.step.active}`]: true
+          }
+        }
+      }
       case "SET_TYPE": {
         return {
           ...state,
@@ -42,14 +52,14 @@ export function wizardReducer(state, action) {
           }
         }
       }
-      case "SET_CONFIG": {
+      case "SET_HOW": {
         return  {
           ...state,
           step: {
             ...state.step,
             [`done_${state.step.active}`]: action.isValid
           },
-          config: action.values,
+          how: action.values,
         };
       }
       case "SET_MAPPING": {
