@@ -28,8 +28,7 @@ const useStyles = makeStyles((theme) => ({
         marginTop: "2rem"
     },
     stepNavigation: {
-        marginTop: "1rem",
-        marginBottom: "1rem",
+        margin: "1rem",
         display: "flex",
         justifyContent: "space-between"
     },
@@ -95,7 +94,8 @@ const ImportWizard = ({onAbort, onCreated}) => {
                     <div className={classes.step}>
                         {state.step.active === 0 && (
                             // <WhatPanel/>
-                            <FilePanel/>)}
+                            <FilePanel/>
+                        )}
                         {state.step.active === 1 && (
                             <HowPanel/>
                         )}
@@ -132,7 +132,6 @@ const StepNavigation = ({onSave}) => {
                     // color="primary"
                     disabled={!state.step.canBack}
                     onClick={() => dispatch({type: "BACK"})}
-                    className={classes.button}
                 > Back
                 </Button>
             </div>
@@ -143,7 +142,6 @@ const StepNavigation = ({onSave}) => {
                         variant="contained"
                         color="primary"
                         onClick={() => dispatch({type: "NEXT"})}
-                        className={classes.button}
                         disabled={!state.step[`done_${state.step.active}`]}
                     >
                         Next
@@ -154,7 +152,6 @@ const StepNavigation = ({onSave}) => {
                         variant="contained"
                         color="primary"
                         onClick={onSave}
-                        className={classes.button}
                     >
                         Save
                     </Button>

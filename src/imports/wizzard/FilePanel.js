@@ -223,9 +223,12 @@ export function FilePanel() {
             </div>
           </div>
 
+            <div>encoding: {encoding}</div>
           <FormGroup className={classes.encoding}>
             <Autocomplete
-                defaultValue={encoding}
+                id="encoding"
+                disableClearable={true}
+                value={encoding}
                 onChange={handleChangeEncoding}
                 // style={{ maxwidth: 300 }}
                 options={selectableEncodings}
@@ -237,13 +240,7 @@ export function FilePanel() {
                       {option.used && (<span>- {option.used}</span>)}
                     </>
                 )}
-                renderInput={(params) => (
-                    <TextField
-                        {...params}
-                        label="File encoding"
-                        variant="outlined"
-                    />
-                )}
+                renderInput={(params) => <TextField {...params} label="File encoding" variant="outlined" margin="normal" /> }
             />
           </FormGroup>
             </CardContent>
