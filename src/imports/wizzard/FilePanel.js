@@ -123,7 +123,7 @@ export function FilePanel() {
   const [encoding, setEncoding] = useState(state?.file?.encoding  || "UTF-8")
 
   const onDrop = useCallback((acceptedFiles, fileRejections, event) => {
-    console.log(`onDrop  ${acceptedFiles.length} acceptedFiles, ${fileRejections.length} fileRejections` )
+    console.log(`onDrop  ${acceptedFiles.length} acceptedFiles, ${fileRejections.length} fileRejections`,  fileRejections)
 
     setError( fileRejections?.map(rejected => rejected.errors.map(error=>error.message).join(',')).join(',') )
 
@@ -165,7 +165,7 @@ export function FilePanel() {
     isDragActive,
     isDragAccept,
     isDragReject
-  } = useDropzone({onDrop, accept: ['text/csv']});
+  } = useDropzone({onDrop, accept: ['text/csv', '.csv']});
 
   const style = useMemo(() => ({
     ...baseStyle,

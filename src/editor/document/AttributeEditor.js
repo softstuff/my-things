@@ -51,10 +51,10 @@ const AttributeEditor = (props) => {
     const [type, setType] = useState(props.type || "string");
     
     useEffect(() => {
-      console.log("AtributeEditor isNew", isNew);
+      console.log("AttributeEditor isNew", isNew);
     }, [isNew]);
     useEffect(() => {
-      console.log("AtributeEditor type change", type);
+      console.log("AttributeEditor type change", type);
     }, [type]);
   
     const showInline = () => {
