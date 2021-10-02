@@ -1,7 +1,8 @@
-import {Button, Icon, IconButton, makeStyles, TextField} from '@material-ui/core';
+import { Button, Icon, IconButton, TextField } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React, {useEffect} from 'react'
 import {useFieldArray, useForm} from 'react-hook-form';
-import DeleteIcon from '@material-ui/icons/Delete';
+import DeleteIcon from '@mui/icons-material/Delete';
 import {useEditor} from '../useEditor';
 
 const useStyles = makeStyles((theme) => ({
@@ -52,64 +53,62 @@ const AttributesManualEditor = ({onSaveThing}) => {
         resetAddAttribute()
     }
     
-    return (
-        <>
-            <form id='thing-form' onSubmit={handleSubmit(onSaveThing)}>
-                {createDocument && (
-                    <TextField className={classes.editField} label='id' name='id' {...register("id")}/>                
-                )}
-                <h2>Attributes</h2>
-                {fields.map((item, index) => (
-                    <div className={classes.editRow} key={item.id}>
-                        <TextField className={classes.editField} 
-                        required
-                        name={item.name}
-                        label={item.name}
-                        {...register()}
-                        defaultValue={item.value}/>
-                        <IconButton aria-label="delete" onClick={()=>remove(index)}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </div>
-                ))}
-                </form>
-
-                <TextField className={classes.newAttribName} placeholder='Name' name='name' {...registerAddAttribute("name",{
-                        required: 'Attribute name is required',
-                        validate: value => {
-                            console.log('validate ', value, document[value] )
-                            return !document[value] || 'Attribute name must be uniqe'
-                        }
-                    })}
-                    helperText={errors.name?.message}
-                    error={ errors.name ? true : false }
-                    />
-
-                
-            <form onSubmit={handleSubmitAddAttribute(onAddNewAttribute)}>
-                <div className={classes.editRow}>
-                    <TextField className={classes.newAttribName} placeholder='Name' name='name' {...registerAddAttribute("name",{
-                        required: 'Attribute name is required',
-                        validate: value => {
-                            console.log('validate ', value, document[value] )
-                            return !document[value] || 'Attribute name must be uniqe'
-                        }
-                    })}
-                    helperText={errors.name?.message}
-                    error={ errors.name ? true : false }
-                    />
-                    <TextField className={classes.newAttribValue} placeholder='Value' name='value' {...registerAddAttribute("value")}/>
-                    <IconButton aria-label="add" type='submit'>
-                        <Icon>add_circle</Icon>
+    return <>
+        <form id='thing-form' onSubmit={handleSubmit(onSaveThing)}>
+            {createDocument && (
+                <TextField className={classes.editField} label='id' name='id' {...register("id")}/>                
+            )}
+            <h2>Attributes</h2>
+            {fields.map((item, index) => (
+                <div className={classes.editRow} key={item.id}>
+                    <TextField className={classes.editField} 
+                    required
+                    name={item.name}
+                    label={item.name}
+                    {...register()}
+                    defaultValue={item.value}/>
+                    <IconButton aria-label="delete" onClick={()=>remove(index)} size="large">
+                        <DeleteIcon />
                     </IconButton>
                 </div>
+            ))}
             </form>
 
-            <Button variant="contained" color="primary" type='submit' form='thing-form'>
-            Save
-            </Button>
-        </>
-    )
+            <TextField className={classes.newAttribName} placeholder='Name' name='name' {...registerAddAttribute("name",{
+                    required: 'Attribute name is required',
+                    validate: value => {
+                        console.log('validate ', value, document[value] )
+                        return !document[value] || 'Attribute name must be uniqe'
+                    }
+                })}
+                helperText={errors.name?.message}
+                error={ errors.name ? true : false }
+                />
+
+            
+        <form onSubmit={handleSubmitAddAttribute(onAddNewAttribute)}>
+            <div className={classes.editRow}>
+                <TextField className={classes.newAttribName} placeholder='Name' name='name' {...registerAddAttribute("name",{
+                    required: 'Attribute name is required',
+                    validate: value => {
+                        console.log('validate ', value, document[value] )
+                        return !document[value] || 'Attribute name must be uniqe'
+                    }
+                })}
+                helperText={errors.name?.message}
+                error={ errors.name ? true : false }
+                />
+                <TextField className={classes.newAttribValue} placeholder='Value' name='value' {...registerAddAttribute("value")}/>
+                <IconButton aria-label="add" type='submit' size="large">
+                    <Icon>add_circle</Icon>
+                </IconButton>
+            </div>
+        </form>
+
+        <Button variant="contained" color="primary" type='submit' form='thing-form'>
+        Save
+        </Button>
+    </>;
 }
 
 export default AttributesManualEditor

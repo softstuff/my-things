@@ -1,5 +1,6 @@
-import { Button, Dialog, DialogContent, DialogTitle, DialogActions, makeStyles, Typography } from "@material-ui/core";
-import SettingsIcon from '@material-ui/icons/Settings';
+import { Button, Dialog, DialogContent, DialogTitle, DialogActions, Typography } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useMapper } from "../useMapper";

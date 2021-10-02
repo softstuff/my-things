@@ -3,13 +3,16 @@ import {
   CardContent,
   Radio,
   FormControlLabel,
-  makeStyles,
   Typography,
   RadioGroup,
   TextField,
-  FormGroup, Button, Paper, CardActions
-} from "@material-ui/core";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+  FormGroup,
+  Button,
+  Paper,
+  CardActions,
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import Autocomplete from '@mui/material/Autocomplete';
 
 import {useCallback, useEffect, useMemo, useState} from "react";
 import { useWorkspace } from "../../components/workspace/useWorkspace";
@@ -206,66 +209,64 @@ export function FilePanel() {
   //   dispatch({type: "SET_STRUCTURE", payload: {name, create, properties}})
   // }
 
-  return (
-    <>
+  return <>
 
-      <div>
-        <Card >
-          <CardContent  className={classes.row}>
-          <div className={classes.container}>
-            <div {...getRootProps({style})}>
-              <input {...getInputProps()} />
-              {isDragActive ? (
-                  <p>Drop the files here ...</p>
-              ) : (
-                  <p>Drag 'n' drop some files here, or click to select files</p>
-              )}
-            </div>
+    <div>
+      <Card >
+        <CardContent  className={classes.row}>
+        <div className={classes.container}>
+          <div {...getRootProps({style})}>
+            <input {...getInputProps()} />
+            {isDragActive ? (
+                <p>Drop the files here ...</p>
+            ) : (
+                <p>Drag 'n' drop some files here, or click to select files</p>
+            )}
           </div>
+        </div>
 
-          <FormGroup className={classes.encoding}>
-            <Autocomplete
-                id="encoding"
-                disableClearable={true}
-                value={encoding}
-                onChange={handleChangeEncoding}
-                // style={{ maxwidth: 300 }}
-                options={selectableEncodings}
-                getOptionLabel={(option) => option.encoding || option}
-                getOptionSelected={(option, value)=> option.encoding === value?.encoding || value}
-                renderOption={(option) => (
-                    <>
-                      <span>{option.encoding}</span>
-                      {option.used && (<span>- {option.used}</span>)}
-                    </>
-                )}
-                renderInput={(params) => <TextField {...params} label="File encoding" variant="outlined" margin="normal" /> }
-            />
-          </FormGroup>
+        <FormGroup className={classes.encoding}>
+          <Autocomplete
+              id="encoding"
+              disableClearable={true}
+              value={encoding}
+              onChange={handleChangeEncoding}
+              // style={{ maxwidth: 300 }}
+              options={selectableEncodings}
+              getOptionLabel={(option) => option.encoding || option}
+              isOptionEqualToValue={(option, value)=> option.encoding === value?.encoding || value}
+              renderOption={(option) => (
+                  <>
+                    <span>{option.encoding}</span>
+                    {option.used && (<span>- {option.used}</span>)}
+                  </>
+              )}
+              renderInput={(params) => <TextField {...params} label="File encoding" variant="outlined" margin="normal" /> }
+          />
+        </FormGroup>
+          </CardContent>
+
+
+      {error && (<div>File was rejected: {error}</div>)}
+      {file && (<>
+      </>)}
+
+      {sample && (
+            <CardContent className={classes.sample} >
+              <Typography variant="h4" gutterBottom>
+                File sample.
+              </Typography>
+              <Typography variant="subtitle2" gutterBottom>
+                Is the text look ok for you?
+              </Typography>
+              <Typography variant="subtitle2" gutterBottom>
+                Otherwise change the encoding.
+              </Typography>
+              <pre>{sample}</pre>
             </CardContent>
-
-
-        {error && (<div>File was rejected: {error}</div>)}
-        {file && (<>
-        </>)}
-
-        {sample && (
-              <CardContent className={classes.sample} >
-                <Typography variant="h4" gutterBottom>
-                  File sample.
-                </Typography>
-                <Typography variant="subtitle2" gutterBottom>
-                  Is the text look ok for you?
-                </Typography>
-                <Typography variant="subtitle2" gutterBottom>
-                  Otherwise change the encoding.
-                </Typography>
-                <pre>{sample}</pre>
-              </CardContent>
-        )}
-        </Card>
-      </div>
-    </>
-  );
+      )}
+      </Card>
+    </div>
+  </>;
 }
 

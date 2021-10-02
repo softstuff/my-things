@@ -1,11 +1,5 @@
-import {
-  FormControl,
-  FormHelperText,
-  InputLabel,
-  makeStyles,
-  NativeSelect,
-  TextField,
-} from "@material-ui/core";
+import { FormControl, FormHelperText, InputLabel, NativeSelect, TextField } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import { useEffect, useState } from "react";
 import {
   useFormContext,
@@ -87,253 +81,253 @@ const AttributeEditor = (props) => {
     );
   };
 
-  const FieldEditor = ({disabled, value, onChange}) => {
+const FieldEditor = ({disabled, value, onChange}) => {
 
-    useEffect(()=>{
-      console.log("FieldEditor value", value)
-    },[value])
+  useEffect(()=>{
+    console.log("FieldEditor value", value)
+  },[value])
 
-    return (
-      <TextField
-      label="Add attribute"
-      onChange={(e) => onChange(e.target.value)}
-      value={value}
-      required={true}
-      InputProps={{ disabled }}
-    />)
-  }
+  return (
+    <TextField
+    label="Add attribute"
+    onChange={(e) => onChange(e.target.value)}
+    value={value}
+    required={true}
+    InputProps={{ disabled }}
+  />)
+}
 
-  const TypeSelector = ({value, onChange}) => {
+const TypeSelector = ({value, onChange}) => {
 
-    useEffect(()=>{
-      console.log("TypeSelector value", value)
-    },[value])
+  useEffect(()=>{
+    console.log("TypeSelector value", value)
+  },[value])
 
-    return (
-      <FormControl>
-          <InputLabel htmlFor="type" error={false}>
-            Type
-          </InputLabel>
-  
-          <NativeSelect
-            label="Type"
-            aria-describedby="type-helper-text"
-            required={true}
-            // onBlur={(e) => onChange(e.target.value)}
-            onChange={(e) => onChange(e.target.value)}
-            value={value}
-          >
-            <option value="">Select a type</option>
-            <option value="string">Text</option>
-            <option value="number">Number</option>
-            <option value="integer">Integer</option>
-            <option value="null">Null</option>
-            <option value="array">List</option>
-          </NativeSelect>
-          <FormHelperText id="type-helper-text" error={false}></FormHelperText>
-        </FormControl>
-      )
-  }
-  
-  const ValueEditorController = ({ fieldName, type, defaultValue }) => {
-    const {control} = useFormContext()
+  return (
+    <FormControl>
+        <InputLabel htmlFor="type" error={false}>
+          Type
+        </InputLabel>
 
-    useEffect(()=>{
-      console.log("ValueEditorController type:", type, " defaultValue", defaultValue)
-    },[type, defaultValue])
+        <NativeSelect
+          label="Type"
+          aria-describedby="type-helper-text"
+          required={true}
+          // onBlur={(e) => onChange(e.target.value)}
+          onChange={(e) => onChange(e.target.value)}
+          value={value}
+        >
+          <option value="">Select a type</option>
+          <option value="string">Text</option>
+          <option value="number">Number</option>
+          <option value="integer">Integer</option>
+          <option value="null">Null</option>
+          <option value="array">List</option>
+        </NativeSelect>
+        <FormHelperText id="type-helper-text" error={false}></FormHelperText>
+      </FormControl>
+    )
+}
 
-    return (
-      <>
-        
-        <Controller
-          name={fieldName}
-          control={control}
-          defaultValue={defaultValue}
-          render={({ field, fieldState, formState}) => (
-            <ValueEditor field={field} fieldState={fieldState} formState={formState} type={type} value={defaultValue} />
-          )}
-        />
-      </>
-    );
-  };
+const ValueEditorController = ({ fieldName, type, defaultValue }) => {
+  const {control} = useFormContext()
 
-  const ValueEditor = ({ field, fieldState, formState, type, value }) => {
+  useEffect(()=>{
+    console.log("ValueEditorController type:", type, " defaultValue", defaultValue)
+  },[type, defaultValue])
 
-    // useEffect(()=>{
-    //   console.log("ValueEditor type:", type, " value", value, "field.value", field.value)
-    // },[field, value])
-
-    return (
-      <>
-        {type === "string" && (
-          <StringEditor value={value} renderField={field} />
+  return (
+    <>
+      
+      <Controller
+        name={fieldName}
+        control={control}
+        defaultValue={defaultValue}
+        render={({ field, fieldState, formState}) => (
+          <ValueEditor field={field} fieldState={fieldState} formState={formState} type={type} value={defaultValue} />
         )}
-        {type === "number" && (
-          <NumberEditor renderField={field} formState={fieldState}/>
-        )}
-        {type === "integer" && (
-          <IntegerEditor renderField={field} formState={fieldState} />
-        )}
-        {type === "map" && (
-          <MapEditor value={value} renderField={field} />
-        )}
-        {type === "null" && (
-          <NullEditor renderField={field} />
-        )}
-      </>
-    );
-  };
-  
-  const StringEditor = ({ field, value = "", renderField }) => {
-    const {
-      formState: { errors },
-    } = useFormContext();
-  
-    useEffect(() => {
-      console.log("StringEditor field", field)
-    }, [field]);
-
-    useEffect(()=>{
-      console.log("StringEditor value", value)
-    },[value])
-  
-    return (
-      <TextField
-        label="Value"
-        {...renderField}
-        helperText={errors.value?.message}
-        error={errors.value ? true : false}
       />
-    );
-  };
-  
-  const NumberEditor = ({renderField, formState }) => {
-        
-    return (
-      <TextField
-        label="Value"
-        value={renderField.value}
-        onChange={(e)=>{renderField.onChange(e.target.valueAsNumber)}} 
-        helperText={formState.errors?.value?.message}
-        error={formState.errors?.value ? true : false}
-        type="number"
-        step="any"
-      />
-    );
-  };
-  
-  const IntegerEditor = ({renderField, formState }) => {
-    
-    
-    return (
-      <TextField
-        label="Value"
-        value={renderField.value}
-        onChange={(e)=>{renderField.onChange(e.target.valueAsNumber)}} 
-        helperText={formState.errors?.value?.message}
-        error={formState.errors?.value ? true : false}
-        type="number"
-        step="1"
-      />
-    );
-  };
-  
-  const ArrayEditorController = ({ fieldName, defaultValue }) => {
+    </>
+  );
+};
 
-    const {control} = useFormContext()
-    const { fields, append, remove} = useFieldArray(
-      {
-        control,
-        name: fieldName,shouldUnregister: true
-      }
-    );
+const ValueEditor = ({ field, fieldState, formState, type, value }) => {
+
+  // useEffect(()=>{
+  //   console.log("ValueEditor type:", type, " value", value, "field.value", field.value)
+  // },[field, value])
+
+  return (
+    <>
+      {type === "string" && (
+        <StringEditor value={value} renderField={field} />
+      )}
+      {type === "number" && (
+        <NumberEditor renderField={field} formState={fieldState}/>
+      )}
+      {type === "integer" && (
+        <IntegerEditor renderField={field} formState={fieldState} />
+      )}
+      {type === "map" && (
+        <MapEditor value={value} renderField={field} />
+      )}
+      {type === "null" && (
+        <NullEditor renderField={field} />
+      )}
+    </>
+  );
+};
+
+const StringEditor = ({ field, value = "", renderField }) => {
+  const {
+    formState: { errors },
+  } = useFormContext();
+
+  useEffect(() => {
+    console.log("StringEditor field", field)
+  }, [field]);
+
+  useEffect(()=>{
+    console.log("StringEditor value", value)
+  },[value])
+
+  return (
+    <TextField
+      label="Value"
+      {...renderField}
+      helperText={errors.value?.message}
+      error={errors.value ? true : false}
+    />
+  );
+};
+
+const NumberEditor = ({renderField, formState }) => {
+      
+  return (
+    <TextField
+      label="Value"
+      value={renderField.value}
+      onChange={(e)=>{renderField.onChange(e.target.valueAsNumber)}} 
+      helperText={formState.errors?.value?.message}
+      error={formState.errors?.value ? true : false}
+      type="number"
+      step="any"
+    />
+  );
+};
+
+const IntegerEditor = ({renderField, formState }) => {
   
-    useEffect(() => {
-      console.log("ArrayEditorController fieldName", fieldName," defaultValue", defaultValue)
-      // append([{[fieldName]: "Stina"} , {[fieldName]: "Maggan"}]);
-      if(Array.isArray(defaultValue)) {
-        const fieldArray = defaultValue.map(v=>({[fieldName]: v}))
-        console.log("Appending ", defaultValue, "as", fieldArray)
-        append(fieldArray)
-      }
   
-    }, [fieldName, defaultValue, append]);
-  
-    const addNew = (e) => {
-      append("")
-      e.preventDefault();
+  return (
+    <TextField
+      label="Value"
+      value={renderField.value}
+      onChange={(e)=>{renderField.onChange(e.target.valueAsNumber)}} 
+      helperText={formState.errors?.value?.message}
+      error={formState.errors?.value ? true : false}
+      type="number"
+      step="1"
+    />
+  );
+};
+
+const ArrayEditorController = ({ fieldName, defaultValue }) => {
+
+  const {control} = useFormContext()
+  const { fields, append, remove} = useFieldArray(
+    {
+      control,
+      name: fieldName,shouldUnregister: true
     }
-    const deleteMe = (index) => {
-      remove(index);
-    };
-  
-    return (
-      <div>
-        List of size {fields.length}
-        <ul>
-          {fields &&
-            fields.map((field, index) => (
-              <li key={field.id}>
-                <ArrayItem fieldName={`${fieldName}.${index}`} value={field[fieldName]} />
-                <button type="button" onClick={() => deleteMe(index)}>
-                  Delete {index}
-                </button>
-              </li>
-            ))}
-          <li>
-            <button onClick={addNew}>
-              Add
-            </button>
-          </li>
-        </ul>
-      </div>
-    );
+  );
+
+  useEffect(() => {
+    console.log("ArrayEditorController fieldName", fieldName," defaultValue", defaultValue)
+    // append([{[fieldName]: "Stina"} , {[fieldName]: "Maggan"}]);
+    if(Array.isArray(defaultValue)) {
+      const fieldArray = defaultValue.map(v=>({[fieldName]: v}))
+      console.log("Appending ", defaultValue, "as", fieldArray)
+      append(fieldArray)
+    }
+
+  }, [fieldName, defaultValue, append]);
+
+  const addNew = (e) => {
+    append("")
+    e.preventDefault();
+  }
+  const deleteMe = (index) => {
+    remove(index);
   };
 
-  const MapEditor = ({ field, value }) => {
-    return (
-      <>
-      ToDo
-      </>
-    )
-  }
+  return (
+    <div>
+      List of size {fields.length}
+      <ul>
+        {fields &&
+          fields.map((field, index) => (
+            <li key={field.id}>
+              <ArrayItem fieldName={`${fieldName}.${index}`} value={field[fieldName]} />
+              <button type="button" onClick={() => deleteMe(index)}>
+                Delete {index}
+              </button>
+            </li>
+          ))}
+        <li>
+          <button onClick={addNew}>
+            Add
+          </button>
+        </li>
+      </ul>
+    </div>
+  );
+};
 
-  const NullEditor = ({ renderField }) => {
-    const {setValue} = useFormContext()
-    useEffect(()=>{
-      setValue(renderField.name, null)
-      console.log("NullEditor renderField", renderField.value)
-    },[renderField, setValue])
+const MapEditor = ({ field, value }) => {
+  return (
+    <>
+    ToDo
+    </>
+  )
+}
 
-    return null
-  }
+const NullEditor = ({ renderField }) => {
+  const {setValue} = useFormContext()
+  useEffect(()=>{
+    setValue(renderField.name, null)
+    console.log("NullEditor renderField", renderField.value)
+  },[renderField, setValue])
 
-  const ArrayItem = ({fieldName, value}) => {
-    const [type, setType] = useState("string")
+  return null
+}
 
-    useEffect(()=>{
-      console.log("ArrayItem fifieldNameeld", fieldName, "value", value)
-    },[fieldName, value])
+const ArrayItem = ({fieldName, value}) => {
+  const [type, setType] = useState("string")
 
-    useEffect(()=>{
-      console.log("ArrayItem type", type)
-    },[type])
+  useEffect(()=>{
+    console.log("ArrayItem fifieldNameeld", fieldName, "value", value)
+  },[fieldName, value])
 
-    useEffect(()=>{
-      console.log("ArrayItem value", value)
-      if(value) {
-        setType(whatType(value))
-      }
-    },[value])
+  useEffect(()=>{
+    console.log("ArrayItem type", type)
+  },[type])
+
+  useEffect(()=>{
+    console.log("ArrayItem value", value)
+    if(value) {
+      setType(whatType(value))
+    }
+  },[value])
 
 
-    return (
-      <>
-        <TypeSelector value={type} onChange={setType} />
-        <ValueEditorController fieldName={fieldName} type={type} defaultValue={value} />
-      </>
-    )
-  }
+  return (
+    <>
+      <TypeSelector value={type} onChange={setType} />
+      <ValueEditorController fieldName={fieldName} type={type} defaultValue={value} />
+    </>
+  )
+}
 
-  
-  export default AttributeEditor
+
+export default AttributeEditor

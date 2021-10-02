@@ -1,8 +1,8 @@
 import React, {useState} from 'react'
-import {makeStyles} from '@material-ui/core/styles';
-import {AppBar, Button, IconButton, Menu, MenuItem, Toolbar, Typography} from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
-import AccountCircle from '@material-ui/icons/AccountCircle';
+import makeStyles from '@mui/styles/makeStyles';
+import {AppBar, Button, IconButton, Menu, MenuItem, Toolbar, Typography} from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import AccountCircle from '@mui/icons-material/AccountCircle';
 
 import {logout} from './firebase/auth'
 import {useHistory} from 'react-router-dom'
@@ -35,7 +35,12 @@ function Header(props) {
         <div className={classes.root}>
             <AppBar position="static" className={props.appBar}>
                 <Toolbar>
-                    <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+                    <IconButton
+                        edge="start"
+                        className={classes.menuButton}
+                        color="inherit"
+                        aria-label="menu"
+                        size="large">
                         <MenuIcon />
                     </IconButton>
                     
@@ -86,36 +91,34 @@ function LoggedInUsersMenu() {
         setAnchorEl(null);
     };
 
-    return (
-        <>
+    return <>
 
 
-            <Typography variant="h6" className={classes.title} onClick={openEditor}>
-                Editor
-            </Typography>
+        <Typography variant="h6" className={classes.title} onClick={openEditor}>
+            Editor
+        </Typography>
 
-            <IconButton
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleUserMenuClick}
-                color="inherit"
-            >
-                <AccountCircle />
-                {claims.displayName}
-            </IconButton>
-            <Menu
-                id="user-menu"
-                anchorEl={anchorEl}
-                keepMounted
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-            >
-                <MenuItem onClick={openUserProfile}>Profile</MenuItem>
-                <MenuItem onClick={logoutUser}>Logout</MenuItem>
-            </Menu>
-        </>
-    )
+        <IconButton
+            aria-label="account of current user"
+            aria-controls="menu-appbar"
+            aria-haspopup="true"
+            onClick={handleUserMenuClick}
+            color="inherit"
+            size="large">
+            <AccountCircle />
+            {claims.displayName}
+        </IconButton>
+        <Menu
+            id="user-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+        >
+            <MenuItem onClick={openUserProfile}>Profile</MenuItem>
+            <MenuItem onClick={logoutUser}>Logout</MenuItem>
+        </Menu>
+    </>;
 }
 
 export default Header

@@ -1,12 +1,5 @@
-import {
-    Box,
-    Button, Card, CardContent,
-    makeStyles,
-    Step,
-    StepLabel,
-    Stepper,
-    Typography
-} from "@material-ui/core";
+import { Box, Button, Card, CardContent, Step, StepLabel, Stepper, Typography } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import {WhatPanel} from "./WhatPanel";
 import {useWizzard, WizzardProvider} from "./useWizzard";
 import {HowPanel} from "./HowPanel";

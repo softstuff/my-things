@@ -1,7 +1,8 @@
 import React, {useState} from 'react'
-import {Breadcrumbs, Link, makeStyles, TextField, Tooltip, Typography} from '@material-ui/core';
-import HomeIcon from '@material-ui/icons/Home';
-import BorderColorIcon from '@material-ui/icons/BorderColor';
+import { Breadcrumbs, Link, TextField, Tooltip, Typography } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import HomeIcon from '@mui/icons-material/Home';
+import BorderColorIcon from '@mui/icons-material/BorderColor';
 import {useForm} from 'react-hook-form';
 import {useEditor} from '../editor/useEditor';
 
@@ -40,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
         height: 20,
     },
 }));
-    
+
 const ThingsBreadcrumbs = () => {
     const classes = useStyles();
     const {collectionId, documentId, setCollectionId, setDocumentId} = useEditor()

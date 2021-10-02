@@ -1,5 +1,6 @@
 //@flow
-import {CircularProgress, makeStyles} from '@material-ui/core'
+import { CircularProgress } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React, {createContext, useContext, useEffect, useState} from 'react'
 import {getWorkspaceIdList, loadWorkspace} from '../../firebase/storage'
 import Workspaces from '../../pages/Workspaces'

@@ -1,14 +1,15 @@
-import {List, ListItem, ListItemIcon, ListItemText, makeStyles, Button } from "@material-ui/core"
-import DeleteIcon from '@material-ui/icons/Delete';
+import { List, ListItem, ListItemIcon, ListItemText, Button } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import React, { useEffect, useState } from "react";
 import { useWorkspace } from "../components/workspace/useWorkspace"
 import { useTable, useExpanded } from 'react-table'
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
-import TableBody from "@material-ui/core/TableBody";
-import MaUTable from "@material-ui/core/Table";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableBody from "@mui/material/TableBody";
+import MaUTable from "@mui/material/Table";
 
 const useStyles = makeStyles((theme) => ({
     nameItem: {

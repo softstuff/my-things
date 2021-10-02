@@ -1,28 +1,20 @@
-import {
-  Button,
-  Collapse,
-  Fab,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  makeStyles,
-} from "@material-ui/core"
-import EditIcon from "@material-ui/icons/Edit"
-import DeleteIcon from "@material-ui/icons/Delete"
-import AddIcon from "@material-ui/icons/Add"
+import { Button, Collapse, Fab, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import EditIcon from "@mui/icons-material/Edit"
+import DeleteIcon from "@mui/icons-material/Delete"
+import AddIcon from "@mui/icons-material/Add"
 import { useEffect, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import { useWorkspace } from "../../components/workspace/useWorkspace"
 import { updateFields, deleteField } from "../../firebase/storage"
 import { useEditor } from "../useEditor"
 import jp from "json-pointer"
-import Dialog from "@material-ui/core/Dialog"
-import DialogActions from "@material-ui/core/DialogActions"
-import DialogContent from "@material-ui/core/DialogContent"
-import DialogTitle from "@material-ui/core/DialogTitle"
+import Dialog from "@mui/material/Dialog"
+import DialogActions from "@mui/material/DialogActions"
+import DialogContent from "@mui/material/DialogContent"
+import DialogTitle from "@mui/material/DialogTitle"
 import AttributeEditor from "./AttributeEditor"
-import { ExpandLess, ExpandMore } from "@material-ui/icons"
+import { ExpandLess, ExpandMore } from "@mui/icons-material"
 
 const useStyles = makeStyles((theme) => ({
   attribute: {

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { database, storage } from "../firebase/config";
 import firebase from 'firebase/app'
 import { useWorkspace } from "../components/workspace/useWorkspace";
-import { Button } from "@material-ui/core";
+import { Button } from "@mui/material";
 
 
 const baseStyle = {

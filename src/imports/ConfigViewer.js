@@ -1,4 +1,4 @@
-import { Button } from "@material-ui/core"
+import { Button } from "@mui/material"
 import MapData from "./mapper/MapData"
 
 const ConfigViewer = ({importer, onAbort}) => {

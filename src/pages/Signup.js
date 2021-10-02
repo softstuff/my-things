@@ -2,8 +2,8 @@ import React, {useState} from "react"
 import {Link} from 'react-router-dom'
 import {useForm} from "react-hook-form"
 import {signup} from "../firebase/auth"
-import Grid from '@material-ui/core/Grid';
-import {Button, Card, CardHeader, CircularProgress, Container, Divider, TextField} from "@material-ui/core";
+import Grid from '@mui/material/Grid';
+import {Button, Card, CardHeader, CircularProgress, Container, Divider, TextField} from "@mui/material";
 
 function Signup(props) {
     const { register, handleSubmit, reset } = useForm()

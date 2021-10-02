@@ -1,5 +1,6 @@
 //@flow
-import {Button, makeStyles, TextField, Typography} from '@material-ui/core'
+import { Button, TextField, Typography } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react'
 import {useForm} from 'react-hook-form'
 import {useEditor} from "../useEditor";

@@ -8,17 +8,17 @@ import {
     Icon,
     IconButton,
     InputLabel,
-    makeStyles,
     NativeSelect,
     Tab,
     Tabs,
     TextField,
     Tooltip,
-    useTheme
-} from '@material-ui/core'
-import DeleteIcon from '@material-ui/icons/Delete';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
+    useTheme,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import {FormProvider, useFieldArray, useForm, useFormContext} from 'react-hook-form'
 // import { saveSchema } from '../firebase/storage'
 import {useSnackbar} from 'notistack';
@@ -249,74 +249,86 @@ const SchemaFormEditor = ({ tenantId, wid, collectionId, collectionPath, schema 
     }
 
 
-    return (
-        <>
-            <FormProvider register={register} watch={watch} >
-                <form id='attributes' onSubmit={handleSubmit(save)} >
+    return <>
+        <FormProvider register={register} watch={watch} >
+            <form id='attributes' onSubmit={handleSubmit(save)} >
 
-                    {fields.map((attribute, index) => (
-                        <>
-                            {attribute.type === 'array' && (
-                                <SchemaSubCollectionFieldFormProperty key={attribute.id} attribute={attribute} index={index}>
-                                    <IconButton aria-label="delete" className={classes.margin} onClick={() => remove(index)}>
-                                        <DeleteIcon />
+                {fields.map((attribute, index) => (
+                    <>
+                        {attribute.type === 'array' && (
+                            <SchemaSubCollectionFieldFormProperty key={attribute.id} attribute={attribute} index={index}>
+                                <IconButton
+                                    aria-label="delete"
+                                    className={classes.margin}
+                                    onClick={() => remove(index)}
+                                    size="large">
+                                    <DeleteIcon />
+                                </IconButton>
+                                {index > 0 && (
+                                    <IconButton aria-label="move up" onClick={() => swap(index - 1, index)} size="large">
+                                        <Tooltip title="Move up">
+                                            <ArrowUpwardIcon fontSize="small" />
+                                        </Tooltip>
                                     </IconButton>
-                                    {index > 0 && (
-                                        <IconButton aria-label="move up" onClick={() => swap(index - 1, index)}>
-                                            <Tooltip title="Move up">
-                                                <ArrowUpwardIcon fontSize="small" />
-                                            </Tooltip>
-                                        </IconButton>
-                                    )}
-                                    {index < fields.length - 1 && (
-                                        <IconButton aria-label="move down" onClick={() => swap(index, index + 1)}>
-                                            <Tooltip title="Move down">
-                                                <ArrowDownwardIcon fontSize="small" />
-                                            </Tooltip>
-                                        </IconButton>
-                                    )}
-                                </SchemaSubCollectionFieldFormProperty>
-                            )}
-                            {attribute.type !== 'array' && (
-                                <SchemaFieldFormProperty key={attribute.id} attribute={attribute} index={index}>
-                                    <IconButton aria-label="delete" className={classes.margin} onClick={() => remove(index)}>
-                                        <DeleteIcon />
+                                )}
+                                {index < fields.length - 1 && (
+                                    <IconButton
+                                        aria-label="move down"
+                                        onClick={() => swap(index, index + 1)}
+                                        size="large">
+                                        <Tooltip title="Move down">
+                                            <ArrowDownwardIcon fontSize="small" />
+                                        </Tooltip>
                                     </IconButton>
-                                    {index > 0 && (
-                                        <IconButton aria-label="move up" onClick={() => swap(index - 1, index)}>
-                                            <Tooltip title="Move up">
-                                                <ArrowUpwardIcon fontSize="small" />
-                                            </Tooltip>
-                                        </IconButton>
-                                    )}
-                                    {index < fields.length - 1 && (
-                                        <IconButton aria-label="move down" onClick={() => swap(index, index + 1)}>
-                                            <Tooltip title="Move down">
-                                                <ArrowDownwardIcon fontSize="small" />
-                                            </Tooltip>
-                                        </IconButton>
-                                    )}
-                                </SchemaFieldFormProperty>
-                            )}
-                        </>
-                    ))}
-                </form>
-                
-                <AddSchemaFormProperty onAdd={append} />
+                                )}
+                            </SchemaSubCollectionFieldFormProperty>
+                        )}
+                        {attribute.type !== 'array' && (
+                            <SchemaFieldFormProperty key={attribute.id} attribute={attribute} index={index}>
+                                <IconButton
+                                    aria-label="delete"
+                                    className={classes.margin}
+                                    onClick={() => remove(index)}
+                                    size="large">
+                                    <DeleteIcon />
+                                </IconButton>
+                                {index > 0 && (
+                                    <IconButton aria-label="move up" onClick={() => swap(index - 1, index)} size="large">
+                                        <Tooltip title="Move up">
+                                            <ArrowUpwardIcon fontSize="small" />
+                                        </Tooltip>
+                                    </IconButton>
+                                )}
+                                {index < fields.length - 1 && (
+                                    <IconButton
+                                        aria-label="move down"
+                                        onClick={() => swap(index, index + 1)}
+                                        size="large">
+                                        <Tooltip title="Move down">
+                                            <ArrowDownwardIcon fontSize="small" />
+                                        </Tooltip>
+                                    </IconButton>
+                                )}
+                            </SchemaFieldFormProperty>
+                        )}
+                    </>
+                ))}
+            </form>
+            
+            <AddSchemaFormProperty onAdd={append} />
 
-                <div className={classes.editField}>
-                    <Button variant="contained" color="primary" type='submit' form='attributes'>
-                        Save
-                    </Button>
-                </div>
+            <div className={classes.editField}>
+                <Button variant="contained" color="primary" type='submit' form='attributes'>
+                    Save
+                </Button>
+            </div>
 
 
-                <AddNewCollection forbiddenNames={[]} onNewCollection={handleNewCollection} />
+            <AddNewCollection forbiddenNames={[]} onNewCollection={handleNewCollection} />
 
 
-            </FormProvider>
-        </>
-    )
+        </FormProvider>
+    </>;
 }
 const SchemaSubCollectionFieldFormProperty = ({ attribute, index, children }) => {
     const classes = useFormEditorStyles();
@@ -504,52 +516,53 @@ const AddSchemaFormProperty = ({ onAdd }) => {
                     label='Description' />
 
                 <div className={classes.actions}>
-                    <IconButton aria-label="delete" className={classes.margin} type='submit'>
+                    <IconButton aria-label="delete" className={classes.margin} type='submit' size="large">
                         <Icon color="primary">add_circle</Icon>
                     </IconButton>
                 </div>
 
             </div>
         </form>
-    )
+    );
 }
 
- const AddNewCollection = ({ forbiddenNames, onNewCollection }) => {
-    const { handleSubmit, register, reset, errors } = useForm()
+const AddNewCollection = ({ forbiddenNames, onNewCollection }) => {
+   const { handleSubmit, register, reset, errors } = useForm()
 
-    const onSubmit = data => {
-        console.log('onNewCollection', data)
-        onNewCollection(data)
-        reset()
-    }
-    return (
-        <form onSubmit={handleSubmit(onSubmit)}>
-            <p>New collection</p>
-            <TextField name='key' label="Name" required='true' {...register('key', {
-                    required: 'You forgot to name your new collection',
-                    validate: value => {
-                        console.log('validate ', value, forbiddenNames)
-                        if (value.startsWith('_')) return "Collections are not allowed"
-                        if (forbiddenNames) {
-                            return !forbiddenNames.includes(value) || 'Collection name must be uniqe'
-                        }
-                        return true
-                    }
-                })}
-                helperText={errors.key?.message}
-                error={errors.key ? true : false} />
+   const onSubmit = data => {
+       console.log('onNewCollection', data)
+       onNewCollection(data)
+       reset()
+   }
+   return (
+       <form onSubmit={handleSubmit(onSubmit)}>
+           <p>New collection</p>
+           <TextField name='key' label="Name" required='true' {...register('key', {
+                   required: 'You forgot to name your new collection',
+                   validate: value => {
+                       console.log('validate ', value, forbiddenNames)
+                       if (value.startsWith('_')) return "Collections are not allowed"
+                       if (forbiddenNames) {
+                           return !forbiddenNames.includes(value) || 'Collection name must be uniqe'
+                       }
+                       return true
+                   }
+               })}
+               helperText={errors.key?.message}
+               error={errors.key ? true : false} />
 
-            <TextField
-                name='description'
-                {...register('description')}
-                label='Description' />
+           <TextField
+               name='description'
+               {...register('description')}
+               label='Description' />
 
 {/* "minItems": 2,
-  "maxItems": 3 */}
-            <IconButton aria-label="add" type='submit'>
-                <Icon>add_circle</Icon>
-            </IconButton>
-        </form>)
+ "maxItems": 3 */}
+           <IconButton aria-label="add" type='submit' size="large">
+               <Icon>add_circle</Icon>
+           </IconButton>
+       </form>
+   );
 }
 
 export default SchemaEditor

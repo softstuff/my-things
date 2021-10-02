@@ -1,10 +1,10 @@
 import React from 'react'
-import {Divider, Drawer, List, ListItem, ListItemIcon, ListItemText, ListSubheader} from '@material-ui/core'
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import InfoIcon from '@material-ui/icons/Info';
-import InputIcon from '@material-ui/icons/Input';
-import ExtensionIcon from '@material-ui/icons/Extension';
+import {Divider, Drawer, List, ListItem, ListItemIcon, ListItemText, ListSubheader} from '@mui/material'
+import InboxIcon from '@mui/icons-material/MoveToInbox';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import InfoIcon from '@mui/icons-material/Info';
+import InputIcon from '@mui/icons-material/Input';
+import ExtensionIcon from '@mui/icons-material/Extension';
 import {Link} from 'react-router-dom';
 import {useWorkspace} from './workspace/useWorkspace';
 

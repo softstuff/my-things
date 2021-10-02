@@ -1,13 +1,16 @@
-import { Box, Fab, FormControl, Select, makeStyles, MenuItem, TextField, Typography } from "@material-ui/core";
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import AddIcon from '@material-ui/icons/Add';
-import DeleteIcon from '@material-ui/icons/Delete';
-import { SortAlphabeticalAscending, SortAlphabeticalDescending } from 'mdi-material-ui'
+import { Box, Fab, FormControl, Select, MenuItem, TextField, Typography } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import Autocomplete from '@mui/material/Autocomplete';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+// import { SortAlphabeticalAscending, SortAlphabeticalDescending } from 'mdi-material-ui'
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSnackbar } from 'notistack';
 import { FilterProvider, useFilter } from "./useFilter";
-import { FormHelperText } from "@material-ui/core";
+import { FormHelperText } from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
     item: {
@@ -166,7 +169,8 @@ const OrderBy = () => {
         
         {state.orderByProperty && (
             <Fab aria-label="order by direction" onClick={toggleSortDirection}>
-                {state.orderByDirection === "asc" ? <SortAlphabeticalAscending /> : <SortAlphabeticalDescending />}
+                {state.orderByDirection === "asc" ? <ArrowDropDownIcon /> : <ArrowDropUpIcon />}
+                {/*{state.orderByDirection === "asc" ? <SortAlphabeticalAscending /> : <SortAlphabeticalDescending />}*/}
             </Fab>
         )}
 

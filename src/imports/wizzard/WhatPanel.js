@@ -1,4 +1,6 @@
-import { Card, CardContent, Radio, FormControlLabel, makeStyles, Typography, RadioGroup } from "@material-ui/core";
+import { Card, CardContent, Radio, FormControlLabel, Typography, RadioGroup } from "@mui/material";
+
+import makeStyles from '@mui/styles/makeStyles';
 
 import { useEffect } from "react";
 import { useWizzard } from "./useWizzard";

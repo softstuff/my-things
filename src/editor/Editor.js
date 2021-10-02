@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import {deleteCollection} from '../firebase/storage'
-import {FormControlLabel, Grid, makeStyles, Paper, Switch} from '@material-ui/core'
+import { FormControlLabel, Grid, Paper, Switch } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import ThingsBreadcrumbs from '../components/ThingsBreadcrumbs';
 import {useSession} from '../firebase/UserProvider';
 import CollectionList from './collection/CollectiontList';

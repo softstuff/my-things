@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import {AppBar, Box, Fab, makeStyles, Tab, Tabs, useTheme} from '@material-ui/core'
-import AddIcon from '@material-ui/icons/Add';
+import { AppBar, Box, Fab, Tab, Tabs, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import AddIcon from '@mui/icons-material/Add';
 import DocumentList from './DocumentList';
 import {useEditor} from '../useEditor';
 import CollectionInfo from "./CollectionInfo";

@@ -1,7 +1,7 @@
 import React, {createRef, useEffect, useRef, useState} from 'react';
 import {Handle, Position} from 'react-flow-renderer';
 import {useEdge} from './useEdge';
-import {Box, TextField, Typography} from '@material-ui/core';
+import {Box, TextField, Typography} from '@mui/material';
 import {Controller, useFormContext} from 'react-hook-form';
 import { NodeSettings } from './NodeSettingsDialog';
 import isEmpty from 'lodash/isEmpty'

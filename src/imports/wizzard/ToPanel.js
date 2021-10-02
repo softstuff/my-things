@@ -1,5 +1,14 @@
-import { Card, CardContent, Radio, FormControlLabel, makeStyles, Typography, RadioGroup, TextField } from "@material-ui/core";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import {
+  Card,
+  CardContent,
+  Radio,
+  FormControlLabel,
+  Typography,
+  RadioGroup,
+  TextField,
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import Autocomplete from '@mui/material/Autocomplete';
 
 import { useEffect } from "react";
 import { useWorkspace } from "../../components/workspace/useWorkspace";

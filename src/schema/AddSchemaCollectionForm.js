@@ -1,6 +1,6 @@
-import {Button, Grid, TextField} from "@material-ui/core"
+import {Button, Grid, TextField} from "@mui/material"
 import {useForm} from "react-hook-form"
-import SaveAltIcon from '@material-ui/icons/SaveAlt';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
 
 
 const AddSchemaCollectionForm = ({ forbiddenNames, pointer, onNewCollection }) => {
@@ -17,7 +17,7 @@ const AddSchemaCollectionForm = ({ forbiddenNames, pointer, onNewCollection }) =
             <Grid
                 container
                 direction="column"
-                justify="flex-start"
+                justifyContent="flex-start"
                 alignItems="flex-start"
                 spacing={2}
             >
@@ -53,7 +53,8 @@ const AddSchemaCollectionForm = ({ forbiddenNames, pointer, onNewCollection }) =
                 </Button>
                 </Grid>
             </Grid>
-        </form>)
+        </form>
+    );
 }
 
 export default AddSchemaCollectionForm

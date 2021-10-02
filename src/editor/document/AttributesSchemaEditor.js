@@ -1,7 +1,8 @@
-import {Button, IconButton, makeStyles, TextField} from '@material-ui/core';
+import { Button, IconButton, TextField } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React, {useEffect} from 'react'
 import {useFieldArray, useForm} from 'react-hook-form';
-import DeleteIcon from '@material-ui/icons/Delete';
+import DeleteIcon from '@mui/icons-material/Delete';
 import useDataConverter from './../../components/useDataConverter';
 import useValidator from './../../components/useValidator';
 
@@ -85,38 +86,36 @@ const AttributesSchemaEditor = ({create, doc, onSaveThing, schema}) => {
     }, [doc, schema, schemaPropsToList, remove, append])
     
     
-    return (
-        <>
-            <form id='thing-form' onSubmit={handleSubmit(handleSave)}>
-                {create && (
-                    <TextField className={classes.editField} label='id' name='id' {...register("id", { required: "The key is required"})}/>                
-                )}
-                <h2>Attributes</h2>
-                {fields.map((item, index) => (
-                    <div className={classes.editRow} key={item.id}>
-                        <TextField className={classes.editField} 
-                        name={item.name}
-                        label={item.name}
-                        type={item.type}
-                        {...register(item.name,{
-                            validate: item.validate
-                        })}
-                        defaultValue={item.value}
-                        helperText={grrerrors[item.name] ? grrerrors[item.name].message : item.description}
-                        error={grrerrors[item.name]}
-                        />
-                        <IconButton aria-label="delete" onClick={()=>remove(index)}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </div>
-                ))}
-                </form>
+    return <>
+        <form id='thing-form' onSubmit={handleSubmit(handleSave)}>
+            {create && (
+                <TextField className={classes.editField} label='id' name='id' {...register("id", { required: "The key is required"})}/>                
+            )}
+            <h2>Attributes</h2>
+            {fields.map((item, index) => (
+                <div className={classes.editRow} key={item.id}>
+                    <TextField className={classes.editField} 
+                    name={item.name}
+                    label={item.name}
+                    type={item.type}
+                    {...register(item.name,{
+                        validate: item.validate
+                    })}
+                    defaultValue={item.value}
+                    helperText={grrerrors[item.name] ? grrerrors[item.name].message : item.description}
+                    error={grrerrors[item.name]}
+                    />
+                    <IconButton aria-label="delete" onClick={()=>remove(index)} size="large">
+                        <DeleteIcon />
+                    </IconButton>
+                </div>
+            ))}
+            </form>
 
-            <Button variant="contained" color="primary" type='submit' form='thing-form'>
-            Save
-            </Button>
-        </>
-    )
+        <Button variant="contained" color="primary" type='submit' form='thing-form'>
+        Save
+        </Button>
+    </>;
 }
 
 export default AttributesSchemaEditor

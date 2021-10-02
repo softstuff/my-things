@@ -3,15 +3,16 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useWorkspace } from '../../components/workspace/useWorkspace';
 import { useUser } from '../../components/user/useUser'
 import { getCollectionQueryRef } from '../../firebase/storage';
-import MaUTable from '@material-ui/core/Table'
-import TableBody from '@material-ui/core/TableBody'
-import TableCell from '@material-ui/core/TableCell'
-import TableHead from '@material-ui/core/TableHead'
-import TableRow from '@material-ui/core/TableRow'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import MaUTable from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useTable, usePagination } from 'react-table';
 import { useEditor } from '../useEditor';
-import { Accordion, AccordionSummary, AccordionDetails, Button, Typography, makeStyles} from '@material-ui/core';
+import { Accordion, AccordionSummary, AccordionDetails, Button, Typography } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import Filter from './filter/Filter';
 
 const useStyles = makeStyles((theme) => ({

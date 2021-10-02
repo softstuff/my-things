@@ -1,20 +1,20 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types';
-import {makeStyles} from '@material-ui/core/styles';
-import TreeView from '@material-ui/lab/TreeView';
-import TreeItem from '@material-ui/lab/TreeItem';
-import Typography from '@material-ui/core/Typography';
+import makeStyles from '@mui/styles/makeStyles';
+import TreeView from '@mui/lab/TreeView';
+import TreeItem from '@mui/lab/TreeItem';
+import Typography from '@mui/material/Typography';
 
-import AddIcon from '@material-ui/icons/Add';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight'
-import Label from '@material-ui/icons/Label';
-import DirectionsRunIcon from '@material-ui/icons/DirectionsRun';
+import AddIcon from '@mui/icons-material/Add';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
+import Label from '@mui/icons-material/Label';
+import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 
 import {useUser} from '../components/user/useUser';
 import {useWorkspace} from '../components/workspace/useWorkspace';
-import Paper from '@material-ui/core/Paper';
-import {Button, Grid} from '@material-ui/core';
+import Paper from '@mui/material/Paper';
+import {Button, Grid} from '@mui/material';
 import useDataConverter from '../components/useDataConverter';
 import RawEditor from '../schema/RawEditor';
 import AddSchemaCollectionForm from '../schema/AddSchemaCollectionForm';
@@ -139,7 +139,7 @@ const SchemaView = () => {
         <Grid
             container
             direction="row"
-            justify="flex-start"
+            justifyContent="flex-start"
             alignItems="stretch"
             className={classes.root}
         >
@@ -183,7 +183,7 @@ const SchemaView = () => {
             </Grid>
            
         </Grid>
-    )
+    );
 }
 
 

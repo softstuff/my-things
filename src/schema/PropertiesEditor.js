@@ -15,15 +15,15 @@ import {
     Grid,
     IconButton,
     InputLabel,
-    makeStyles,
     NativeSelect,
     TextField,
-    Typography
-} from '@material-ui/core';
-import SaveIcon from '@material-ui/icons/Save';
-import DeleteIcon from '@material-ui/icons/Delete';
-import SettingsIcon from '@material-ui/icons/Settings';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+    Typography,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import SaveIcon from '@mui/icons-material/Save';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SettingsIcon from '@mui/icons-material/Settings';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {useConfirm} from 'material-ui-confirm';
 import {useSnackbar} from 'notistack';
 import useDataConverter from '../components/useDataConverter';
@@ -192,11 +192,10 @@ const AddNewProperty = ({ property }) => {
     const type = watch(`type`, property?.type)
 
     return (
-
         <Grid spacing={1}
             container
             direction="column"
-            justify="center"
+            justifyContent="center"
             alignItems="stretch"
         >
             {property?.key && (
@@ -303,7 +302,8 @@ const AddNewProperty = ({ property }) => {
                 } />
 
 
-        </Grid>)
+        </Grid>
+    );
 }
 
 const EditPropertyDialogTrigger = ({ pointer, property }) => {
@@ -311,25 +311,24 @@ const EditPropertyDialogTrigger = ({ pointer, property }) => {
     const { collectionIdFor } = useSchema()
 
 
-    return (
-        <>
-            <IconButton
-                aria-label="Update property"
-                type='submit'
-                variant="contained"
-                color="primary"
-                onClick={() => setOpen(true)}
-            >
-                <SettingsIcon />
-            </IconButton>
+    return <>
+        <IconButton
+            aria-label="Update property"
+            type='submit'
+            variant="contained"
+            color="primary"
+            onClick={() => setOpen(true)}
+            size="large">
+            <SettingsIcon />
+        </IconButton>
 
-            <AddPropertyDialog
-                title={`Edit attribute ${property.key} for ${collectionIdFor(pointer)}`}
-                pointer={pointer}
-                property={property}
-                open={open}
-                setOpen={setOpen} />
-        </>)
+        <AddPropertyDialog
+            title={`Edit attribute ${property.key} for ${collectionIdFor(pointer)}`}
+            pointer={pointer}
+            property={property}
+            open={open}
+            setOpen={setOpen} />
+    </>;
 }
 
 const AddPropertyDialogTrigger = ({ pointer }) => {
@@ -410,7 +409,7 @@ const AddPropertyDialog = ({ title, pointer, property, open, setOpen }) => {
                     <Grid
                         container
                         direction="row"
-                        justify="space-between"
+                        justifyContent="space-between"
                         alignItems="center"
                     >
                         <Button

@@ -1,4 +1,5 @@
-import {Backdrop, Button, Card, CardContent, CardHeader, Divider, Grid, makeStyles} from '@material-ui/core'
+import { Backdrop, Button, Card, CardContent, CardHeader, Divider, Grid } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react'
 import {auth} from '../firebase/config'
 import {useSession} from '../firebase/UserProvider';
@@ -77,7 +78,7 @@ const NewTenant = () => {
                 <CardContent>
                     <Grid container
                         direction="row"
-                        justify="space-between"
+                        justifyContent="space-between"
                         alignItems="stretch"
                         className={classes.box}>
                         <div className={classes.cell}>
@@ -94,7 +95,7 @@ const NewTenant = () => {
                 </CardContent>
             </Card>
         </Backdrop>
-    )
+    );
 }
 
 export default NewTenant

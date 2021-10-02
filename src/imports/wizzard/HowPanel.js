@@ -5,12 +5,13 @@ import {
   FormControlLabel,
   FormGroup,
   FormLabel,
-  makeStyles, Paper,
+  Paper,
   Radio,
   RadioGroup,
   TextField,
-} from "@material-ui/core";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import Autocomplete from '@mui/material/Autocomplete';
 import { useEffect } from "react";
 import { useWizzard } from "./useWizzard";
 import isEmpty from "lodash/isEmpty";

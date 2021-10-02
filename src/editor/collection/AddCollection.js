@@ -1,5 +1,5 @@
 // @flow
-import {Icon, IconButton, TextField} from '@material-ui/core'
+import {Icon, IconButton, TextField} from '@mui/material'
 import React from 'react'
 import {useForm} from 'react-hook-form'
 
@@ -34,11 +34,11 @@ const AddCollection = ( { onAdd, forbiddenNames }) => {
                 helperText={errors.name?.message}
                 error={ errors.name ? true : false }/>
              <TextField name='id' label="Collection id" {...register("id")} />
-            <IconButton aria-label="add" type='submit'>
+            <IconButton aria-label="add" type='submit' size="large">
                 <Icon>add_circle</Icon>
             </IconButton>
         </form>
-    )
+    );
 }
 
 export default AddCollection

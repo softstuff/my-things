@@ -5,7 +5,7 @@ import {useHistory, useLocation} from 'react-router-dom'
 import {signInWithCustomToken} from './auth'
 import NewTenant from '../pages/NewTenant'
 import Signin from '../pages/Signin'
-import {CircularProgress} from '@material-ui/core'
+import {CircularProgress} from '@mui/material'
 
 
 export const UserContext = React.createContext()
