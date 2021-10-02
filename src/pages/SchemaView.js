@@ -19,7 +19,7 @@ import useDataConverter from '../components/useDataConverter';
 import RawEditor from '../schema/RawEditor';
 import AddSchemaCollectionForm from '../schema/AddSchemaCollectionForm';
 import {useSchema} from '../schema/useSchema';
-import {useConfirm} from 'material-ui-confirm';
+// import {useConfirm} from 'material-ui-confirm';
 import PropertiesEditor from '../schema/PropertiesEditor';
 
 
@@ -61,7 +61,7 @@ const SchemaView = () => {
     const [selectedPointer, setSelectedPointer] = useState('')
     const [subSchema, setSubSchema] = useState()
     const {addNewCollection, deleteCollection, getPropertyFor, collectionIdFor} = useSchema()
-    const confirm = useConfirm();
+    // const confirm = useConfirm();
 
     useEffect(()=>{
         console.log('Loading details panel from ', selectedPointer, schema)
@@ -83,23 +83,23 @@ const SchemaView = () => {
 
 
     const handleDeleteClick = (pointer) => {
-        console.log('Do delete  ', pointer)
+        console.log('FIX ME Do delete  ', pointer)
         const collectionId = collectionIdFor(pointer)
-        confirm({ 
-            title: `Are you sure you like to delete ${collectionId}?`,
-            description: 'This action is permanent!',
-            confirmationText: 'Yes',
-            cancellationText: 'No' })
-            .then(() => { 
-                console.log("Confirmed to delete ", pointer)
-                deleteCollection(pointer)
-                if (selectedPointer === pointer) {
-                    setSelectedPointer('')
-                    setSubSchema()
-                    setShowDetail()
-                }
-                
-            })
+        // confirm({
+        //     title: `Are you sure you like to delete ${collectionId}?`,
+        //     description: 'This action is permanent!',
+        //     confirmationText: 'Yes',
+        //     cancellationText: 'No' })
+        //     .then(() => {
+        //         console.log("Confirmed to delete ", pointer)
+        //         deleteCollection(pointer)
+        //         if (selectedPointer === pointer) {
+        //             setSelectedPointer('')
+        //             setSubSchema()
+        //             setShowDetail()
+        //         }
+        //
+        //     })
     }
 
     const handleShowJsonSchema = () => {

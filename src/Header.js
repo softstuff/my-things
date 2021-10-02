@@ -8,7 +8,7 @@ import {logout} from './firebase/auth'
 import {useHistory} from 'react-router-dom'
 import {useSession} from './firebase/UserProvider'
 
-
+const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
@@ -19,11 +19,15 @@ const useStyles = makeStyles((theme) => ({
     title: {
         flexGrow: 1,
     },
+    appBar: {
+        width: `calc(100% - ${drawerWidth}px)`,
+        marginLeft: drawerWidth,
+    },
 }));
 
 
 
-function Header(props) {
+function Header() {
     const { claims, jira } = useSession()    
     const classes = useStyles();
     
@@ -33,7 +37,7 @@ function Header(props) {
     }
     return (
         <div className={classes.root}>
-            <AppBar position="static" className={props.appBar}>
+            <AppBar position="static" className={classes.appBar}>
                 <Toolbar>
                     <IconButton
                         edge="start"

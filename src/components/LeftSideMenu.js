@@ -5,22 +5,35 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import InfoIcon from '@mui/icons-material/Info';
 import InputIcon from '@mui/icons-material/Input';
 import ExtensionIcon from '@mui/icons-material/Extension';
+import AssignmentReturnedIcon from '@mui/icons-material/AssignmentReturned';
 import {Link} from 'react-router-dom';
 import {useWorkspace} from './workspace/useWorkspace';
+import {makeStyles} from "@mui/styles";
+
+const drawerWidth = 240;
+const useStyles = makeStyles((theme) => ({
+  toolbar: theme.mixins.toolbar,
+  drawer: {
+    width: drawerWidth,
+    flexShrink: 0,
+  },
+  drawerPaper: {
+    width: drawerWidth,
+  },
+}))
 
 
 const LeftSiteMenu = (props) => {
+  const classes = useStyles();
   const { wid } = useWorkspace()
 
 
-  // <div className={props.toolbar} />
-
   return (
     <Drawer
-      className={props.drawer}
+      className={classes.drawer}
       variant="permanent"
       classes={{
-        paper: props.drawerPaper,
+        paper: classes.drawerPaper,
       }}
       anchor="left"
     >
@@ -54,7 +67,7 @@ const LeftSiteMenu = (props) => {
         </ListItem>
         <ListItem button  component={Link} to={`/import`}>
           <ListItemIcon>
-            <ExtensionIcon />
+            <AssignmentReturnedIcon />
           </ListItemIcon>
           <ListItemText primary='Import' />
         </ListItem>

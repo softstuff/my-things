@@ -24,7 +24,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {useConfirm} from 'material-ui-confirm';
+// import {useConfirm} from 'material-ui-confirm';
 import {useSnackbar} from 'notistack';
 import useDataConverter from '../components/useDataConverter';
 import {useSchema} from './useSchema'
@@ -359,7 +359,7 @@ const AddPropertyDialog = ({ title, pointer, property, open, setOpen }) => {
     const { handleSubmit, reset } = methods
     // const { } = useDataConverter()
     const { addProperty, deleteProperty } = useSchema()
-    const confirm = useConfirm();
+    // const confirm = useConfirm();
     const isNew = property === undefined
 
 
@@ -378,16 +378,16 @@ const AddPropertyDialog = ({ title, pointer, property, open, setOpen }) => {
 
 
     const handleDeleteClick = () => {
-        console.log(`Do delete ${property.key} from ${pointer}`)
-        confirm({ 
-            title: `Are you sure you like to delete argument ${property.key}?`,
-            description: 'This action is permanent!',
-            confirmationText: 'Yes',
-            cancellationText: 'No' })
-            .then(() => { 
-                console.log(`Confirmed to delete ${property.key} from ${pointer}`)
-                deleteProperty(pointer, property.key)
-            })
+        console.log(`FIX ME,  Do delete ${property.key} from ${pointer}`)
+        // confirm({
+        //     title: `Are you sure you like to delete argument ${property.key}?`,
+        //     description: 'This action is permanent!',
+        //     confirmationText: 'Yes',
+        //     cancellationText: 'No' })
+        //     .then(() => {
+        //         console.log(`Confirmed to delete ${property.key} from ${pointer}`)
+        //         deleteProperty(pointer, property.key)
+        //     })
     }
 
     return (
