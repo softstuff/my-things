@@ -22,6 +22,7 @@ import ImportPage from "./pages/ImportPage";
 import {WorkspaceProvider} from "./components/workspace/useWorkspace";
 import {ConfirmProvider} from 'material-ui-confirm';
 import EditorPage from "./pages/EditorPage";
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -53,12 +54,14 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const theme = createMuiTheme();
+
 function App() {
     const classes = useStyles();
 
 
     return (
-        <>
+        <ThemeProvider theme={theme}>
             <CssBaseline/>
             <div className={classes.root}>
 
@@ -107,7 +110,7 @@ function App() {
                     </SnackbarProvider>
                 </BrowserRouter>
             </div>
-        </>
+        </ThemeProvider>
     );
 }
 
