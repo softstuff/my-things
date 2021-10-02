@@ -223,7 +223,6 @@ export function FilePanel() {
             </div>
           </div>
 
-            <div>encoding: {encoding}</div>
           <FormGroup className={classes.encoding}>
             <Autocomplete
                 id="encoding"

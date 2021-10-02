@@ -71,43 +71,61 @@ export function ToPanel() {
 }
 
 const CreateNewStructure = ({}) => {
-  const {state, dispatch} = useWizzard()
-  const { control, register } = useForm();
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+  const {state} = useWizzard()
+  const { control, register, handleSubmit } = useForm();
+  const { fields, replace, append, remove, move} = useFieldArray({
     control, // control props comes from useForm (optional: if you are using FormContext)
-    name: "structure", // unique name for your Field Array
+    name: "fields", // unique name for your Field Array
     // keyName: "id", default to "id", you can change the key name
   });
 
   useEffect(()=>{
-    console.log("C", state.how.columns.map(column => ({name: column, type: 'text'})))
-    remove()
-    append( state.how.columns.map(column => ({name: column, type: 'text'})))
+    console.log("Load columns", state.how.columns.map(column => ({name: column, type: 'text'})))
+
+    replace( state.how.columns.map(column => ({name: column, type: 'text'})))
   },[])
 
+  const createStructure = structur => {
+    console.log("Create structure", structur)
+  }
 
   return (<>
     <p>Create a new structure</p>
 
+    <form onSubmit={handleSubmit(createStructure)}>
+    <input
+        {...register(`name`)}
+    />
+
+
     {fields.map((field, index) => (
         <div key={field.id}>
         <input
-            {...register(`structure.${index}.name`)}
+            {...register(`fields.${index}.name`)}
         />
 
-          <input
-        {...register(`structure.${index}.type`)}
+          <input type="hidden"
+        {...register(`fields.${index}.type`)}
         />
+
+          <button onClick={()=>move(index,index-1)} disabled={index === 0}>Up</button>
+          <button onClick={()=>move(index, index+1)} disabled={index+1 === fields.length} >Down</button>
+          <button onClick={()=>remove(index)} >Remove</button>
         </div>
     ))}
 
+    <div>
+      <button onClick={()=>append({name:"", type: "text"})} >Add</button>
+    </div>
 
-    {state.how.columns.map((column, index) => (
-      <AttributeEditor key={index} field={column} type={'text'} />
-    ))}
 
+    <div>
+      <button type="submit" >Create structure</button>
+    </div>
 
-    <DevTool control={control} /> {/* set up the dev tool */}
+    </form>
+
+    {/*<DevTool control={control} /> /!* set up the dev tool *!/*/}
 
   </>)
 }
