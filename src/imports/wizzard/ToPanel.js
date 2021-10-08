@@ -6,16 +6,19 @@ import {
     Typography,
     RadioGroup,
     Select,
-    TextField, FormControl, Box, InputLabel, NativeSelect, FormHelperText, MenuItem,
+    TextField, FormControl, Box, InputLabel, NativeSelect, FormHelperText, MenuItem, IconButton,
 } from "@mui/material";
+import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
+import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
+import DeleteIcon from '@mui/icons-material/Delete';
 import makeStyles from '@mui/styles/makeStyles';
 import Autocomplete from '@mui/material/Autocomplete';
 
-import React, {useEffect} from "react";
-import {useWorkspace} from "../../components/workspace/useWorkspace";
-import {useWizzard} from "./useWizzard";
-import {Controller, useFieldArray, useForm, useFormContext, FormProvider} from "react-hook-form";
-import {DevTool} from "@hookform/devtools";
+import React, { useEffect } from "react";
+import { useWorkspace } from "../../components/workspace/useWorkspace";
+import { useWizzard } from "./useWizzard";
+import { Controller, useFieldArray, useForm, useFormContext, FormProvider } from "react-hook-form";
+import { DevTool } from "@hookform/devtools";
 
 const useStyles = makeStyles(() => ({
     container: {},
@@ -30,8 +33,8 @@ const useStyles = makeStyles(() => ({
 
 export function ToPanel() {
     const classes = useStyles()
-    const {state, dispatch} = useWizzard()
-    const {workspace} = useWorkspace()
+    const { state, dispatch } = useWizzard()
+    const { workspace } = useWorkspace()
 
     // useEffect(()=>{
     //   dispatch({type: "SET_TYPE", value: state.type, isValid: state.type !== null})
@@ -47,14 +50,14 @@ export function ToPanel() {
         const create = !workspace.collections.includes(name)
         let properties = []
         if (create && state.type === "CSV") {
-            properties = state.config.columns.map(name => ({name, type: "text"}))
+            properties = state.config.columns.map(name => ({ name, type: "text" }))
         }
 
-        dispatch({type: "SET_STRUCTURE", payload: {name, create, properties}})
+        dispatch({ type: "SET_STRUCTURE", payload: { name, create, properties } })
     }
 
     if (!workspace.collections || workspace.collections.length === 0) {
-        return <CreateNewStructure/>
+        return <CreateNewStructure />
     }
 
     return (
@@ -64,7 +67,7 @@ export function ToPanel() {
                 <Autocomplete
                     options={workspace?.collections}
                     renderInput={(params) => (
-                        <TextField {...params} label="Structure name" margin="normal" variant="outlined"/>
+                        <TextField {...params} label="Structure name" margin="normal" variant="outlined" />
                     )}
                     onChange={(_, value) => handleStructureSelect(value)}
                     value={state.structure?.name}
@@ -79,21 +82,21 @@ export function ToPanel() {
     );
 }
 
-const CreateNewStructure = ({}) => {
+const CreateNewStructure = ({ }) => {
     const classes = useStyles()
-    const {state} = useWizzard()
+    const { state } = useWizzard()
     const methods = useForm();
-    const {control, register, handleSubmit} = methods;
-    const {fields, replace, append, remove, move} = useFieldArray({
+    const { control, register, handleSubmit } = methods;
+    const { fields, replace, append, remove, move } = useFieldArray({
         control, // control props comes from useForm (optional: if you are using FormContext)
         name: "fields", // unique name for your Field Array
         // keyName: "id", default to "id", you can change the key name
     });
 
     useEffect(() => {
-        console.log("Load columns", state.how.columns.map(column => ({name: column, type: 'text'})))
+        console.log("Load columns", state.how.columns.map(column => ({ name: column, type: 'text' })))
 
-        replace(state.how.columns.map(column => ({name: column, type: 'text'})))
+        replace(state.how.columns.map(column => ({ name: column, type: 'text' })))
     }, [])
 
     const createStructure = structur => {
@@ -105,36 +108,56 @@ const CreateNewStructure = ({}) => {
 
         <form onSubmit={handleSubmit(createStructure)}>
             <FormProvider {...methods} >
-                <FormControl sx={{mx: "auto", mb: "2rem"}}>
+                <FormControl sx={{ mx: "auto", mb: "2rem" }}>
                     <Controller
                         name={"name"}
                         control={control}
-                        rules={{required: "Select the a name"}}
-                        render={({field, fieldState: {invalid, error}}) => (
+                        rules={{ required: "Select the a name" }}
+                        render={({ field, fieldState: { invalid, error } }) => (
                             <TextField
                                 label="Structure name" {...field}
                                 variant="standard"
                                 helperText={error?.message}
-                                error={invalid}/>
+                                error={invalid} />
                         )}
                     />
                 </FormControl>
 
-                <Typography sx={{mb: "2rem"}}>Attributes</Typography>
+                <Typography sx={{ mb: "2rem" }}>Attributes</Typography>
 
                 {fields.map((field, index) => (
                     <Box key={field.id} display={"flex"} flexDirection={"row"} gap={"2rem"}>
-                        <AttributeEditor index={index}/>
+                         <FormControl>
+                            <input
+                                {...register("key")}
+                                type="radio"
+                                name="weather"
+                                value={index}
+                            />
+                        </FormControl>
+                          
+                        <AttributeEditor index={index} />
 
-                        <button onClick={() => move(index, index - 1)} disabled={index === 0}>Up</button>
-                        <button onClick={() => move(index, index + 1)} disabled={index + 1 === fields.length}>Down
-                        </button>
-                        <button onClick={() => remove(index)}>Remove</button>
+                        <FormControl>
+                            <IconButton aria-label="Move down" onClick={() => move(index, index - 1)} disabled={index === 0}>
+                                <ArrowCircleUpIcon />
+                            </IconButton>
+                        </FormControl>
+                        <FormControl>
+                            <IconButton aria-label="Move down" onClick={() => move(index, index + 1)} disabled={index + 1 === fields.length}>
+                                <ArrowCircleDownIcon />
+                            </IconButton>
+                        </FormControl>
+                        <FormControl>
+                            <IconButton aria-label="delete" onClick={() => remove(index)}>
+                                <DeleteIcon />
+                            </IconButton>
+                        </FormControl>
                     </Box>
                 ))}
 
                 <div>
-                    <button onClick={() => append({name: "", type: "text"})}>Add</button>
+                    <button onClick={() => append({ name: "", type: "text" })}>Add</button>
                 </div>
 
 
@@ -149,41 +172,42 @@ const CreateNewStructure = ({}) => {
     </>)
 }
 
-const AttributeEditor = ({index}) => {
+const AttributeEditor = ({ index }) => {
     const { register, control } = useFormContext();
 
     return (
         <>
-            <FormControl sx={{mx: "auto", mb: "2rem"}}>
+            <FormControl sx={{ mx: "auto", mb: "2rem" }}>
                 <Controller
                     name={`fields.${index}.name`}
                     control={control}
-                    rules={{required: "Select a attribute name"}}
-                    render={({field, fieldState: {invalid, error}}) => (
+                    rules={{ required: "Select a attribute name" }}
+                    render={({ field, fieldState: { invalid, error } }) => (
                         <TextField
                             label="Name" {...field}
                             variant="standard"
                             helperText={error?.message}
-                            error={invalid}/>
+                            error={invalid} />
                     )}
                 />
             </FormControl>
 
-            <FormControl>
-                <InputLabel id={`fields.${index}.type_label`} error={false}>
-                    Type
-                </InputLabel>
-                <Controller
-                    name={`fields.${index}.type`}
-                    control={control}
-                    rules={{required: "Select a attribute type"}}
-                    render={({field, fieldState: {invalid, error}}) => (
 
+
+            <Controller
+                name={`type`}
+                control={control}
+                rules={{ required: "Select a attribute type" }}
+                render={({ field, fieldState: { invalid, error } }) => (
+                    <FormControl sx={{ width: "10rem" }}>
+                        <InputLabel id={`type_label`} error={error}>
+                            Type
+                        </InputLabel>
                         <Select
                             labelId={`fields.${index}.type_label`}
+                            aria-describedby="type-error-text"
                             label="Type"
-                            >
-                            <MenuItem value={10}>Ten</MenuItem>
+                        >
                             <MenuItem value="">Select a type</MenuItem>
                             <MenuItem value="string">Text</MenuItem>
                             <MenuItem value="number">Number</MenuItem>
@@ -191,31 +215,11 @@ const AttributeEditor = ({index}) => {
                             <MenuItem value="null">Null</MenuItem>
                             <MenuItem value="array">List</MenuItem>
                         </Select>
-                    )}
-                />
-                >
-
-                <NativeSelect
-                    label="Type"
-                    aria-describedby="type-helper-text"
-                    required={true}
-                    // onBlur={(e) => onChange(e.target.value)}
-                    onChange={(e) => onChange(e.target.value)}
-                    value={value}
-                >
-                    <option value="">Select a type</option>
-                    <option value="string">Text</option>
-                    <option value="number">Number</option>
-                    <option value="integer">Integer</option>
-                    <option value="null">Null</option>
-                    <option value="array">List</option>
-                </NativeSelect>
-                <FormHelperText id="type-helper-text" error={false}></FormHelperText>
-            </FormControl>
-
-            <input type="hidden"
-                   {...register(`fields.${index}.type`)}
+                        <FormHelperText id="type-error-text" error={error}>{invalid}</FormHelperText>
+                    </FormControl>
+                )}
             />
+
         </>
     )
 }

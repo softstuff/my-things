@@ -1,0 +1,18 @@
+{
+  "jira": {
+    "app": {
+      "name": "My Things",
+      "vendor": {
+        "url": "https://www.softstuff.se",
+        "name": "SoftStuff"
+      },
+      "page": {
+        "title": {
+          "general": "My Things - Editor"
+        }
+      },
+      "baseurl": "https://my-things-60357.web.app",
+      "key": "my-things-app-key"
+    }
+  }
+}
